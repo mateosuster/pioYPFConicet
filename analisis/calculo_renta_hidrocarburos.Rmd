@@ -33,14 +33,14 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 
 library(readxl) 
-library(readr)
+# library(readr)
 library(tidyverse)
 library(lubridate)
 library(fs)
 library(ggplot2)
 library(plotly)
 library(huxtable) #revisar esto para dar formato al eje Y
-library(PerformanceAnalytics)
+# library(PerformanceAnalytics)
 library(Hmisc)
 # library(zoo)
 
@@ -2626,6 +2626,14 @@ stock_balances_rama <-  stock_balances_empresas %>%
 
 ####################################
 #AFIP
+tasa_depreciacion_afip <- read_excel("C:/Archivos/Datos/AFIP/gcia_v8.xlsx", 
+    skip = 4) %>%
+  select(-c(49:ncol(.))) %>% 
+  group_by( rama, year) %>% 
+  summarise(tasa_depreciacion = depreciacionbsuso/bsuso)
+
+
+
 # Stock de balances -  AFIP
 datos_afip <- read_excel("C:/Archivos/Datos/AFIP/gcia_v8.xlsx", 
     skip = 4) %>%
