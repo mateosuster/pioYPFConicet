@@ -95,6 +95,7 @@ conversor_m3MMBTU_p <- function(x){x / 0.0353}
 conversor_m3bep_q <- function(x) {x * 5883}
 conversor_MMBTUbep_q <- function(x) {x * 0.17245496} # BP
 conversor_MMBTUbep_p <- function(x) {x / 0.17245496}
+conversor_bepMMBTU_p <- function(x) {x / (1/0.17245496)}
 ```
 
 
@@ -4792,6 +4793,7 @@ costos <- produccion_total %>%
   mutate(costos_totales = consumo_intermedio +masa_salarial + consumo_k_fijo,
          costos_totales_sum_gcia_normal = costos_totales + (ppye * tg_normal),
          precio_costo = costos_totales/produccion_total,
+         precio_costo_mmbtu = conversor_bepMMBTU_p(precio_costo),
          precio_produccion =costos_totales_sum_gcia_normal/produccion_total,
          precio_venta_potencial = ((ppye * tg_normal)+renta_total)/produccion_total)
 costos
