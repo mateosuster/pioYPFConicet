@@ -279,7 +279,7 @@ ipim_base94 <- sipm_serie56_95 %>% mutate(ipim_nivel_gral_94 = generar_indice(ip
   select(anio, ipim_nivel_gral, ipim_nivel_gral_94)
 
 # Ganancia y pbi pesos corrientes (fuente: JIC/EM continuacion JIC)
-ganancia_y_pbi <- read_excel("datasets/ganancia y pbi.xlsx") %>% 
+ganancia_y_pbi <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/ganancia y pbi.xlsx") %>% 
   mutate(unidad = "Millones de pesos corrientes") %>% 
   select(anio, unidad, everything(.))
 
@@ -289,7 +289,7 @@ ganancia_y_pbi <- read_excel("datasets/ganancia y pbi.xlsx") %>%
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 # Estimacion de otros autores
 # **Estimación JK**
-renta_hidrocarburos_jk <- read_excel("renta_hidrocarburos_jk.xls", 
+renta_hidrocarburos_jk <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/renta_hidrocarburos_jk.xls", 
     skip = 2) %>% 
   filter(indice_tiempo <= 2019) %>% 
   mutate_all(as.double) %>% 
@@ -342,7 +342,7 @@ renta_precio_expo_gas_jk <- renta_hidrocarburos_jk %>%
 
 
 #Estimación Bill y Farfaro Ruiz
-renta_hidrocarburos_fr <- read_excel("datasets/renta_hidrocarburos_FR.xlsx") %>%
+renta_hidrocarburos_fr <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/renta_hidrocarburos_FR.xlsx" ) %>%
   select(-unidad) %>% 
   rename(regalias = "Regalías",
          retenciones = Retenciones,
@@ -549,7 +549,7 @@ prod_merge_crudo <-  prod_regalias_crudo %>%
 
 
 #Existencias
-existencias_petroleo <- read_excel("datasets/existencias_crudo.xlsx") %>%
+existencias_petroleo <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/existencias_crudo.xlsx") %>%
   filter(!(is.na(existencias ))) %>% 
   rename(existencias_crudo = existencias) %>% 
   mutate(existencias_crudo = conversor_m3bbl_q(existencias_crudo),
@@ -582,7 +582,7 @@ ggplotly(prod_merge_crudo %>%
        caption = "Fuente: elaboración propia en base a Anuario de Combustibles, EIA, Ministerio de Economía, Secretaría de Energía (Base Regalías y SESCO)")+
   # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
   scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
-  theme(legend.position = "bottom"), width = 800, height = 600)
+  theme(legend.position = "bottom"), width = 600, height = 400)
                      
                      
 ```
@@ -1821,7 +1821,7 @@ importaciones_exportaciones <- read_csv("C:/Archivos/Datos/Hidrocarburos/SESCO/R
 importaciones_exportaciones_post2016 <- read_csv("C:/Archivos/Datos/Hidrocarburos/SESCO/Refinación y comercializacion/importaciones-exportaciones-a-partir-del-2016-.csv")
 
 ####comercio exterior post 2010: "TD_comercio_exterior.xlsx"
-comex_post2010 <- read_delim("datasets/comex_post2010.csv", 
+comex_post2010 <- read_delim("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/comex_post2010.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE, 
     skip = 5) %>% 
   mutate(unidad = case_when(Datos == "Suma de monto" ~ "usd",
@@ -1838,11 +1838,11 @@ comex_post2010 <- read_delim("datasets/comex_post2010.csv",
          6:7)
 
 #otra base. solo cantidades. ver de donde apareció
-impo_expo <- read_csv("datasets/importaciones-exportaciones (1).csv")
+impo_expo <- read_csv("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/importaciones-exportaciones (1).csv")
 
 
 ###exportaciones pre 2010: "Exportaciones.xlsx"
-expo_pre2010 <- read_delim("datasets/expo_pre2010.csv", 
+expo_pre2010 <- read_delim("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/expo_pre2010.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE) %>% 
   rename(anio = "Año",
          mes = "Mes",
@@ -1864,7 +1864,7 @@ expo_usd_ton <- read_delim("C:/Archivos/Datos/Hidrocarburos/Estimacion propia/da
     skip = 3)
 
 ###importaciones pre 2010: "Importaciones.xlsx"
-impo_pre2010 <- read_delim("datasets/impo_pre2010.csv", 
+impo_pre2010 <- read_delim("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/impo_pre2010.csv", 
     ";", escape_double = FALSE, trim_ws = TRUE) %>% 
   rename(anio = "Año",
          mes = "Mes",
@@ -2180,7 +2180,7 @@ subsidios_cefip <- read_excel("/Archivos/Datos/Hidrocarburos/subsidios/subsidios
             subsidios_cefip=sum(subsidios_cefip, na.rm = T))
 
 #ejes 
-subsidios_ejes <- read_excel("subsidios.xlsx") %>% 
+subsidios_ejes <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/subsidios.xlsx" ) %>% 
   rename(subsidios_usd = subsidios_hidrocarburos) %>% 
   right_join(tcp_anual_b %>% 
                select(anio, tcc), by = "anio") %>%
@@ -4412,14 +4412,14 @@ renta_tcp_gas <-  renta_diferencial_precios_gas %>%
 
 ```{r echo=FALSE}
 
-retenciones_campodonico <- read_excel("datasets/retenciones.xlsx", 
+retenciones_campodonico <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/retenciones.xlsx" , 
     sheet = "usd") %>% 
   left_join(tcp_anual %>% select(-TCP)) %>% 
   mutate(retenciones_hc = retenciones_hg * TCC * 1000000,
          unidad = "ars") %>% 
   select(anio, unidad, retenciones_hc)
 
-retenciones_crudo <- read_excel("datasets/retenciones.xlsx") %>%
+retenciones_crudo <- read_excel( "/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/retenciones.xlsx" ) %>%
   rename(retenciones_crudo_jk = retenciones_jk,
          retenciones_crudo_bfr = "retenciones_bfr_M$2008") %>% 
   mutate(retenciones_crudo_bfr = retenciones_crudo_bfr * ipc08_bfr * 1000 ,
@@ -4888,9 +4888,10 @@ writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo,
                          precio_interno_gas =precio_interno_gas_mmbtu_usd, 
                          exportacion_gas = expo_q_gas, 
                          precio_externo_gas = precio_mdomundial_gas_MMBTU,
+                         subsidios =subsidios_hidrocarburos,
                          tipo_cambio = tcp_anual_b,
                          ipc = ipc_promedio),
-                    path = "resultados/variables.xlsx")
+                    path =  "resultados/variables.xlsx")
 
 
 writexl::write_xlsx(list(renta_total_pv_pbi = renta_pbi_pv,
@@ -4910,6 +4911,8 @@ writexl::write_xlsx(list(renta_total_pv_pbi = renta_pbi_pv,
 writexl::write_xlsx(renta_total_pbi_pv,
                     path = "resultados/renta_total_PxQ.xlsx")
 
+writexl::write_xlsx(costos,
+                    path = "resultados/costos.xlsx")
 
 # writexl::write_xlsx(list(produccion = prod_merge_crudo, 
 #                          exportaciones = expo_q_crudo,
