@@ -42,7 +42,7 @@ library(plotly)
 library(huxtable) #revisar esto para dar formato al eje Y
 # library(PerformanceAnalytics)
 library(Hmisc)
-# library(zoo)
+library(zoo)
 
 
 
@@ -447,7 +447,7 @@ prod_regalias_crudo <- read_delim("C:/Archivos/Datos/Hidrocarburos/Regalias/prod
     ";", escape_double = FALSE, trim_ws = TRUE) %>% 
   rename(anio = "AÑO") %>% 
   mutate(unidad = "m3",
-         anio =na.locf(anio),
+         anio =zoo::na.locf(anio),
          fecha = as.Date(parse_date_time(paste0(anio, MES), orders = "ym"))) %>% 
   select(fecha, MES, anio, unidad, "TOTAL CUENCA", everything(.)) %>% 
   rename(prod_crudo_m3 = "TOTAL CUENCA") %>% 
@@ -613,7 +613,7 @@ prod_regalias_gas <- read_delim("C:/Archivos/Datos/Hidrocarburos/Regalias/produc
     ";", escape_double = FALSE, trim_ws = TRUE) %>% 
   rename(anio = "AÑO") %>% 
   mutate(unidad = "Miles de m3",
-         anio = na.locf(anio),
+         anio = zoo::na.locf(anio),
          fecha = as.Date(parse_date_time(paste0(anio, MES), orders = "ym"))) %>% 
   select(fecha, unidad, "TOTAL CUENCA", everything(.)) %>% 
   rename(prod_gas_Mm3 = "TOTAL CUENCA") %>% 
@@ -1388,7 +1388,7 @@ graf_precio_mdo_mundial_crudo <- precios_referencia_y_expo_crudo %>%
   labs(title = "Precios de exportación y referencia del mercado mundial del crudo", 
        y = "usd/barriles")
 
-ggplotly(graf_precio_mdo_mundial_crudo, width = 800, height = 600)
+ggplotly(graf_precio_mdo_mundial_crudo, width = 600, height = 400)
 
 ```
 
@@ -4524,15 +4524,13 @@ $$Impuestos\_netos\_específicos = Retenciones + Regalías - Subsidios$$
 
 ```{r echo=FALSE}
 # knitr::opts_chunk$set(echo= TRUE,fig.width = 120,fig.height = 400)
-
-
 renta_hidrocarburifera_total <- renta_tg %>% 
   select(anio, stock_seleccionado, ppye,
          tg_hidrocarburos, union_tg) %>% 
   left_join(valor_total_produccion %>% 
               filter(variable == "excedente_bruto_explotacion") %>% 
               rename(excedente_bruto_explotacion = valor) %>% 
-              select(-c(variable, unidad)) %>% 
+              select(-c(variable)) %>% 
               rename(fuente_gcia = fuente)) %>% 
   left_join(subsidios_hidrocarburos %>% 
               left_join(ipc_promedio %>% select(anio, ipc_18), by ="anio") %>%
@@ -4541,7 +4539,10 @@ renta_hidrocarburifera_total <- renta_tg %>%
               select(anio, subsidios)) %>% 
   mutate(renta_con_union_tg = ppye* (tg_hidrocarburos - union_tg),
          gcia_normal_hidrocarburos = ppye * union_tg,
-         renta_total = excedente_bruto_explotacion - gcia_normal_hidrocarburos -subsidios )
+         renta_total = excedente_bruto_explotacion - gcia_normal_hidrocarburos -subsidios,
+         proporcion_subsidios = subsidios/
+           (excedente_bruto_explotacion - gcia_normal_hidrocarburos)) %>% 
+  select(anio , unidad, everything(.))
 renta_hidrocarburifera_total
 
 renta_hidrocarburifera_total %>%
@@ -4622,6 +4623,9 @@ renta_pbi_pv <- renta_dif_precios_crudo %>%
          renta_total = renta_dif_precios_gas+ renta_dif_precios_crudo +
            renta_sobrevaluacion_crudo + renta_sobrevaluacion_gas +
            regalias_total +  retenciones_crudo_jk - subsidios,
+         proporcion_subsidios = subsidios/(renta_dif_precios_gas+ renta_dif_precios_crudo +
+           renta_sobrevaluacion_crudo + renta_sobrevaluacion_gas +
+           regalias_total +  retenciones_crudo_jk)  ,
          renta_pv = (renta_total*ipc_18)/ganancia,
          renta_pbi = (renta_total*ipc_18)/pbi,
          unidad = "Millones de pesos 2018",
@@ -4638,14 +4642,14 @@ renta_pbi_pv <- renta_dif_precios_crudo %>%
   distinct()
 
 
-
 #Renta total
 graf_renta_total <- renta_pbi_pv %>%
   filter(anio >1960) %>% 
-  select(-c(unidad, ipc_18, renta_total, tcc, tcp, sobrevaluacion)) %>% 
+  select(-c(unidad, ipc_18, renta_total, tcc, tcp, sobrevaluacion,
+            subsidios, proporcion_subsidios)) %>% 
   gather(key = tipo_renta,
          value = valor,
-         2:8) %>% 
+         2:7) %>% 
   ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
   geom_col(position = "stack")+
   theme(legend.position = "bottom")+
@@ -4656,25 +4660,13 @@ graf_renta_total <- renta_pbi_pv %>%
   theme_classic()
 ggplotly(graf_renta_total, width = 600, height = 400)
 
-# OLVIDAR
-# graf_renta_total_comparacion_b <- renta_usd %>% 
-#   filter(!(autor == "Propia" & tipo_de_renta == "renta_total")) %>%
-#   mutate(tipo_de_renta= case_when(tipo_de_renta =="renta_diferencial_precios" &
-#                                     autor == "Propia" ~ "renta_total",
-#                                   T ~ tipo_de_renta)) %>%
-#   filter(tipo_de_renta == "renta_total") %>% 
-#   ggplot(aes(anio, valor, color = autor))+
-#   geom_line()+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta hidrocarburífera total (petróleo y gas)", 
-#        subtitle = "Con renta total propia metodología propia", 
-#        y = "Millones de USD")+
-#   theme_classic()+
-#   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
-# graf_renta_total_comparacion_b
+# proporcion subsidios
+renta_pbi_pv[,c("anio","proporcion_subsidios")] %>% arrange(-anio)
+```
 
 
-#Renta TCC
+```{r echo=FALSE}
+#Renta tcp y tcc
 graf_renta_total_usd <- renta_pbi_pv %>% 
   select(c(anio, renta_usd_tcc, renta_usd_tcp)) %>%
   filter(anio > 1962) %>% 
@@ -4790,20 +4782,36 @@ ggplotly(graf_renta_total_pv, width = 600, height = 400)
 
 ## Costos
 ```{r}
-
+#estimacion costos propia
 costos <- produccion_total %>% 
-  select(anio, unidad_produccion=unidad, produccion_total=produccion_total_bep) %>% 
+  select(anio, unidad_produccion=unidad,
+         produccion_crudo =prod_crudo, produccion_gas=prod_gas,
+         produccion_total=produccion_total_bep) %>% 
   left_join(valor_total_produccion %>% 
+              left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
+              left_join(tcp_anual_b %>% select(-sobrevaluacion)) %>%
               filter(variable %in% c("consumo_intermedio", "masa_salarial","consumo_k_fijo" )) %>%
+              mutate(valor = (valor*10^6)*ipc_18/tcc,
+                     unidad ="USD tcc") %>% 
               spread(key=variable, value=valor)) %>% 
-  left_join(renta_hidrocarburifera_total %>% select(anio, stock_seleccionado, 
-                                                    ppye, tg_normal=union_tg, renta_total)) %>% 
-  mutate(costos_totales = consumo_intermedio +masa_salarial + consumo_k_fijo,
-         costos_totales_sum_gcia_normal = costos_totales + (ppye * tg_normal),
+  left_join(renta_hidrocarburifera_total %>% 
+              select(anio, stock_seleccionado,
+                     ppye, tg_normal=union_tg, renta_total) ) %>% 
+  left_join(precios_referencia_y_expo_crudo %>% 
+              select(anio, unidad, precio_referencia_externo = precio_me_crudo)) %>% 
+  mutate(ppye = (ppye*10^6)*ipc_18/tcc,
+         renta_total = (renta_total*10^6)*ipc_18/tcc,
+         unidad_costos= "USD/boe",
+         costos_totales = (consumo_intermedio +masa_salarial + consumo_k_fijo),
+         costos_totales_sum_gcia_normal = costos_totales + (ppye  * tg_normal),
          precio_costo = costos_totales/produccion_total,
          precio_costo_mmbtu = conversor_bepMMBTU_p(precio_costo),
          precio_produccion =costos_totales_sum_gcia_normal/produccion_total,
-         precio_venta_potencial = ((ppye * tg_normal)+renta_total)/produccion_total)
+         precio_venta_potencial = (produccion_total *precio_referencia_externo -
+                                     costos_totales)/produccion_total )
+         # precio_venta_potencial = ((ppye * tg_normal)+renta_total)/produccion_total)
+# (produccion x precio internacional - costos_totales) / barriles BOE = gcia + renta por barril 
+#expresar en usd tcc y tcp
 costos
 ```
 
