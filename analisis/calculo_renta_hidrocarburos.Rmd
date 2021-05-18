@@ -734,25 +734,27 @@ produccion_total <- prod_merge_gas_bep %>%
               select(anio, unidad,prod_crudo) %>%  mutate(unidad ="BEP") ) %>% 
   mutate(produccion_total_bep = prod_crudo + prod_gas)
 
-
+produccion_total
 ```
 
 
 
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
 ## Crudo procesado
-```{r message=FALSE, warning=FALSE, include=FALSE}
-
 
 ```
 
 
-## Ventas
- Crudo y Gas
 
-* [SESCO - Refinación y Comercialización de petróleo, gas y derivados](http://datos.minem.gob.ar/dataset/refinacion-y-comercializacion-de-petroleo-gas-y-derivados-tablas-dinamicas)
-
- Datos de cantidades
 ```{r message=FALSE, warning=FALSE, include=FALSE}
+## Ventas
+ # Crudo y Gas
+
+# * [SESCO - Refinación y Comercialización de petróleo, gas y derivados](http://datos.minem.gob.ar/dataset/refinacion-y-comercializacion-de-petroleo-gas-y-derivados-tablas-dinamicas)
+# 
+#  Datos de cantidades
+#  
 #compras empresas del sector
 compras <- read_csv("C:/Archivos/Datos/Hidrocarburos/SESCO/Refinación y comercializacion/compras.csv")
 
@@ -1730,7 +1732,7 @@ graf_precio_mdo_mundial_gas_mmbtu <- precio_mdomundial_gas_MMBTU %>%
   theme(legend.position = "right")+
   labs(title = "Precios de exportación y referencia del mercado mundial del gas", 
        y = "usd/MMBTU")
-ggplotly(graf_precio_mdo_mundial_gas_mmbtu, width = 800, height = 600)
+ggplotly(graf_precio_mdo_mundial_gas_mmbtu, width = 600, height = 400)
 
 
 #precios en ars. INCOMPLETO
@@ -4813,6 +4815,15 @@ costos <- produccion_total %>%
 # (produccion x precio internacional - costos_totales) / barriles BOE = gcia + renta por barril 
 #expresar en usd tcc y tcp
 costos
+
+```
+
+```{r}
+ggplotly(costos %>% 
+           filter(anio > 1960) %>% 
+  ggplot(aes(anio, precio_costo, color = fuente))+ 
+  geom_line()+
+    labs(title = "Costos. Estimacion propia", y = "USD/BOE", x = "Año"))
 ```
 
 # Comparación con estimación de otros autores
