@@ -95,7 +95,7 @@ conversor_m3MMBTU_p <- function(x){x / 0.0353}
 conversor_m3bep_q <- function(x) {x * 5883}
 conversor_MMBTUbep_q <- function(x) {x * 0.17245496} # BP
 conversor_MMBTUbep_p <- function(x) {x / 0.17245496}
-conversor_bepMMBTU_p <- function(x) {x / (1/0.17245496)}
+conversor_bepMMBTU_p <- function(x) {x / 5.798615}
 ```
 
 
@@ -3559,7 +3559,7 @@ Donde:
 
 * $ConKfijo$ = Consumo de Capital Fijo
 * $PPyE$= Propiedad, Planta y Equipo neta
-* $ prom(\frac{Dep}{PPyE}) $ =  tasa de depreciación promedio
+* $prom(\frac{Dep}{PPyE}) $ =  tasa de depreciación promedio
 * $Dep$ = Depreciaciones (cuenta gastos)
 
 
@@ -3866,7 +3866,7 @@ read_csv("C:/Archivos/Datos/Balances/gas y petroleo_datos/datos_r/resultados/bal
     group_by(empresa) %>% 
     mutate(tasa_depreciacion = depreciaciones/ppye) %>% select(fecha, empresa, tasa_depreciacion)
 ```
-
+# Emprolijar este lio
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -3912,8 +3912,10 @@ pv_hidrocarburos <- pv_hidrocarburos_ccnn %>%
 ###
 valor_total_produccion <- pv_hidrocarburos_ccnn %>%  # no tiene descontado servicios
  mutate(fuente = "CCNN") %>% 
+   full_join(pv_hidrocarburos_propia %>% 
+              select(anio, consumo_k_fijo)) %>%  
   select(anio, unidad, fuente,valor_bruto_produccion,valor_agregado,
-         consumo_intermedio, masa_salarial, excedente_bruto_explotacion) %>% 
+         consumo_intermedio, masa_salarial, excedente_bruto_explotacion, consumo_k_fijo) %>% 
   gather(key = variable,
          value = valor,
          4:ncol(.)) %>% 
@@ -4216,7 +4218,7 @@ ggplotly(graf_renta_emp, width = 800, height = 600)
 
 
 
-```{r echo=FALSE}
+```{r include=FALSE}
 ejercicio <- valor_total_produccion %>% 
   filter(variable == "valor_agregado") %>% 
   # full_join(stock_rama %>%
@@ -4243,7 +4245,7 @@ graf_relacion <- ejercicio %>%
   labs(title = "Activo sobre valor agregado")+
   facet_wrap(~activos) 
 
-ggplotly(graf_relacion, width = 800, height = 600)
+ggplotly(graf_relacion, width = 600, height = 400)
 
 
 ```
@@ -4783,6 +4785,51 @@ ggplotly(graf_renta_total_pv, width = 600, height = 400)
 ```
 
 ## Costos
+
+$$Q\_total = Q_{petróleo} + Q_{gas} $$
+Donde:
+  
+  * $Q\_total$ = Cantidades producidas de petróleo y gas en Barriles Equivalentes de Petróleo
+  * $Q_{petróleo}$ = Cantidades producidas de petróleo crudo en barriles equivalentes de petróleo (BOE)
+  * $Q_{gas}$ = Cantidades producidas de gas natural en barriles equivalentes de petróleo (BOE)
+  
+
+$$ Costos\_totales =  CI + MS + ConKfijo$$
+
+Donde:
+
+* $Costos\_totales$ = Costos totales hidrocarburíferos
+* $CI$ = Consumo Intermedio, distintas estimaciones
+* $MS$ = Masa Salarial, distintas estimaciones
+* $ConKfijo$ = Consumo de Capital Fijo
+
+
+$$Costos\_totales\_con\_Gcia = Costos\_totales + Gcia\_Normal_{hidrocarburífera} $$
+Donde:
+
+* $Costos\_totales\_con\_Gcia$ = Costos totales hidrocarburíferos con ganancia normal 
+* $Gcia\_Normal_{hidrocarburífera}$ = Ganancia normal del sector hidrocarburífero
+
+$$ Precio\_costo = \frac{Costos\_totales}{Q\_total}   $$
+Donde:
+* $Precio\_costo$ = Precio de costo en BOE
+
+A partir de esto se puede calcular un costo recuperable del petróleo y del gas
+
+$$Costo\_crudo = Q_{petróleo} * Precio\_costo$$
+$$Costo\_gas = Q_{gas} * Precio\_costo$$
+
+
+$$Precio\_produccion = \frac{Costos\_totales\_con\_Gcia}{Q\_total}$$
+
+$$Precio\_vta\_potencial =  \frac{Q\_total*Pext_{petróleo} - Costos\_totales}{Q\_total} $$
+
+
+Donde:
+* $Precio\_produccion$= Precio de produccion
+* $Precio_vta_potencial$ = Precio de venta potencial
+* $Pext_{petróleo}$ = Precio de exportación/referencia internacional del petróleo crudo
+
 ```{r}
 #estimacion costos propia
 costos <- produccion_total %>% 
@@ -4792,7 +4839,8 @@ costos <- produccion_total %>%
   left_join(valor_total_produccion %>% 
               left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
               left_join(tcp_anual_b %>% select(-sobrevaluacion)) %>%
-              filter(variable %in% c("consumo_intermedio", "masa_salarial","consumo_k_fijo" )) %>%
+              filter(variable %in% c("consumo_intermedio", "masa_salarial","consumo_k_fijo" ),
+                     fuente%in% c("Criterio CCNN", "CCNN")) %>%
               mutate(valor = (valor*10^6)*ipc_18/tcc,
                      unidad ="USD tcc") %>% 
               spread(key=variable, value=valor)) %>% 
@@ -4819,11 +4867,15 @@ costos
 ```
 
 ```{r}
-ggplotly(costos %>% 
+costos %>% 
            filter(anio > 1960) %>% 
   ggplot(aes(anio, precio_costo, color = fuente))+ 
   geom_line()+
-    labs(title = "Costos. Estimacion propia", y = "USD/BOE", x = "Año"))
+    labs(title = "Precio de costo",
+         subtitle= "Estimacion propia a partir de CCNN y reestimacion de VBP con criterio CCNN", 
+         y = "USD/BOE", x = "Año")
+
+
 ```
 
 # Comparación con estimación de otros autores
