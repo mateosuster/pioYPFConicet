@@ -1,0 +1,56 @@
+---
+title: "Neuquén"
+output: html_notebook
+---
+
+ 
+```{r}
+library(readxl)
+library(dplyr)
+
+conversor_m3bbl_p <- function(x) {x / 6.2898}
+conversor_m3bbl_q <- function(x) {x * 6.2898}
+
+produccion_provincia <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/produccion_provincia.xlsx", 
+    skip = 10) %>%
+  rename(anio = "AÑO", mes = "MES") %>% 
+  mutate(unidad = "m3",
+         anio =zoo::na.locf(anio),
+         fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, mes, anio, unidad, everything(.)) %>% 
+  group_by(fecha, mes, anio, unidad) %>% 
+  mutate_all(conversor_m3bbl_q) %>%
+  ungroup() %>% 
+  mutate(unidad = "barriles")
+produccion_provincia
+
+precio_tipo_crudo <- read_excel("data/precio_tipo_crudo.xlsx", skip = 12) %>% 
+  rename(anio = "AÑO", mes = "MES") %>% 
+  mutate(unidad = "USD/m3",
+         anio =zoo::na.locf(anio),
+         fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, mes, anio, unidad, everything(.)) %>% 
+  group_by(fecha, mes, anio, unidad) %>% 
+  mutate_all(conversor_m3bbl_p) %>%
+  ungroup() %>% 
+  mutate(unidad = "USD/barriles")
+precio_tipo_crudo
+
+
+precio_provincia <- read_excel("data/precio_provincia.xlsx", skip = 12) %>% 
+  rename(anio = "AÑO", mes = "MES") %>% 
+  mutate(unidad = "USD/m3",
+         anio =zoo::na.locf(anio),
+         fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, mes, anio, unidad, everything(.)) %>% 
+  group_by(fecha, mes, anio, unidad) %>% 
+  mutate_all(conversor_m3bbl_p) %>%
+  ungroup() %>% 
+  mutate(unidad = "USD/barriles")
+precio_provincia
+
+writexl::write_xlsx(x = list(produccion_provincia, precio_provincia, precio_tipo_crudo),
+                      path = "resultados/neuquen/produccion_y_precios_x_provincia(Regalias).xlsx")
+
+```
+
