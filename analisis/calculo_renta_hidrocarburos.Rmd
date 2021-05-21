@@ -199,7 +199,14 @@ tcp_anual_b <- read_excel("C:/Archivos/Datos/TCP/tcc_tcp_historico.xlsx") %>%
          tcp = "TCP") %>% 
   mutate(anio = case_when(anio == 43313 ~ 2018,
                           T ~ anio))
-  
+
+# tc_3500 <- read_excel("/Archivos/Datos/TCP/com3500.xls", skip = 3, sheet = 1) %>% 
+#   select(-"...3") %>% 
+#   mutate(anio = year(Fecha)) %>% 
+#   group_by(anio) %>% 
+#   summarise(tcc_avg = mean(`Tipo de Cambio de Referencia - en Pesos - por Dólar`))
+# write.csv(tc_3500, "resultados/auxiliares/tc_3500.csv")
+
 tcc_dic_63 <- read_excel("C:/Archivos/Datos/TCP/tcc_dic_63.xlsx")
 
 tcc_moneda_original <-  tcc_dic_63 %>% 
@@ -2627,15 +2634,23 @@ stock_balances_rama <-  stock_balances_empresas %>%
 
 
 ####################################
+# Tasas de depreciacion
 #AFIP
 tasa_depreciacion_afip <- read_excel("C:/Archivos/Datos/AFIP/gcia_v8.xlsx", 
     skip = 4) %>%
   select(-c(49:ncol(.))) %>% 
   group_by( rama, year) %>% 
   summarise(tasa_depreciacion = depreciacionbsuso/bsuso)
+#Balances
+read_csv("C:/Archivos/Datos/Balances/gas y petroleo_datos/datos_r/resultados/balances_arg.csv", 
+         col_types = cols(X1 = col_skip())) %>%
+    filter(empresa == "YPF") %>% 
+    group_by(empresa) %>% 
+    mutate(tasa_depreciacion = depreciaciones/ppye) %>% 
+  select(fecha, empresa, tasa_depreciacion)
 
 
-
+###AFIP
 # Stock de balances -  AFIP
 datos_afip <- read_excel("C:/Archivos/Datos/AFIP/gcia_v8.xlsx", 
     skip = 4) %>%
@@ -3384,141 +3399,74 @@ PIB Explotación Minas y Canteras en australes a precios de 1970. 1980-1990](htt
 
 ## Valor Bruto de la Producción, Valor Agregado y Consumo Intermedio 
 
-Hay dos estimaciones del Valor Bruto y Agregado de Producción, con su correspondiente Consumo Interemedio, los cuales corresponden a fuentes distintas. Asimismo, se deduce la plusalía total de la rama luego de descontar del Valor Agregado el respectivo consumo intermedio, masa salarial, impuestos específicos y depreciación de capital.
+Se presentan a continuación distintas estimaciones del Valor Bruto y Agregado de Producción (VBP y VA), Consumo Interemedio (CI) y  Excedente Bruto de Explotación (EBE). Esta última partida constituye la plusvalía (PV) total de la rama, es decir, la suma de la renta de la tierra (RT) más la ganancia normal (Gnorm), y se obtiene luego de descontar del VA sus respectivos CI, MS, impuestos específicos (Imp) y depreciación de capital o consumo de capital fijo (ConsKfijo). Las distintas series presentadas se construyeron siguiendo los siguientes criterios que luego se observarán en la formulación matemática:
 
 
-Fuentes: 
+* CCNN
+  + Valores contables oficiales de las Cuentas Nacionales (sólo disponible para el período 2004-2012). Dado que se posee información del salario promedio del sector y el empleo, se pudo obtener la MS resultante. A partir de estos datos se elaboró un coeficiente que refleja el promedio de la proporción de la MS sobre el VBP (sin distinguir extracción y sus respectivos servicios de apoyo) que se utilizará en los cálculos posteriores. Se podria afinar una MS solo de extracción.
 
-*  INDEC - Dirección Nacional de Cuentas Nacionales (Base Minería e Hidrocarburos de las Cuentas Nacionales). Las variables "extraccion_y_servicios_hidrocarburos" refieren a "Extracción de petróleo crudo y gas natural. Actividades de servicios relacionadas con la extracción de petróleo y gas, excepto las actividades de prospección" 
+* Criterio CCNN
+  + Estimación propia de los valores contables a partir de las fuentes recopiladas, siguiendo los criterios de las Cuentas Nacionales. Es decir, para obtener el VBP se valua la producción destinada al mercado interno (resultante a partir de la diferencia entre producción y exportaciones) con los precios internos y las exportaciones con los precios de exportación o referencia internacional, con tipo de cambio comercial (TCC). Este VBP no tiene descontado los servicios auxiliares a la extracción de hidrocarburos. El Consumo Intermedio se estima a partir del coeficiente técnico de la MIP de 1997 sobre el VBP mencionado anteriormente. De igual manera, para calcular la masa salarial se aplicó el coeficiente mencionado en el párrafo anterior sobre el VBP aquí resultante. Finalmente, como se mencionó anteriormente, el VA el EBE se calcularon a partir de las diferencias mencionadas anteriormente. Esta estimación de VBP no tiene descontado los servicios de apoyo a la extracción.
 
-* Cálculo propio del VBP con datos datos de producción y precio internacional recopilados. Las fuentes son las siguientes (los criterios son los mismos para la utilización posterior en el cálculo de renta de la tierra hidrocarburífera por diferencial de precios, sobrevaluación cambiaria y otros mecanismos)
+CCNN reestimado
+tiene descontado serivicios
+VBP a partir de indic
+#restimacion de VBP criterio CCNN
+vbp_ccnn <- vbp_va_ci_ccnn %>% 
+  select(anio,unidad, vbp_extraccion_hidrocarburos, 
+         va_extraccion_hidrocarburos, ci_extraccion_hidrocarburos) %>% 
+  full_join(indice_vbp_criterio_ccnn, by = "anio") %>% 
+  arrange(anio) %>% 
+  mutate(vbp_extraccion_ccnn = case_when(
+    anio < 2004 ~ vbp_va_ci_ccnn$vbp_extraccion_hidrocarburos[vbp_va_ci_ccnn$anio == 2004] *
+      vbp_criterio_ccnn_04,
+    anio > 2012 ~ vbp_va_ci_ccnn$vbp_extraccion_hidrocarburos[vbp_va_ci_ccnn$anio == 2012]  *
+      vbp_criterio_ccnn_12,
+    T ~ vbp_extraccion_hidrocarburos),
+    ci_extraccion_ccnn = vbp_extraccion_ccnn*coef_tecnico,
+    # ci_extraccion_ccnn = vbp_extraccion_ccnn*mean_coef_req_extr_ccnn,
+    va_extraccion_ccnn = vbp_extraccion_ccnn- ci_extraccion_ccnn,
+    unidad = "Millones de pesos corrientes") %>%
+  left_join(masa_salarial_hidrocarburos %>% 
+              select(anio,  unidad, ms_ccnn = masa_salarial_oede),
+            by = c("anio", "unidad")) %>%
+  left_join(stock_estimado %>%
+               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
+               select(anio, consumo_k_fijo)) %>% 
+  mutate(ms_ccnn = case_when(is.na(ms_ccnn) ~vbp_extraccion_ccnn*mean_coef_ms,
+                                   T ~ ms_ccnn),
+         ebe_ccnn = va_extraccion_ccnn -ms_ccnn -consumo_k_fijo,
+         fuente = "CCNN reestimado") %>% 
+   select(anio, fuente, unidad, 
+          vbp_extraccion_ccnn, ci_extraccion_ccnn, va_extraccion_ccnn, 
+          ms_ccnn, consumo_k_fijo, ebe_ccnn) %>% 
+  arrange(anio)
 
-#### Fuentes elegidas para la construcción de series 
+Criterio Propio
+  + Estimación propia que refleja con mayor precisión el valor de la riqueza presente en el sector. El VBP se obtiene a paritr de valuar la totalidad de la producción a los precios externos o de referencia internacional y con el tipo de cambio de paridad (TCP), que mide la capacidad real de compra de la moneda nacional. Sin embargo, como el CI constituyen intercambios de mercancías realizadas en el ámbito nacional, dicha partida se obtiene a partir de los valores obtenidos en los cálculos de criterio CCNN. Es decir, el CI es calculado con el coeficiente técnico sobre el VBP con produccion local valuada a precios internos y exporaciones a precios externos con TCC. Asimismo, de igual manera que en Criterio CCNN, la MS se estimó a partir del coeficiente promedio (obtenido sobre los valores oficiales de CCNN) sobre el VBP estimado con criterio propio, y el VA y el EBE a partir de las diferencias entre las partidas anteriores. Es importante subrayar que este cálculo de VBP no tiene descontado los servicios de apoyo a la extracción.
 
-* Producción de Crudo: 
-  + 1911 a 1992: Anuario de combustibles 
-  + 1993 - actualidad: SESCO Downstream
-  
-* Exportaciones de Crudo: 
-  + 1962 a 1993: UN Comtrade (clasificación SITC as reported)
-  + 1994 en adelante: SESCO Downstream
-  + Los datos faltantes de SESCO se completaron con MECON
-  + Siguen habiendo datos faltantes para los años 1965, 1970-74, 1976-78, 1980-84
-  
-* Precio Mercado Interno de Crudo: 
-  + 1963 a 1965: Kozulj y Pistonesi - Revista IDEE ajustado con el índice del precio del Anuario de YPF 
-  + 1989 a 1991: Anuario de YPF
-  + 1966 a 1988: Kozulj y Pistonesi - Revista IDEE
-  + 1992: MECON ajustado con la variación del Índice de precios internos al por mayor (IPIM)
-  + 1993 en adelante: MECON 
-  
-* Precio Mercado Externo Crudo:
-  + entre 1962 y 1992: precio de exportación argentina de UN Comtrade
-  + entre 1993-2001 y 2004-2014: precio de exportación argentina de Mecon
-  + entre 2002 y 2003: precio de exportación de Argentina de UN Comtrade (Clasificación HS as reported)  
-  + 2014 en adelante: precio de exportación argentina de Secretaría de Energía (Regalías)
-  + Valores faltantes previos a 1992: Brent  (Fuente: Inflation Data)
-  
-* Producción de Gas:
-  + 1911 a 1992: Anuario de combustibles 
-  + 1993 en adelante: SESCO Downstream
-  
-* Exportaciones de gas: 
-  + 1962 a 1996: UN Comtrade,
-  + 1997 en adelante: SESCO Downstream
-  + Datos faltantes para los años 1999 y 2000
-  
-* Precio Mercado Interno de gas:
-  + 1963 - 1969 & 1989 - 1992: Anuario de YPF
-  + 1970 - 1988:  Kozulj y Pistonesi - Revista IDEE
-  + 1993 en adelante: Secretaría de Energía - Base Regalías
-  + El dato del año 1992 se dividió por 10, dado que resultaba excesivamente alto, lo cual es metodológicamente inaceptable pero sirve de ejercicio. 
-  
-* Precio Mercado Externo:
-  + Años 1964 y 1965: Precio de importación de gas proveniente de Bolivia hacia Argentina de UN Comtrade
-  + 1966 en adelante: Precio de exportacion de gas desde Bolivia a Argentina de UN Comtrade
-  + Datos faltantes para los años previos a 1963 y período 1968-1971 
-
-<br>
+Criterio Propio con VBP de CCNN
+  + VBP estimado con Criterio propio, pero el descuento del CI es unicamente de extracción. Sin embargo, el VBP no tiene descontado los servicios. 
 
 
 
-### Estimación por Cuentas Nacionales
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-# coeficientes de requerimientos directos
-
-# extraido de MIP 97 a partir de CI/VBP 
-# coef_req_directos <-  0.272264638
-
-# extraido de cuadro de utilizacion 2004 a partir de CI/VBP
-coef_tecnico <-  0.369104302
-
-coef_tecnico_97 <- 0.374125887
+### Formulación matemática de los cálculos
 
 
-#MIP
-
-#CUO 
-COU <- read_excel("C:/Archivos/Datos/MIP/sh_cou_06_16.xls", 
-    skip = 2) %>%
-  rename(sector = "...1",
-         cpc = "...2") %>% 
-  filter(str_detect(sector, "\\d") & !(str_detect(sector, "^N")))
-
-servicio_s_extraccion <-  sum(COU[12])/sum(COU[11])
-nrow(COU)
-```
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-vbp_va_ci_ccnn <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls",
-                        sheet = "Cuentas Nacionales", skip = 5) %>% 
-  rename(anio = "Año",
-         periodo ="Período",
-        vbp_extraccion_y_servicios_hidrocarburos =  "...5",
-        va_extraccion_y_servicios_hidrocarburos =  "...15") %>% 
-  filter(is.na(periodo), !is.na(anio) ) %>%  #filtramos los datos anuales
-  mutate(unidad = "Miles de pesos corrientes",
-         vbp_extraccion_y_servicios_hidrocarburos= as.double(vbp_extraccion_y_servicios_hidrocarburos),
-         va_extraccion_y_servicios_hidrocarburos= as.double(va_extraccion_y_servicios_hidrocarburos),
-         vbp_extraccion_hidrocarburos = vbp_extraccion_y_servicios_hidrocarburos * (1 - servicio_s_extraccion),
-         va_extraccion_hidrocarburos = va_extraccion_y_servicios_hidrocarburos * (1 - servicio_s_extraccion),
-         ci_extraccion_y_servicios_hidrocarburos=
-           vbp_extraccion_y_servicios_hidrocarburos-va_extraccion_y_servicios_hidrocarburos,
-         ci_extraccion_hidrocarburos = vbp_extraccion_hidrocarburos - va_extraccion_hidrocarburos) %>% 
-  select(anio, unidad,
-         vbp_extraccion_y_servicios_hidrocarburos , 
-         va_extraccion_y_servicios_hidrocarburos,
-         ci_extraccion_y_servicios_hidrocarburos,
-         vbp_extraccion_hidrocarburos , 
-         va_extraccion_hidrocarburos,
-         ci_extraccion_hidrocarburos) %>% 
-  group_by(anio, unidad) %>%
-  mutate_all(function(x) {x/10^3}) %>%
-  ungroup() %>% 
-  mutate(unidad = "Millones de pesos corrientes",
-         coef_req_extr_y_serv =ci_extraccion_y_servicios_hidrocarburos/vbp_extraccion_y_servicios_hidrocarburos,
-         coef_req_extr = ci_extraccion_hidrocarburos/vbp_extraccion_hidrocarburos) %>% 
-  filter(!(is.na(coef_req_extr_y_serv)))
-vbp_va_ci_ccnn
-
-mean_coef_req_extr_ccnn <- mean(vbp_va_ci_ccnn$coef_req_extr)
-mean_coef_req_extr_ccnn_b <- mean(sum(vbp_va_ci_ccnn$ci_extraccion_hidrocarburos)/
-                                  sum(vbp_va_ci_ccnn$vbp_extraccion_hidrocarburos))
-
-```
-
-### Estimaciones en base a fuentes recopiladas. Metodología propia y CCNN
-
+* VBP con criterio propio 
 
 $$VBP_{propia} = (Pext_{petróleo} * Q_{petróleo} + Pext_{gas} * Q_{gas}) * TCP$$
+
+* VBP con criterio CCNN 
+
 $$VBP_{CCNN} = (Pint_{petróleo} * QMInt_{petróleo} + Pext_{petróleo} * Expo_{petróleo} + Pint_{gas} * QMInt_{gas} + Pext_{gas} * Expo_{gas})* TCC$$
 
 
 Donde: 
 
 * $VBP_{propia}$ = Valor Bruto de la Producción, estimación propia
-* $VBP_{CCNN}$ = Valor Bruto de la Producción,  criterio de las CCNN
+* $VBP_{CCNN}$ = Valor Bruto de la Producción,  estimación propia con criterio de las CCNN
 * $Pext_{petróleo}$ = Precio de exportación/referencia internacional del petróleo crudo
 * $Pext_{gas}$ = Precio de exportación/referencia internacional del gas natural
 * $Pint_{petróleo}$ = Precio mercado interno del petróleo crudo
@@ -3577,7 +3525,8 @@ Con respecto a la estimación propia, el consumo intermedio se estimó a partir 
 
 Por su parte, la masa salarial se calculó como la multiplicación entre la remuneración promedio de la rama por el empleo registrado por los 12 meses del año más el aguinaldo. Los años faltantes se completaron por medio de multiplicar el VBP por el peso promedio de la masa salarial para los años con datos. Un método similar aplica Dachevsky: resulta de multiplicar el VBP por la proporción entre la remuneración a los asalariados sobre el valor total de producción de YPF para el año 1973/1963. 
 
-El consumo de capital fijo surge de aplicar la tasa de depreciación promedio resultante de los balances de YPF (1998 - 2018) al stock de capital adelantado estimado (ver apartado *Estimación de stock de capital a partir de la evolución de pozos perforados*) . 
+El consumo de capital fijo surge de aplicar la tasa de depreciación promedio resultante de los balances de YPF (1998 - 2018) al stock de capital adelantado estimado (ver apartado *Estimación de stock de capital a partir de la evolución de pozos perforados*). Dicho promedio resulta en torno al 12% del stock de capital
+
 
 
 
@@ -3593,6 +3542,139 @@ VBP extraccion( CCNN) = VBP extraccion y servicios (CCNN) * 0,893 (1)
 1910 - 2018
 armar indice VBP criterio CCNN para mover (1) los años que nos faltan (1910 - 2004 y 2012 -2018) 
 deberia ser = que aplicar coef (2) a VBP
+
+
+#### Fuentes para la construcción de series 
+
+* Producción de Crudo: 
+  + 1911 a 1992: Anuario de combustibles 
+  + 1993 - actualidad: SESCO Downstream
+  
+* Exportaciones de Crudo: 
+  + 1962 a 1993: UN Comtrade (clasificación SITC as reported)
+  + 1994 en adelante: SESCO Downstream
+  + Los datos faltantes de SESCO se completaron con MECON
+  + Siguen habiendo datos faltantes para los años 1965, 1970-74, 1976-78, 1980-84
+  
+* Precio Mercado Interno de Crudo: 
+  + 1963 a 1965: Kozulj y Pistonesi - Revista IDEE ajustado con el índice del precio del Anuario de YPF 
+  + 1989 a 1991: Anuario de YPF
+  + 1966 a 1988: Kozulj y Pistonesi - Revista IDEE
+  + 1992: MECON ajustado con la variación del Índice de precios internos al por mayor (IPIM)
+  + 1993 en adelante: MECON 
+  
+* Precio Mercado Externo Crudo:
+  + entre 1962 y 1992: precio de exportación argentina de UN Comtrade
+  + entre 1993-2001 y 2004-2014: precio de exportación argentina de Mecon
+  + entre 2002 y 2003: precio de exportación de Argentina de UN Comtrade (Clasificación HS as reported)  
+  + 2014 en adelante: precio de exportación argentina de Secretaría de Energía (Regalías)
+  + Valores faltantes previos a 1992: Brent  (Fuente: Inflation Data)
+  
+* Producción de Gas:
+  + 1911 a 1992: Anuario de combustibles 
+  + 1993 en adelante: SESCO Downstream
+  
+* Exportaciones de gas: 
+  + 1962 a 1996: UN Comtrade,
+  + 1997 en adelante: SESCO Downstream
+  + Datos faltantes para los años 1999 y 2000
+  
+* Precio Mercado Interno de gas:
+  + 1963 - 1969 & 1989 - 1992: Anuario de YPF
+  + 1970 - 1988:  Kozulj y Pistonesi - Revista IDEE
+  + 1993 en adelante: Secretaría de Energía - Base Regalías
+  + El dato del año 1992 se dividió por 10, dado que resultaba excesivamente alto, lo cual es metodológicamente inaceptable pero sirve de ejercicio. 
+  
+* Precio Mercado Externo:
+  + Años 1964 y 1965: Precio de importación de gas proveniente de Bolivia hacia Argentina de UN Comtrade
+  + 1966 en adelante: Precio de exportacion de gas desde Bolivia a Argentina de UN Comtrade
+  + Datos faltantes para los años previos a 1963 y período 1968-1971 
+
+* Valor Bruto de la Producción, Valor Agregado y Consumo Intermedio:
+  + INDEC - Dirección Nacional de Cuentas Nacionales (Base Minería e Hidrocarburos de las Cuentas Nacionales). Las variables "extraccion_y_servicios_hidrocarburos" refieren a "Extracción de petróleo crudo y gas natural. Actividades de servicios relacionadas con la extracción de petróleo y gas, excepto las actividades de prospección"
+  + Cálculo propio del VBP con datos datos de producción y precio internacional recopilados. Las fuentes son las siguientes (los criterios son los mismos para la utilización posterior en el cálculo de renta de la tierra hidrocarburífera por diferencial de precios, sobrevaluación cambiaria y otros mecanismos)
+
+* Salario y empleo
+  + MTEySS (Base Minería e Hidrocarburos de las Cuentas Nacionales)
+  + [Ministerio de Trabajo, Empleo y Seguridad Social - Observatorio de Empleo y Dinámica Empresarial (OEDE)](http://www.trabajo.gob.ar/estadisticas/oede/estadisticasnacionales.asp)
+  + EPH ??
+<br>
+
+
+
+### Estimación por Cuentas Nacionales
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+#coef CI
+#MIP
+# coeficientes de requerimientos directos
+
+# extraido de MIP 97 a partir de CI/VBP 
+# coef_req_directos <-  0.272264638
+
+# extraido de cuadro de utilizacion 2004 a partir de CI/VBP
+coef_tecnico <-  0.369104302
+
+coef_tecnico_97 <- 0.374125887
+
+
+
+#Peso de los servicios
+#CUO 
+#la suma de las columnas nos da el VBP
+COU <- read_excel("C:/Archivos/Datos/MIP/sh_cou_06_16.xls", 
+    skip = 2) %>%
+  rename(sector = "...1",
+         cpc = "...2") %>% 
+  filter(str_detect(sector, "\\d") & !(str_detect(sector, "^N")))
+
+servicio_s_extraccion <-  sum(COU[12])/sum(COU[11])
+nrow(COU)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#CCNN
+vbp_va_ci_ccnn <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls",
+                        sheet = "Cuentas Nacionales", skip = 5) %>% 
+  rename(anio = "Año",
+         periodo ="Período",
+        vbp_extraccion_y_servicios_hidrocarburos =  "...5",
+        va_extraccion_y_servicios_hidrocarburos =  "...15") %>% 
+  filter(is.na(periodo), !is.na(anio) ) %>%  #filtramos los datos anuales
+  mutate(unidad = "Miles de pesos corrientes",
+         vbp_extraccion_y_servicios_hidrocarburos= as.double(vbp_extraccion_y_servicios_hidrocarburos),
+         va_extraccion_y_servicios_hidrocarburos= as.double(va_extraccion_y_servicios_hidrocarburos),
+         vbp_extraccion_hidrocarburos = vbp_extraccion_y_servicios_hidrocarburos * (1 - servicio_s_extraccion),
+         va_extraccion_hidrocarburos = va_extraccion_y_servicios_hidrocarburos * (1 - servicio_s_extraccion),
+         ci_extraccion_y_servicios_hidrocarburos=
+           vbp_extraccion_y_servicios_hidrocarburos-va_extraccion_y_servicios_hidrocarburos,
+         ci_extraccion_hidrocarburos = vbp_extraccion_hidrocarburos - va_extraccion_hidrocarburos) %>% 
+  select(anio, unidad,
+         vbp_extraccion_y_servicios_hidrocarburos , 
+         va_extraccion_y_servicios_hidrocarburos,
+         ci_extraccion_y_servicios_hidrocarburos,
+         vbp_extraccion_hidrocarburos , 
+         va_extraccion_hidrocarburos,
+         ci_extraccion_hidrocarburos) %>% 
+  group_by(anio, unidad) %>%
+  mutate_all(function(x) {x/10^3}) %>%
+  ungroup() %>% 
+  mutate(unidad = "Millones de pesos corrientes",
+         coef_req_extr_y_serv =ci_extraccion_y_servicios_hidrocarburos/vbp_extraccion_y_servicios_hidrocarburos,
+         coef_req_extr = ci_extraccion_hidrocarburos/vbp_extraccion_hidrocarburos) %>% 
+  filter(!(is.na(coef_req_extr_y_serv)))
+vbp_va_ci_ccnn
+
+mean_coef_req_extr_ccnn <- mean(vbp_va_ci_ccnn$coef_req_extr)
+mean_coef_req_extr_ccnn_b <- mean(sum(vbp_va_ci_ccnn$ci_extraccion_hidrocarburos)/
+                                  sum(vbp_va_ci_ccnn$vbp_extraccion_hidrocarburos))
+
+```
+
+### Estimaciones en base a fuentes recopiladas. Metodología propia y CCNN
+
+
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -3626,8 +3708,10 @@ vbp_va_ci_propia <- precios_y_cantidades %>%
          expo_gas = replace_na(expo_gas, 0 ),
          gas_mdo_interno = prod_gas - expo_gas,
          unidad_valor_produccion = "Millones de pesos corrientes",
-         vbp_criterio_ccnn = ((crudo_mdo_interno*precio_crudo_mdoint+expo_crudo*precio_me_crudo
-                               + gas_mdo_interno * precio_gas_mdoint +expo_gas*precio_externo_gas )*tcc)/10^6,
+         vbp_criterio_ccnn = ((crudo_mdo_interno*precio_crudo_mdoint+
+                                 expo_crudo*precio_me_crudo
+                               + gas_mdo_interno * precio_gas_mdoint 
+                               +expo_gas*precio_externo_gas )*tcc)/10^6,
          valor_bruto_crudo = (prod_crudo*precio_me_crudo*tcp)/10^6,
          valor_bruto_gas =   (prod_gas * precio_externo_gas*tcp)/10^6,
          vbp_criterio_propio = valor_bruto_crudo + valor_bruto_gas, 
@@ -3652,11 +3736,7 @@ indice_vbp_criterio_ccnn <- vbp_va_ci_propia %>%
 
 ## Empleo, Remuneraciones y Masa Salarial (CCNN)
 
-Fuentes:
 
-* MTEySS (Base Minería e Hidrocarburos de las Cuentas Nacionales)
-* [Ministerio de Trabajo, Empleo y Seguridad Social - Observatorio de Empleo y Dinámica Empresarial (OEDE)](http://www.trabajo.gob.ar/estadisticas/oede/estadisticasnacionales.asp)
-* Falta EPH
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #anuarios CEPAL
@@ -3788,6 +3868,7 @@ masa_salarial_hidrocarburos
 ## Plusvalía total del sector
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+#CCNN
 #con base de cuentas nacionales
 pv_hidrocarburos_ccnn <- vbp_va_ci_ccnn %>% 
   left_join(masa_salarial_hidrocarburos %>% 
@@ -3829,7 +3910,8 @@ var((read_csv("C:/Archivos/Datos/Balances/gas y petroleo_datos/datos_r/resultado
 
 #restimacion de VBP criterio CCNN
 vbp_ccnn <- vbp_va_ci_ccnn %>% 
-  select(anio,unidad, vbp_extraccion_hidrocarburos, va_extraccion_hidrocarburos, ci_extraccion_hidrocarburos) %>% 
+  select(anio,unidad, vbp_extraccion_hidrocarburos, 
+         va_extraccion_hidrocarburos, ci_extraccion_hidrocarburos) %>% 
   full_join(indice_vbp_criterio_ccnn, by = "anio") %>% 
   arrange(anio) %>% 
   mutate(vbp_extraccion_ccnn = case_when(
@@ -3858,19 +3940,10 @@ vbp_ccnn <- vbp_va_ci_ccnn %>%
           ms_ccnn, consumo_k_fijo, ebe_ccnn) %>% 
   arrange(anio)
 vbp_ccnn
-```
-```{r}
-read_csv("C:/Archivos/Datos/Balances/gas y petroleo_datos/datos_r/resultados/balances_arg.csv", 
-         col_types = cols(X1 = col_skip())) %>%
-    filter(empresa == "YPF") %>% 
-    group_by(empresa) %>% 
-    mutate(tasa_depreciacion = depreciaciones/ppye) %>% select(fecha, empresa, tasa_depreciacion)
-```
-# Emprolijar este lio
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-# propia
+
+# criterio propia
 pv_hidrocarburos_propia <-  vbp_va_ci_propia %>% 
   select(anio, unidad = unidad_valor_produccion, 
          vbp_criterio_propio, consumo_intermedio,valor_agregado ) %>% 
@@ -3879,12 +3952,11 @@ pv_hidrocarburos_propia <-  vbp_va_ci_propia %>%
               # filter(variable == "ppye_estimado_bolsar") %>% 
               mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
                select(anio, consumo_k_fijo)) %>% 
-  mutate(
-    # masa_salarial = valor_agregado * coef_salario,
+  mutate( # masa_salarial = valor_agregado * coef_salario,
     masa_salarial = vbp_criterio_propio * mean_coef_ms,
         excedente_bruto_explotacion =  valor_agregado - masa_salarial - consumo_k_fijo)
   
-# PV CCNN y propia
+# "Criterio propio con VBP CCNN" 
 pv_hidrocarburos <- pv_hidrocarburos_ccnn %>% 
   rename(vbp_ccnn = valor_bruto_produccion,
          va_ccnn = valor_agregado,
@@ -3928,7 +4000,7 @@ valor_total_produccion <- pv_hidrocarburos_ccnn %>%  # no tiene descontado servi
               gather(key = variable,
                       value = valor,
                       4:ncol(.))) %>%
-  bind_rows(pv_hidrocarburos %>% #tiene descontado  servicios
+  bind_rows(pv_hidrocarburos %>% 
               mutate(fuente = "Criterio propio con VBP CCNN") %>% 
               select(anio, unidad, fuente, valor_bruto_produccion = vbp, 
                    consumo_intermedio = ci, 
@@ -3939,7 +4011,7 @@ valor_total_produccion <- pv_hidrocarburos_ccnn %>%  # no tiene descontado servi
                gather(key = variable,
                       value = valor,
                       4:ncol(.))) %>% 
-  bind_rows(vbp_va_ci_propia %>% # no tiene descontado servicios
+  bind_rows(vbp_va_ci_propia %>% # Criterio CCNN. No tiene descontado servicios 
               left_join(stock_estimado %>%  
                           select(-unidad),
                           # filter(variable == "ppye_estimado_bolsar"),
@@ -3974,8 +4046,10 @@ valor_total_produccion <- pv_hidrocarburos_ccnn %>%  # no tiene descontado servi
   left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
   mutate(valor = valor /ipc_18,
          unidad = "Millones de pesos de 2018") %>%
-  select(-ipc_18)
+  select(-ipc_18) %>% 
+  filter(!is.na(fuente))
 valor_total_produccion
+
 ```
 
 ```{r echo=FALSE}
@@ -3991,7 +4065,9 @@ graf_valor_produccion <- valor_total_produccion %>%
        subtitle = "Valor total y componentes",
        y = "Millones de pesos de 2018")+
   facet_wrap(~variable)
-ggplotly(graf_valor_produccion, width = 750, height = 500)
+ggplotly(graf_valor_produccion, width = 750, height = 400)
+
+
 ```
 
 
@@ -4958,7 +5034,7 @@ ggplotly(graf_renta_total_comparacion, width = 600, height = 400)
 ```
 
 
-```{r echo=FALSE}
+```{r include=FALSE}
 ## Exportación de resultados
 
 writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo, 
@@ -4972,7 +5048,7 @@ writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo,
                          subsidios =subsidios_hidrocarburos,
                          tipo_cambio = tcp_anual_b,
                          ipc = ipc_promedio),
-                    path =  "resultados/variables.xlsx")
+                    path =  "resultados/argentina/variables.xlsx")
 
 
 writexl::write_xlsx(list(renta_total_pv_pbi = renta_pbi_pv,
@@ -4986,14 +5062,14 @@ writexl::write_xlsx(list(renta_total_pv_pbi = renta_pbi_pv,
                          # crudo_precio_expo_jk = renta_precio_expo_crudo_jk,
                          # gas_dif_precios_expo_jk = renta_precio_expo_gas_jk,
                          estimacion_jk = renta_hidrocarburos_jk), 
-                    path = "resultados/renta_hidrocarburos_total.xlsx")
+                    path = "resultados/argentina/renta_hidrocarburos_total.xlsx")
 
 
 writexl::write_xlsx(renta_total_pbi_pv,
-                    path = "resultados/renta_total_PxQ.xlsx")
+                    path = "resultados/argentina/renta_total_PxQ.xlsx")
 
 writexl::write_xlsx(costos,
-                    path = "resultados/costos.xlsx")
+                    path = "resultados/argentina/costos.xlsx")
 
 # writexl::write_xlsx(list(produccion = prod_merge_crudo, 
 #                          exportaciones = expo_q_crudo,
@@ -5024,7 +5100,7 @@ writexl::write_xlsx(costos,
 writexl::write_xlsx(list("flujo"= comparacion_pozos,
                          "flujo_total"= listado_pozos,
                          "stock" = pozos_iapg_centenario), 
-                    path = "resultados/pozos.xlsx")
+                    path = "resultados/argentina/pozos.xlsx")
 
 
 writexl::write_xlsx(list(afip = stock_afip,
@@ -5033,12 +5109,12 @@ writexl::write_xlsx(list(afip = stock_afip,
                          bolsar_v2 = stock_balances_rama,
                          "inversion por pozo (IAPG)" = inversion_pozos,
                           "inversion por pozo (Cap IV)"= inversion_pozos_capiv),
-                    path = "resultados/stock_petroleo.xlsx")
+                    path = "resultados/argentina/stock_petroleo.xlsx")
 
 writexl::write_xlsx(list("TG indice flujo pozos"= tasa_ganancia_rama_flujo, 
                          # "TG indice flujo stock" = tasa_ganancia_rama_stock,
                          "renta empresas" = renta_tg), 
-                    path = "resultados/tasa de ganancia y renta hidrocarburífera.xlsx")
+                    path = "resultados/argentina/tasa de ganancia y renta hidrocarburífera.xlsx")
 
 
 print("El código terminó de correr")
