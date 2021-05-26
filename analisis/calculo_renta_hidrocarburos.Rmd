@@ -3402,52 +3402,20 @@ PIB Explotación Minas y Canteras en australes a precios de 1970. 1980-1990](htt
 Se presentan a continuación distintas estimaciones del Valor Bruto y Agregado de Producción (VBP y VA), Consumo Interemedio (CI) y  Excedente Bruto de Explotación (EBE). Esta última partida constituye la plusvalía (PV) total de la rama, es decir, la suma de la renta de la tierra (RT) más la ganancia normal (Gnorm), y se obtiene luego de descontar del VA sus respectivos CI, MS, impuestos específicos (Imp) y depreciación de capital o consumo de capital fijo (ConsKfijo). Las distintas series presentadas se construyeron siguiendo los siguientes criterios que luego se observarán en la formulación matemática:
 
 
-* CCNN
+* CCNN (*vbp_va_ci_ccnn* y *pv_hidrocarburos_ccnn*)
   + Valores contables oficiales de las Cuentas Nacionales (sólo disponible para el período 2004-2012). Dado que se posee información del salario promedio del sector y el empleo, se pudo obtener la MS resultante. A partir de estos datos se elaboró un coeficiente que refleja el promedio de la proporción de la MS sobre el VBP (sin distinguir extracción y sus respectivos servicios de apoyo) que se utilizará en los cálculos posteriores. Se podria afinar una MS solo de extracción.
 
-* Criterio CCNN
+* Criterio CCNN (*vbp_va_ci_propia*)
   + Estimación propia de los valores contables a partir de las fuentes recopiladas, siguiendo los criterios de las Cuentas Nacionales. Es decir, para obtener el VBP se valua la producción destinada al mercado interno (resultante a partir de la diferencia entre producción y exportaciones) con los precios internos y las exportaciones con los precios de exportación o referencia internacional, con tipo de cambio comercial (TCC). Este VBP no tiene descontado los servicios auxiliares a la extracción de hidrocarburos. El Consumo Intermedio se estima a partir del coeficiente técnico de la MIP de 1997 sobre el VBP mencionado anteriormente. De igual manera, para calcular la masa salarial se aplicó el coeficiente mencionado en el párrafo anterior sobre el VBP aquí resultante. Finalmente, como se mencionó anteriormente, el VA el EBE se calcularon a partir de las diferencias mencionadas anteriormente. Esta estimación de VBP no tiene descontado los servicios de apoyo a la extracción.
 
-CCNN reestimado
-tiene descontado serivicios
-VBP a partir de indic
-#restimacion de VBP criterio CCNN
-vbp_ccnn <- vbp_va_ci_ccnn %>% 
-  select(anio,unidad, vbp_extraccion_hidrocarburos, 
-         va_extraccion_hidrocarburos, ci_extraccion_hidrocarburos) %>% 
-  full_join(indice_vbp_criterio_ccnn, by = "anio") %>% 
-  arrange(anio) %>% 
-  mutate(vbp_extraccion_ccnn = case_when(
-    anio < 2004 ~ vbp_va_ci_ccnn$vbp_extraccion_hidrocarburos[vbp_va_ci_ccnn$anio == 2004] *
-      vbp_criterio_ccnn_04,
-    anio > 2012 ~ vbp_va_ci_ccnn$vbp_extraccion_hidrocarburos[vbp_va_ci_ccnn$anio == 2012]  *
-      vbp_criterio_ccnn_12,
-    T ~ vbp_extraccion_hidrocarburos),
-    ci_extraccion_ccnn = vbp_extraccion_ccnn*coef_tecnico,
-    # ci_extraccion_ccnn = vbp_extraccion_ccnn*mean_coef_req_extr_ccnn,
-    va_extraccion_ccnn = vbp_extraccion_ccnn- ci_extraccion_ccnn,
-    unidad = "Millones de pesos corrientes") %>%
-  left_join(masa_salarial_hidrocarburos %>% 
-              select(anio,  unidad, ms_ccnn = masa_salarial_oede),
-            by = c("anio", "unidad")) %>%
-  left_join(stock_estimado %>%
-               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
-               select(anio, consumo_k_fijo)) %>% 
-  mutate(ms_ccnn = case_when(is.na(ms_ccnn) ~vbp_extraccion_ccnn*mean_coef_ms,
-                                   T ~ ms_ccnn),
-         ebe_ccnn = va_extraccion_ccnn -ms_ccnn -consumo_k_fijo,
-         fuente = "CCNN reestimado") %>% 
-   select(anio, fuente, unidad, 
-          vbp_extraccion_ccnn, ci_extraccion_ccnn, va_extraccion_ccnn, 
-          ms_ccnn, consumo_k_fijo, ebe_ccnn) %>% 
-  arrange(anio)
-
-Criterio Propio
+CCNN reestimado (*vbp_ccnn*)
+  + Estimacion que toma los valores oficiales de las cuentas nacionales para el período que hay valores (2004 -2012), e imputa los valores faltantes por medio de la evolución de un índice del VBP propio con criterio CCNN. Cabe subrayar que el valor base del VBP tiene descontado los servicios de apoyo a la extracción, pero no así el VBP utilizado en el índice. El CI se estimó a partir de aplicar el coeficiente técnico sobre esta estimación del VBP, por lo qeu sería un CI sólo de extracción. Se utilizaron los valores oficiales de la MS cuando se encontraba disponible el dato, mientras que se procedió a imputar los faltantes por medio del coeficiente sobre el VBP. Como en todos los casos, el VA y EBE surgen como diferencia de las partidas anteriores. 
+  
+Criterio Propio (*pv_hidrocarburos_propia*)
   + Estimación propia que refleja con mayor precisión el valor de la riqueza presente en el sector. El VBP se obtiene a paritr de valuar la totalidad de la producción a los precios externos o de referencia internacional y con el tipo de cambio de paridad (TCP), que mide la capacidad real de compra de la moneda nacional. Sin embargo, como el CI constituyen intercambios de mercancías realizadas en el ámbito nacional, dicha partida se obtiene a partir de los valores obtenidos en los cálculos de criterio CCNN. Es decir, el CI es calculado con el coeficiente técnico sobre el VBP con produccion local valuada a precios internos y exporaciones a precios externos con TCC. Asimismo, de igual manera que en Criterio CCNN, la MS se estimó a partir del coeficiente promedio (obtenido sobre los valores oficiales de CCNN) sobre el VBP estimado con criterio propio, y el VA y el EBE a partir de las diferencias entre las partidas anteriores. Es importante subrayar que este cálculo de VBP no tiene descontado los servicios de apoyo a la extracción.
 
-Criterio Propio con VBP de CCNN
-  + VBP estimado con Criterio propio, pero el descuento del CI es unicamente de extracción. Sin embargo, el VBP no tiene descontado los servicios. 
+Criterio Propio con VBP de CCNN (*pv_hidrocarburos*)
+  + Toma el VBP de criterio propio y para obtener el VA, se le descuenta el CI de extracción de CCNN restimado (sin embargo, como se dijo, el VBP no tiene descontado los servicios). Se utilizó tambien la MS estimada en CCNN restimado. El EBE surge como diferencia de las partidas. 
 
 
 
