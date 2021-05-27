@@ -2109,103 +2109,141 @@ expo_q_gas
 expo_usd_gas
 ```
 
+## Empleo, Remuneraciones y Masa Salarial (CCNN)
 
-
-## Regalías
-
-* Fuentes: 
-  + Secretaría de Energía (Base Regalías)
-
-
-REVISAR EL CALCULO DE BETANIA 
-cuanto ganarian las provincias si el precio del mercado interno se acomoda al internacional?
+* Salario y empleo
+  + MTEySS (Base Minería e Hidrocarburos de las Cuentas Nacionales) (1996-2013)
+  + [Ministerio de Trabajo, Empleo y Seguridad Social - Observatorio de Empleo y Dinámica Empresarial (OEDE)](http://www.trabajo.gob.ar/estadisticas/oede/estadisticasnacionales.asp) (1996-2019)
+  + EPH ??
+<br>
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-#regalias
-#filtro con productos
-productos <- list("crudo", "gas", "gasolina", "glp")
+#anuarios CEPAL
+cepal_1991 <- read_excel("C:/Archivos/Datos/Hidrocarburos/CEPAL/cepal_1991.xlsx") %>% 
+  mutate(valor = valor / conversor_pesos$A /10^3,
+         unidad = "Millones de pesos corrientes")
 
-#loop para levantar las bases
-lista_regalias = list()
-for(i in productos){
-  regalias_i <- read_delim(paste0("C:/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/regalias_", i, ".csv"), 
-    ";", escape_double = FALSE, trim_ws = TRUE, 
-    skip = 1)
-  lista_regalias[[i]] <- regalias_i
-}
+masa_salarial_cepal <- cepal_1991 %>% 
+  filter(variable == "remuneracion_al_trabajo") %>% 
+  rename(ms_cepal = valor)
+  
 
-#bases individuales
-regalias_crudo <- lista_regalias$crudo %>% 
-  mutate(moneda = "usd",
-         producto = "crudo")
-regalias_gas <- lista_regalias$gas %>% 
-  mutate(moneda = "ars",
-         producto = "gas")
-regalias_gasolina <- lista_regalias$gasolina %>% 
-  mutate(moneda = "usd",
-         producto = "gasolina")
-regalias_glp <- lista_regalias$glp %>% 
-  mutate(moneda = "ars",
-         producto = "glp")
+#con datos de la base de CCNN
+empleo <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls", 
+    sheet = "Empleo registrado", skip = 5) %>% 
+  rename(anio = "Año",
+          periodo ="Período",
+         empleo_extraccion_hidrocarburos = "...7",
+        empleo_servicios_hidrocarburos = "...8" ) %>%
+   filter(is.na(periodo), !is.na(anio) ) %>%
+  select(anio, empleo_extraccion_hidrocarburos,empleo_servicios_hidrocarburos ) %>% 
+  mutate(unidad_empleo = "Puestos de trabajo",
+         empleo_extraccion_hidrocarburos = as.double(empleo_extraccion_hidrocarburos),
+         empleo_servicios_hidrocarburos = as.double(empleo_servicios_hidrocarburos)) 
+  
 
-#base completa
-regalias <-  regalias_crudo %>% 
-  bind_rows(regalias_gas, regalias_gasolina, regalias_glp) %>% 
-  rename(anio = "AÑO",
-         mes = "MES", 
-         regalias_total = "TOTAL PROVINCIA") %>% 
-  mutate(fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
-  select(fecha, anio, mes, producto, moneda, regalias_total, everything(.)) %>% 
-  group_by(producto, anio, moneda ) %>% 
-  summarise(regalias_total = sum(regalias_total)) %>% 
-  left_join(tcp_anual %>% select(-TCP)) %>% 
-  mutate(regalias_total = case_when(moneda == "usd" ~ regalias_total * TCC,
-                                    T ~ regalias_total),
-         unidad = "ars") %>% 
-  select(-c(TCC, moneda))
+salarios <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls", 
+    sheet = "Remuneraciones", col_types = c("numeric", 
+        "date", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text"), skip = 5) %>% 
+    rename(anio = "Año",
+          periodo ="Período",
+          salario_extraccion_hidrocarburos = "...7",
+         salario_servicios_hidrocarburos =  "...8") %>% 
+  filter(!is.na(anio) & anio < 2014) %>% 
+  select(anio, salario_extraccion_hidrocarburos,salario_servicios_hidrocarburos ) %>% 
+  mutate(unidad_salario = "Pesos corrientes",
+         salario_extraccion_hidrocarburos= as.double(salario_extraccion_hidrocarburos),
+        salario_servicios_hidrocarburos = as.double(salario_servicios_hidrocarburos))
+   
+masa_salarial_ccnn <- empleo %>% 
+  left_join(salarios, by = "anio") %>% 
+  mutate(unidad_masa_salarial = "Millones de pesos corrientes",
+         masa_salarial_extraccion = (salario_extraccion_hidrocarburos *empleo_extraccion_hidrocarburos*13)/10^6,
+         masa_salarial_servicios = (salario_servicios_hidrocarburos *empleo_servicios_hidrocarburos*13)/10^6,
+         masa_salarial_total = masa_salarial_extraccion + masa_salarial_servicios) 
 
-regalias
 
-# writexl::write_xlsx(regalias %>% 
-#   spread(.,
-#          key = anio,
-#          value = regalias_total), path = "resultados/regalias.xlsx")
-```
 
-## Subsidios
-```{r}
-# CEFIP cont et al. Subsidios como % del PBI
-subsidios_cefip <- read_excel("/Archivos/Datos/Hidrocarburos/subsidios/subsidios.xlsx") %>% 
+#con datos de empleo registrado 
+remuneraciones_anual <- read_excel("C:/Archivos/Datos/Hidrocarburos/Ministerio Trabajo/nacional_serie_remuneraciones_anual.xlsx", 
+    sheet = "C 5", col_types = c("skip", 
+        "text", "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric", "numeric", "numeric", 
+        "numeric"), skip = 4) %>% 
   gather(key = anio,
-         value = subsidios_porcentaje_pbi,
-         2:ncol(.)) %>% 
-  filter(sector %in% c("CAMMESA", "Plan Gas","ENARSA", "Subsidios FF GN y GLP")) %>% 
-  mutate(anio = as.double(anio)) %>% 
-  left_join(ganancia_y_pbi %>% 
-              select(anio, pbi)) %>%
-  mutate(subsidios_porcentaje_pbi=as.double(subsidios_porcentaje_pbi),
-         subsidios_cefip = subsidios_porcentaje_pbi * pbi * 10^6) %>% 
-  group_by(anio) %>% 
-  summarise(unidad = "Pesos corrientes",
-            subsidios_cefip=sum(subsidios_cefip, na.rm = T))
+         value = valor,
+         2:ncol(.)) %>%
+  rename(rama_actividad = "Rama de actividad") %>% 
+  filter( str_detect(rama_actividad, "petróleo")) %>% 
+  mutate(unidad_salario = "Pesos corrientes",
+         rama_actividad= 
+           case_when(rama_actividad==
+                                     "Actividades  de servicios relacionadas con la extracción de petróleo y gas, excepto las actividades de prospección" ~ 
+                                     "remuneracion_servicios_extraccion",
+                                   rama_actividad==
+                                     "Extracción de petróleo crudo y gas natural" ~ 
+                                     "remuneracion_extraccion_petroleo_gas")) %>% 
+    filter(!(is.na(rama_actividad))) %>% 
+  spread(key = rama_actividad,
+         value = valor)
+  
 
-#ejes 
-subsidios_ejes <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/subsidios.xlsx" ) %>% 
-  rename(subsidios_usd = subsidios_hidrocarburos) %>% 
-  right_join(tcp_anual_b %>% 
-               select(anio, tcc), by = "anio") %>%
-  group_by(anio) %>% 
-  summarise(unidad = "Pesos corrientes",
-         subsidios_ejes = subsidios_usd*tcc*10^6)
 
-subsidios_hidrocarburos <- subsidios_ejes%>% 
-  select(anio, unidad, subsidios_ejes) %>% 
-  full_join(subsidios_cefip, by =c("anio", "unidad")) %>% 
-  arrange(-anio) %>% 
-  mutate(unidad = "Pesos corrientes")
-         # x = subsidios_cefip/subsidios_ejes)
-subsidios_hidrocarburos  
+empleo_anual <- read_excel("C:/Archivos/Datos/Hidrocarburos/Ministerio Trabajo/nacional_serie_empleo_anual.xlsx", 
+    sheet = "C 5", col_types = c("skip", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text", 
+        "text", "text", "text", "text", "text"), 
+    skip = 4)%>% 
+  gather(key = anio,
+         value = valor,
+         2:ncol(.)) %>%
+  rename(rama_actividad = "Rama de actividad") %>% 
+  filter( str_detect(rama_actividad, "petróleo")) %>% 
+  mutate(valor = as.double(valor),
+         unidad_empleo = "Puestos de trabajo",
+         rama_actividad= case_when(rama_actividad==
+                                     "Actividades  de servicios relacionadas con la extracción de petróleo y gas, excepto las actividades de prospección" ~ 
+                                     "empleo_servicios_extraccion",
+                                   rama_actividad==
+                                     "Extracción de petróleo crudo y gas natural" ~ "empleo_extraccion_petroleo_gas")) %>% 
+  filter(!(is.na(rama_actividad))) %>% 
+  spread(key = rama_actividad,
+         value = valor)
+
+masa_salarial_oede <- empleo_anual %>% 
+  left_join(remuneraciones_anual, by = "anio") %>% 
+  mutate(unidad_masa_salarial = "Millones de pesos corrientes",
+         masa_salarial_extraccion = (  remuneracion_extraccion_petroleo_gas *empleo_extraccion_petroleo_gas*13)/10^6,
+         masa_salarial_servicios = (remuneracion_servicios_extraccion *empleo_servicios_extraccion*13)/10^6,
+         masa_salarial_total = masa_salarial_servicios + masa_salarial_extraccion,
+         anio =as.double(anio))
+
+masa_salarial_hidrocarburos <- masa_salarial_ccnn %>% 
+  select(anio, unidad = unidad_masa_salarial, masa_salarial_ccnn = masa_salarial_total) %>% 
+  full_join(masa_salarial_oede %>% 
+              select(anio, unidad = unidad_masa_salarial, 
+                     masa_salarial_oede =masa_salarial_total)) %>% 
+  full_join(masa_salarial_cepal %>% 
+              select(anio, unidad, ms_cepal)) %>% 
+  mutate(ms = case_when(anio < 1996 ~ ms_cepal,
+                        anio >= 1996 ~masa_salarial_oede)) %>% 
+  arrange(anio)
+masa_salarial_hidrocarburos  
+
+
 ```
+
 
 
 ## Pozos
@@ -3382,59 +3420,147 @@ ggplotly(graf_inversion_pozo, width = 700, height = 400)
 
 ```
 
+## Regalías
+
+* Fuentes: 
+  + Secretaría de Energía (Base Regalías)
 
 
-# Valor total de la producción y ganancia
+REVISAR EL CALCULO DE BETANIA 
+cuanto ganarian las provincias si el precio del mercado interno se acomoda al internacional?
 
-## PBI
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#regalias
+#filtro con productos
+productos <- list("crudo", "gas", "gasolina", "glp")
+
+#loop para levantar las bases
+lista_regalias = list()
+for(i in productos){
+  regalias_i <- read_delim(paste0("C:/Archivos/Datos/Hidrocarburos/Estimacion propia/datasets/regalias_", i, ".csv"), 
+    ";", escape_double = FALSE, trim_ws = TRUE, 
+    skip = 1)
+  lista_regalias[[i]] <- regalias_i
+}
+
+#bases individuales
+regalias_crudo <- lista_regalias$crudo %>% 
+  mutate(moneda = "usd",
+         producto = "crudo")
+regalias_gas <- lista_regalias$gas %>% 
+  mutate(moneda = "ars",
+         producto = "gas")
+regalias_gasolina <- lista_regalias$gasolina %>% 
+  mutate(moneda = "usd",
+         producto = "gasolina")
+regalias_glp <- lista_regalias$glp %>% 
+  mutate(moneda = "ars",
+         producto = "glp")
+
+#base completa
+regalias <-  regalias_crudo %>% 
+  bind_rows(regalias_gas, regalias_gasolina, regalias_glp) %>% 
+  rename(anio = "AÑO",
+         mes = "MES", 
+         regalias_total = "TOTAL PROVINCIA") %>% 
+  mutate(fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, anio, mes, producto, moneda, regalias_total, everything(.)) %>% 
+  group_by(producto, anio, moneda ) %>% 
+  summarise(regalias_total = sum(regalias_total)) %>% 
+  left_join(tcp_anual %>% select(-TCP)) %>% 
+  mutate(regalias_total = case_when(moneda == "usd" ~ regalias_total * TCC,
+                                    T ~ regalias_total),
+         unidad = "ars") %>% 
+  select(-c(TCC, moneda))
+
+regalias
+
+# writexl::write_xlsx(regalias %>% 
+#   spread(.,
+#          key = anio,
+#          value = regalias_total), path = "resultados/regalias.xlsx")
+```
+
+## Subsidios
+```{r}
+# CEFIP cont et al. Subsidios como % del PBI
+subsidios_cefip <- read_excel("/Archivos/Datos/Hidrocarburos/subsidios/subsidios.xlsx") %>% 
+  gather(key = anio,
+         value = subsidios_porcentaje_pbi,
+         2:ncol(.)) %>% 
+  filter(sector %in% c("CAMMESA", "Plan Gas","ENARSA", "Subsidios FF GN y GLP")) %>% 
+  mutate(anio = as.double(anio)) %>% 
+  left_join(ganancia_y_pbi %>% 
+              select(anio, pbi)) %>%
+  mutate(subsidios_porcentaje_pbi=as.double(subsidios_porcentaje_pbi),
+         subsidios_cefip = subsidios_porcentaje_pbi * pbi * 10^6) %>% 
+  group_by(anio) %>% 
+  summarise(unidad = "Pesos corrientes",
+            subsidios_cefip=sum(subsidios_cefip, na.rm = T))
+
+#ejes 
+subsidios_ejes <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/subsidios.xlsx" ) %>% 
+  rename(subsidios_usd = subsidios_hidrocarburos) %>% 
+  right_join(tcp_anual_b %>% 
+               select(anio, tcc), by = "anio") %>%
+  group_by(anio) %>% 
+  summarise(unidad = "Pesos corrientes",
+         subsidios_ejes = subsidios_usd*tcc*10^6)
+
+subsidios_hidrocarburos <- subsidios_ejes%>% 
+  select(anio, unidad, subsidios_ejes) %>% 
+  full_join(subsidios_cefip, by =c("anio", "unidad")) %>% 
+  arrange(-anio) %>% 
+  mutate(unidad = "Pesos corrientes")
+         # x = subsidios_cefip/subsidios_ejes)
+subsidios_hidrocarburos  
+```
 
 
-[Producto Interno Bruto Explotación Minas y Canteras Millones de pesos constantes. Base 1960. Valores trimestrales
-PIB Explotación Minas y Canteras en millones de pesos de 1960. 1970-1980](https://datos.gob.ar/dataset/sspm-producto-interno-bruto-sectorial-1970-1980)
+
+# Valor total de la producción  
 
 
-[Producto Interno Bruto Explotación Minas y Canteras, Australes constantes. Base 1970.Valores trimestrales
-PIB Explotación Minas y Canteras en australes a precios de 1970. 1980-1990](https://datos.gob.ar/dataset/sspm-producto-interno-bruto-sectorial-1980-1990) 
- 
+## Criterios metodológicos 
+Se presentan a continuación distintas estimaciones sobre la magnitud de riqueza presente en el sector hidrocarburífero: Valor Bruto y Agregado de Producción (VBP y VA), Consumo Interemedio (CI), Masa Salarial (MS) y Excedente Bruto de Explotación (EBE). El VBP surge de la valuación de la producción a sus precios correspondientes. El VA resulta de la diferencia entre el VBP y CI, el cual puede surgir originalmente de esta resta o a partir del coeficiente técnico de la Matriz Insumo Producto (MIP). El EBE constituye la plusvalía (PV) total de la rama, es decir, la suma de la renta de la tierra (RT) más la ganancia normal (Gnorm), y se obtiene luego de descontar la MS y los impuestos específicos (Imp) del VA. En todos los casos que se presentarán a continuación, los Imp se calcularon a partir de un coeficiente fijo resultante de la  MIP de 1997. Lo mismo pasa con la estimación de la depreciación de capital o consumo de capital fijo (ConsKfijo), que se obtiene a partir de aplicar la tasa de depreciación promedio resultante de los balances de YPF (1998 - 2018) sobre el total de Propiedad, Planta y Equipo (PPyE) de la rama. Esta partida se aplica para obtener el Excedente Neto de Explotación. Se presentan distintas estimaciones para el VBP, CI y MS, que luego se observarán en la formulación matemática:
 
-## Valor Bruto de la Producción, Valor Agregado y Consumo Intermedio 
-
-Se presentan a continuación distintas estimaciones sobre la magnitud de riqueza presente en el sector hidrocarburífero: Valor Bruto y Agregado de Producción (VBP y VA), Consumo Interemedio (CI), Masa Salarial (MS) y Excedente Bruto de Explotación (EBE). El VBP surge de la valuación de la producción a sus precios correspondientes. El VA resulta de la diferencia entre el VBP y CI, el cual puede surgir originalmente de esta resta o a partir del coeficiente técnico de la Matriz Insumo Producto (MIP). El EBE constituye la plusvalía (PV) total de la rama, es decir, la suma de la renta de la tierra (RT) más la ganancia normal (Gnorm), y se obtiene luego de descontar la MS y los impuestos específicos (Imp) del VA. En todos los casos que se presentarán a continuación, los Imp se calcularon a partir de un coeficiente fijo resultante de la  MIP de 1997. Lo mismo pasa con la estimación de la depreciación de capital o consumo de capital fijo (ConsKfijo), que se obtiene a partir de aplicar una tasa de depreciación constante sobre el Stock de Capital Adelantado (KTA). Esta partida se aplica para obtener el Excedente Neto de Explotación. Se presentan distintas estimaciones para el VBP, CI y MS, que luego se observarán en la formulación matemática:
 
 
 * CCNN (*vbp_va_ci_ccnn* y *pv_hidrocarburos_ccnn*)
   + Valores contables oficiales de las Cuentas Nacionales (sólo disponible para el período 2004-2012). Dado que se presentan series de VBP y VA, se pudo estimar el CI como la diferencia de dichas cuentas. Se procedió a separar el VBP a partir del peso del VBP de los servicios de apoyo a la extracción sobre el VBP de extracción de petróleo y gas, presente en el Cuadro de Utilización de Oferta (COU) de 2004 de INDEC. Se descontó esta proporción (resultante del 10,7%) del VBP total para obtener un VBP sólo de extracción. Dado que se posee información del salario promedio del sector y el empleo, se pudo obtener la MS resultante, tanto para el total del sector (extracción y servicios relacionados) como para sólo extracción. A partir de estos datos se elaboró un coeficiente que refleja el promedio de la proporción de la MS sobre el VBP que se utilizará en cálculos posteriores de MS total y MS de extracción. 
 
 * Estimación propia con criterio CCNN (*vbp_va_ci_propia*)
-  + Estimación propia de los valores contables a partir de las fuentes recopiladas, siguiendo los criterios de las Cuentas Nacionales. Es decir, para obtener el VBP se valua la producción destinada al mercado interno (resultante a partir de la diferencia entre producción y exportaciones) con los precios internos y las exportaciones con los precios de exportación, valuados tipo de cambio comercial (TCC). Se procedió también a separar el VBP de extracción neto de los servicios tal como se explicó anteriormente. El CI se estimó a partir de aplicar el coeficiente técnico de la MIP de 1997 sobre el VBP. De igual manera, para calcular la masa salarial se aplicó el coeficiente de MS mencionado anteriormente. Finalmente, como se mencionó anteriormente, el VA el EBE se calcularon a partir de las diferencias mencionadas anteriormente. 
+  + Estimación propia de los valores contables a partir de las fuentes recopiladas, siguiendo los criterios de las Cuentas Nacionales. Es decir, para obtener el VBP se valua la producción destinada al mercado interno (resultante a partir de la diferencia entre producción y exportaciones) con los precios internos y las exportaciones con los precios de exportación, valuados tipo de cambio comercial (TCC). Se procedió también a separar el VBP de extracción neto de los servicios tal como se explicó anteriormente. El CI se estimó a partir de aplicar el coeficiente técnico (ratio CI/VBP) resultante de la MIP de 1997 (equivalente a 0.272). De igual manera, para calcular la masa salarial se aplicó el coeficiente de MS mencionado anteriormente. Finalmente, como se mencionó anteriormente, el VA el EBE se calcularon a partir de las diferencias mencionadas anteriormente. 
 
 * Empalme CCNN (*vbp_ccnn*)
   + Estimación que toma los valores oficiales de las cuentas nacionales para el período donde se presentan datos (2004 -2012) y que imputa los valores faltantes por medio de la evolución del índice del VBP propio con criterio CCNN explicado anteriormente. Asimismo, se utilizaron los valores oficiales de la MS cuando se encontraba disponible el dato (1996-2018), mientras que se utilizó el valor propio estimado con criterio de las CCNN para los restantes años. 
   
 * Criterio Propio (*pv_hidrocarburos_propia*)
-  + Estimación propia que refleja con mayor precisión el valor de la riqueza total presente en el sector. El VBP se obtiene a paritr de valuar la totalidad de la producción a los precios externos o de referencia internacional y con el tipo de cambio de paridad (TCP), que mide la capacidad real de compra de la moneda nacional. Sin embargo, como el CI constituyen intercambios de mercancías realizadas en el ámbito nacional, dicha partida se obtiene a partir de los valores obtenidos en la serie de empalme CCNN. De igual manera, se utilizó la MS resultante de esta última estimación. 
+  + Estimación propia que refleja con mayor precisión el valor de la riqueza total presente en el sector. El VBP se obtiene a paritr de valuar la totalidad de la producción a los precios externos o de referencia internacional y con el tipo de cambio de paridad (TCP), que mide la capacidad real de compra de la moneda nacional. Sin embargo, como el CI constituye intercambios de mercancías realizadas en el ámbito nacional, dicha partida se obtiene a partir de los valores obtenidos en la serie de empalme CCNN. De igual manera, se utilizó la MS resultante de esta última estimación. 
 
 
 
 
-### Formulación matemática de los cálculos
+## Formulación matemática de estimaciones con criterio propio y criterio CCNN
 
-
-* VBP con criterio propio 
-
+VBP total
 $$VBP_{propia} = (Pext_{petróleo} * Q_{petróleo} + Pext_{gas} * Q_{gas}) * TCP$$
 
-* VBP con criterio CCNN 
-
+VBP total criterio CCNN
 $$VBP_{CCNN} = (Pint_{petróleo} * QMInt_{petróleo} + Pext_{petróleo} * Expo_{petróleo} + Pint_{gas} * QMInt_{gas} + Pext_{gas} * Expo_{gas})* TCC$$
 
+VBP extracción criterio CCNN
+
+$$VBP\_extraccion_{CCNN} = VBP_{CCNN} * (1-prop\_servicios)$$
+$$prop\_servicios = \frac{VBP\_servicios_{COU}}{VBP\_extraccion_{COU}}$$
 
 Donde: 
 
-* $VBP_{propia}$ = Valor Bruto de la Producción, estimación propia
-* $VBP_{CCNN}$ = Valor Bruto de la Producción,  estimación propia con criterio de las CCNN
-* $Pext_{petróleo}$ = Precio de exportación/referencia internacional del petróleo crudo
-* $Pext_{gas}$ = Precio de exportación/referencia internacional del gas natural
+* $VBP_{propia}$ = Valor Bruto de la Producción total, estimación propia
+* $VBP_{CCNN}$ = Valor Bruto de la Producción total,  estimación propia con criterio de las CCNN
+* $VBP\extraccion_{CCNN}$ = Valor Bruto de la Producción extracción,  estimación propia con criterio de las CCNN
+* $Pext_{petróleo}$ = Precio de exportación o referencia internacional del petróleo crudo (según corresponda)
+* $Pext_{gas}$ = Precio de exportación o referencia internacional del gas natural (según corresponda)
 * $Pint_{petróleo}$ = Precio mercado interno del petróleo crudo
 * $Pint_{gas}$ = Precio mercado interno del gas natural
 * $Q_{petróleo}$ = Cantidades producidas totales de petróleo crudo
@@ -3445,27 +3571,39 @@ Donde:
 * $Expo_{gas}$ = exportaciones de gas natural
 * $TCC$ = Tipo de Cambio Comercial
 * $TCP$ = Tipo de Cambio de Paridad
+* $prop\_extraccion$ = proporción del VBP de servicios de apoyo sobre VBP de extracción de petróleo y gas
+* $VBP\_servicios_{COU}$ = VBP de servicios de apoyo del Cuadro de Utilización de Oferta
+* $VBP\_extracción_{COU}$ = VBP de extracción de petróleo y gas del Cuadro de Utilización de Oferta
 
 
-$$ CI_{propia} = VBP_{CCNN} *  Coef\_tec $$
+Como se mencionó, en todos los casos en los que se presenta dato de consumo intermedio y masa salarial de las CCNN, se realizó el reemplazo de los valores estimados por los datos oficiales de las CCNN.
+
+Consumo Intermedio, valores oficiales de las CCNN:
+$$ CI_{CCNN} = VBP_{CCNN} -  VA_{CCNN} $$
+Consumo Intermedio, valores estimados bajo criterio de las CCNN:
+$$ CI_{CCNN} = VBP_{CCNN} *  Coef\_tec $$
  
 
-$$VA_{propia}  = VBP_{propia} – CI_{propia} $$
+
 
 
 Donde:
 
-* $CI_{propia}$ = Consumo Intermedio, estimación propia
+* $CI_{CCNN}$ = Consumo Intermedio, estimación propia
 * $VA_{propia}$ = Valor Agregado, estimación propia 
 * $Coef\_tec$ = Coeficiente técnico de Matriz Insumo Producto
 
-$$MS_{propia} = W * Emp * 13$$
+Masa Salarial, valores oficiales de las CCNN:
+$$MS = W * Emp * 13$$
+Masa Salarial, valores estimados bajo criterio de las CCNN:
+$$MS =  VBP_{CCNN} *  Coef\_MS$$
 
 Donde: 
 
-* $MS_{propia}$ = Masa Salarial, estimación propia
+* $MS$ = Masa Salarial 
 * $W$ =  Salario anual promedio
 * $Emp$ = Empleo
+* $Coef\_MS$ = Coeficiente de la proporción de MS sobre VBP
 
 $$ConKfijo = PPyE *  prom(\frac{Dep}{PPyE}) $$
 
@@ -3474,8 +3612,10 @@ Donde:
 * $ConKfijo$ = Consumo de Capital Fijo
 * $PPyE$= Propiedad, Planta y Equipo neta
 * $prom(\frac{Dep}{PPyE}) $ =  tasa de depreciación promedio
-* $Dep$ = Depreciaciones (cuenta gastos)
+* $Dep$ = Depreciaciones (cuenta gastos por naturaleza)
 
+
+$$VA_{propia}  = VBP_{propia} – CI_{CCNN} $$
 
 $$PV_{propia}  = VA_{propia} – MS_{propia}  – ConKfijo - IMP $$
 
@@ -3485,32 +3625,9 @@ Donde:
 *  $PV_{propia}$ = Plusvalía (*Excedente Bruto de Explotación*)
 *  $IMP$ = Impuestos normales
 
-En los casos en los que se presenta dato de consumo intermedio y masa salarial de las CCNN, se realizó el reemplazo de los datos estimados por los registrados en CCNN.
-
-Con respecto a la estimación propia, el consumo intermedio se estimó a partir de multiplicar el Valor Bruto de Producción por el coeficiente técnico resultante del Cuadro de Utilizacion de INDEC año 2004 (obtenido a partir del ratio CI/VBP). Su valor es igual 0.369, lo cual no está alejado del coeficiente promedio resultante de la serie de Valor de la Producción en base a cuentas nacionales (0.412). Sí se encuentra más alejado del coeficiente de la MIP base 1997 (0.272).
-
-Por su parte, la masa salarial se calculó como la multiplicación entre la remuneración promedio de la rama por el empleo registrado por los 12 meses del año más el aguinaldo. Los años faltantes se completaron por medio de multiplicar el VBP por el peso promedio de la masa salarial para los años con datos. Un método similar aplica Dachevsky: resulta de multiplicar el VBP por la proporción entre la remuneración a los asalariados sobre el valor total de producción de YPF para el año 1973/1963. 
-
-El consumo de capital fijo surge de aplicar la tasa de depreciación promedio resultante de los balances de YPF (1998 - 2018) al stock de capital adelantado estimado (ver apartado *Estimación de stock de capital a partir de la evolución de pozos perforados*). Dicho promedio resulta en torno al 12% del stock de capital
 
 
-
-
-Corrección VPB
-
-Cuadro utilizacion de oferta
-peso de los servicios = Servicios petroleo/extraccion = 10,7% (2)
-
-años 2004-2011
-aplicamos coef a base mineria/hidrocarburos CCNN
-VBP extraccion( CCNN) = VBP extraccion y servicios (CCNN) * 0,893 (1)
-
-1910 - 2018
-armar indice VBP criterio CCNN para mover (1) los años que nos faltan (1910 - 2004 y 2012 -2018) 
-deberia ser = que aplicar coef (2) a VBP
-
-
-#### Fuentes para la construcción de series 
+## Fuentes para la construcción de series 
 
 * Producción de Crudo: 
   + 1911 a 1992: Anuario de combustibles 
@@ -3568,6 +3685,14 @@ deberia ser = que aplicar coef (2) a VBP
 
 
 ### Cuentas Nacionales
+
+[Producto Interno Bruto Explotación Minas y Canteras Millones de pesos constantes. Base 1960. Valores trimestrales
+PIB Explotación Minas y Canteras en millones de pesos de 1960. 1970-1980](https://datos.gob.ar/dataset/sspm-producto-interno-bruto-sectorial-1970-1980)
+
+
+[Producto Interno Bruto Explotación Minas y Canteras, Australes constantes. Base 1970.Valores trimestrales
+PIB Explotación Minas y Canteras en australes a precios de 1970. 1980-1990](https://datos.gob.ar/dataset/sspm-producto-interno-bruto-sectorial-1980-1990) 
+
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 
 #coef CI
@@ -3581,7 +3706,6 @@ deberia ser = que aplicar coef (2) a VBP
 coef_tecnico <-  0.369104302
 
 coef_tecnico_97 <- 0.374125887
-
 
 
 #Peso de los servicios
@@ -3696,140 +3820,6 @@ indice_vbp_criterio_ccnn <- vbp_va_ci_propia %>%
 
 
 
-## Empleo, Remuneraciones y Masa Salarial (CCNN)
-
-* Salario y empleo
-  + MTEySS (Base Minería e Hidrocarburos de las Cuentas Nacionales) (1996-2013)
-  + [Ministerio de Trabajo, Empleo y Seguridad Social - Observatorio de Empleo y Dinámica Empresarial (OEDE)](http://www.trabajo.gob.ar/estadisticas/oede/estadisticasnacionales.asp) (1996-2019)
-  + EPH ??
-<br>
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#anuarios CEPAL
-cepal_1991 <- read_excel("C:/Archivos/Datos/Hidrocarburos/CEPAL/cepal_1991.xlsx") %>% 
-  mutate(valor = valor / conversor_pesos$A /10^3,
-         unidad = "Millones de pesos corrientes")
-
-masa_salarial_cepal <- cepal_1991 %>% 
-  filter(variable == "remuneracion_al_trabajo") %>% 
-  rename(ms_cepal = valor)
-  
-
-#con datos de la base de CCNN
-empleo <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls", 
-    sheet = "Empleo registrado", skip = 5) %>% 
-  rename(anio = "Año",
-          periodo ="Período",
-         empleo_extraccion_hidrocarburos = "...7",
-        empleo_servicios_hidrocarburos = "...8" ) %>%
-   filter(is.na(periodo), !is.na(anio) ) %>%
-  select(anio, empleo_extraccion_hidrocarburos,empleo_servicios_hidrocarburos ) %>% 
-  mutate(unidad_empleo = "Puestos de trabajo",
-         empleo_extraccion_hidrocarburos = as.double(empleo_extraccion_hidrocarburos),
-         empleo_servicios_hidrocarburos = as.double(empleo_servicios_hidrocarburos)) 
-  
-
-salarios <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls", 
-    sheet = "Remuneraciones", col_types = c("numeric", 
-        "date", "text", "text", "text", "text", 
-        "text", "text", "text", "text", "text", 
-        "text"), skip = 5) %>% 
-    rename(anio = "Año",
-          periodo ="Período",
-          salario_extraccion_hidrocarburos = "...7",
-         salario_servicios_hidrocarburos =  "...8") %>% 
-  filter(!is.na(anio) & anio < 2014) %>% 
-  select(anio, salario_extraccion_hidrocarburos,salario_servicios_hidrocarburos ) %>% 
-  mutate(unidad_salario = "Pesos corrientes",
-         salario_extraccion_hidrocarburos= as.double(salario_extraccion_hidrocarburos),
-        salario_servicios_hidrocarburos = as.double(salario_servicios_hidrocarburos))
-   
-masa_salarial_ccnn <- empleo %>% 
-  left_join(salarios, by = "anio") %>% 
-  mutate(unidad_masa_salarial = "Millones de pesos corrientes",
-         masa_salarial_extraccion = (salario_extraccion_hidrocarburos *empleo_extraccion_hidrocarburos*13)/10^6,
-         masa_salarial_servicios = (salario_servicios_hidrocarburos *empleo_servicios_hidrocarburos*13)/10^6,
-         masa_salarial_total = masa_salarial_extraccion + masa_salarial_servicios) 
-
-
-
-#con datos de empleo registrado 
-remuneraciones_anual <- read_excel("C:/Archivos/Datos/Hidrocarburos/Ministerio Trabajo/nacional_serie_remuneraciones_anual.xlsx", 
-    sheet = "C 5", col_types = c("skip", 
-        "text", "numeric", "numeric", "numeric", 
-        "numeric", "numeric", "numeric", 
-        "numeric", "numeric", "numeric", 
-        "numeric", "numeric", "numeric", 
-        "numeric", "numeric", "numeric", 
-        "numeric", "numeric", "numeric", 
-        "numeric", "numeric", "numeric", 
-        "numeric", "numeric", "numeric", 
-        "numeric"), skip = 4) %>% 
-  gather(key = anio,
-         value = valor,
-         2:ncol(.)) %>%
-  rename(rama_actividad = "Rama de actividad") %>% 
-  filter( str_detect(rama_actividad, "petróleo")) %>% 
-  mutate(unidad_salario = "Pesos corrientes",
-         rama_actividad= 
-           case_when(rama_actividad==
-                                     "Actividades  de servicios relacionadas con la extracción de petróleo y gas, excepto las actividades de prospección" ~ 
-                                     "remuneracion_servicios_extraccion",
-                                   rama_actividad==
-                                     "Extracción de petróleo crudo y gas natural" ~ 
-                                     "remuneracion_extraccion_petroleo_gas")) %>% 
-    filter(!(is.na(rama_actividad))) %>% 
-  spread(key = rama_actividad,
-         value = valor)
-  
-
-
-empleo_anual <- read_excel("C:/Archivos/Datos/Hidrocarburos/Ministerio Trabajo/nacional_serie_empleo_anual.xlsx", 
-    sheet = "C 5", col_types = c("skip", 
-        "text", "text", "text", "text", "text", 
-        "text", "text", "text", "text", "text", 
-        "text", "text", "text", "text", "text", 
-        "text", "text", "text", "text", "text", 
-        "text", "text", "text", "text", "text"), 
-    skip = 4)%>% 
-  gather(key = anio,
-         value = valor,
-         2:ncol(.)) %>%
-  rename(rama_actividad = "Rama de actividad") %>% 
-  filter( str_detect(rama_actividad, "petróleo")) %>% 
-  mutate(valor = as.double(valor),
-         unidad_empleo = "Puestos de trabajo",
-         rama_actividad= case_when(rama_actividad==
-                                     "Actividades  de servicios relacionadas con la extracción de petróleo y gas, excepto las actividades de prospección" ~ 
-                                     "empleo_servicios_extraccion",
-                                   rama_actividad==
-                                     "Extracción de petróleo crudo y gas natural" ~ "empleo_extraccion_petroleo_gas")) %>% 
-  filter(!(is.na(rama_actividad))) %>% 
-  spread(key = rama_actividad,
-         value = valor)
-
-masa_salarial_oede <- empleo_anual %>% 
-  left_join(remuneraciones_anual, by = "anio") %>% 
-  mutate(unidad_masa_salarial = "Millones de pesos corrientes",
-         masa_salarial_extraccion = (  remuneracion_extraccion_petroleo_gas *empleo_extraccion_petroleo_gas*13)/10^6,
-         masa_salarial_servicios = (remuneracion_servicios_extraccion *empleo_servicios_extraccion*13)/10^6,
-         masa_salarial_total = masa_salarial_servicios + masa_salarial_extraccion,
-         anio =as.double(anio))
-
-masa_salarial_hidrocarburos <- masa_salarial_ccnn %>% 
-  select(anio, unidad = unidad_masa_salarial, masa_salarial_ccnn = masa_salarial_total) %>% 
-  full_join(masa_salarial_oede %>% 
-              select(anio, unidad = unidad_masa_salarial, 
-                     masa_salarial_oede =masa_salarial_total)) %>% 
-  full_join(masa_salarial_cepal %>% 
-              select(anio, unidad, ms_cepal)) %>% 
-  mutate(ms = case_when(anio < 1996 ~ ms_cepal,
-                        anio >= 1996 ~masa_salarial_oede)) %>% 
-  arrange(anio)
-masa_salarial_hidrocarburos  
-
-
-```
 
 ## Plusvalía total del sector
 
