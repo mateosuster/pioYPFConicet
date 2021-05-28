@@ -4014,9 +4014,6 @@ criterio_propio <- precios_y_cantidades %>%
 
 
 
-
-## Plusvalía total del sector
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 filtro <- c("anio", "unidad", "fuente", "vbp_tot", "vbp_extr",
             "ci_tot", "ci_extr",  "ms_tot", "ms_extr",
@@ -4045,84 +4042,12 @@ graf_valor_produccion <- valor_total_produccion %>%
        subtitle = "Valor total y componentes",
        y = "Millones de pesos de 2018")+
   facet_wrap(~variable)
-ggplotly(graf_valor_produccion, width = 750, height = 400)
+gp <- ggplotly(graf_valor_produccion, width = 750, height = 800)  
+gp[['x']][['layout']][['annotations']][[2]][['x']] <- -0.11
+gp %>% layout(margin = list(l = 75))
 
 
 ```
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-###
-valor_total_produccion <- ccnn_oficial %>%  # no tiene descontado servicios
- mutate(fuente = "CCNN") %>% 
-   full_join(pv_hidrocarburos_propia %>% 
-              select(anio, consumo_k_fijo)) %>%  
-  select(anio, unidad, fuente,vbp_extr,valor_agregado,
-         consumo_intermedio, masa_salarial, excedente_bruto_explotacion, consumo_k_fijo) %>% 
-  gather(key = variable,
-         value = valor,
-         4:ncol(.)) %>% 
-  bind_rows(pv_hidrocarburos_propia %>% 
-              mutate(fuente = "Criterio Propio") %>% 
-              select(anio, unidad, 
-                     fuente,
-                     valor_bruto_produccion = vbp_criterio_propio,
-                     everything(.)) %>% 
-              gather(key = variable,
-                      value = valor,
-                      4:ncol(.))) %>%
-  bind_rows(pv_hidrocarburos %>% 
-              mutate(fuente = "Criterio propio con VBP CCNN") %>% 
-              select(anio, unidad, fuente, valor_bruto_produccion = vbp, 
-                   consumo_intermedio = ci, 
-                   valor_agregado= va, 
-                   masa_salarial = ms, 
-                   excedente_bruto_explotacion = ebe,
-                   consumo_k_fijo= consumo_k_fijo_propio) %>% 
-               gather(key = variable,
-                      value = valor,
-                      4:ncol(.))) %>% 
-  bind_rows(vbp_va_ci_propia %>% # Criterio CCNN. No tiene descontado servicios 
-              left_join(stock_estimado %>%  
-                          select(-unidad),
-                          # filter(variable == "ppye_estimado_bolsar"),
-                        by = "anio") %>%
-              left_join(ipc_promedio %>% select(anio, ipc_18))  %>%
-              distinct() %>%
-              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf,
-                     fuente = "Criterio CCNN",
-                     valor_agregado = vbp_criterio_ccnn - consumo_intermedio,
-                     masa_salarial = mean_coef_ms * vbp_criterio_ccnn,
-                     excedente_bruto_explotacion =valor_agregado-  masa_salarial-consumo_k_fijo,
-                     unidad = "Millones de pesos corrientes") %>%
-              select(anio, unidad, fuente,
-                    valor_bruto_produccion = vbp_criterio_ccnn,
-                   consumo_intermedio,
-                   valor_agregado,
-                   masa_salarial,
-                   excedente_bruto_explotacion , consumo_k_fijo) %>%
-              gather(key = variable,
-                      value = valor,
-                      4:ncol(.))) %>%
-  bind_rows(vbp_ccnn %>% # CCNN Reestimado, tiene descontado serivicios
-              #select(-consumo_k_fijo) %>% 
-              rename(valor_bruto_produccion = vbp_extr_ccnn, 
-                   consumo_intermedio = ci_extr_ccnn,
-                   valor_agregado =va_extr_ccnn,
-                   masa_salarial =ms_ccnn,
-                   excedente_bruto_explotacion =ebe_ccnn) %>% 
-              gather(key = variable,
-                      value = valor,
-                      4:ncol(.))) %>%
-  left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
-  mutate(valor = valor /ipc_18,
-         unidad = "Millones de pesos de 2018") %>%
-  select(-ipc_18) %>% 
-  filter(!is.na(fuente))
-valor_total_produccion
-
-```
-
 
 
 
