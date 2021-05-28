@@ -3524,7 +3524,7 @@ subsidios_hidrocarburos
 
 
 ## Criterios metodológicos 
-Se presentan a continuación distintas estimaciones sobre la magnitud de riqueza presente en el sector hidrocarburífero: Valor Bruto y Agregado de Producción (VBP y VA), Consumo Interemedio (CI), Masa Salarial (MS) y Excedente Bruto de Explotación (EBE). El VBP surge de la valuación de la producción a sus precios correspondientes. El VA resulta de la diferencia entre el VBP y CI, el cual puede surgir originalmente de esta resta o a partir del coeficiente técnico de la Matriz Insumo Producto (MIP). El EBE constituye la plusvalía (PV) total de la rama, es decir, la suma de la renta de la tierra (RT) más la ganancia normal (Gnorm), y se obtiene luego de descontar la MS y los impuestos específicos (Imp) del VA. En todos los casos que se presentarán a continuación, los Imp se calcularon a partir de un coeficiente fijo resultante de la  MIP de 1997. Lo mismo pasa con la estimación de la depreciación de capital o consumo de capital fijo (ConsKfijo), que se obtiene a partir de aplicar la tasa de depreciación promedio resultante de los balances de YPF (1998 - 2018) sobre el total de Propiedad, Planta y Equipo (PPyE) de la rama. Esta partida se aplica para obtener el Excedente Neto de Explotación. Se presentan distintas estimaciones para el VBP, CI y MS, que luego se observarán en la formulación matemática:
+Se presentan a continuación distintas estimaciones sobre la magnitud de riqueza presente en el sector hidrocarburífero: Valor Bruto y Agregado de Producción (VBP y VA), Consumo Interemedio (CI), Masa Salarial (MS) y Excedente Bruto de Explotación (EBE). El VBP surge de la valuación de la producción a sus precios correspondientes. El VA resulta de la diferencia entre el VBP y CI, el cual puede surgir originalmente de esta resta o a partir del coeficiente técnico de la Matriz Insumo Producto (MIP). El EBE constituye la plusvalía (PV) total de la rama, es decir, la suma de la renta de la tierra (RT) más la ganancia normal (Gnorm), y se obtiene luego de descontar la MS y los impuestos específicos (Imp) del VA. En todos los casos que se presentarán a continuación, los Imp se calcularon a partir de aplicar sobre el VBP un coeficiente  resultante del peso de los impuestos promedio de la  MIP de 1997. Lo mismo pasa con la estimación de la depreciación de capital o consumo de capital fijo (ConsKfijo), que se obtiene a partir de aplicar la tasa de depreciación promedio resultante de los balances de YPF (1998 - 2018) sobre el total de Propiedad, Planta y Equipo (PPyE) de la rama. Esta partida se aplica para obtener el Excedente Neto de Explotación. Se presentan distintas estimaciones para el VBP, CI y MS, que luego se observarán en la formulación matemática:
 
 
 
@@ -3799,6 +3799,11 @@ ci_extraccion <- mip_97[c(126,149), c("actividad" , "Extracción de petróleo, g
 
 coef_tecnico_97 <- ci_extraccion[1,2]/ci_extraccion[2,2]
 
+x <- mip_97[c(140, 149),] #%>% 
+   # gather(key = sector, value = valor, 2:ncol(.)) %>% 
+
+imp_prom_97 <- apply(X = x[1,2:ncol(x)]/x[2,2:ncol(x)] , MARGIN = 1 , FUN = function(x) mean(x, na.rm=T)  )
+    
 
 # coef CUO 2004 a partir de CI/VBP
 # coef_tecnico <-  0.369104302
@@ -3898,7 +3903,7 @@ median_coef_ms <-  ccnn_oficial %>%
 
 ```
 
-### Estimación propia con criterio de propio y criterio CCNN
+### Estimaciones propias 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #variables para la estimación 
@@ -4004,10 +4009,10 @@ criterio_propio <- precios_y_cantidades %>%
          vbp_tot =( (prod_crudo*precio_me_crudo  + prod_gas * precio_externo_gas) * tcp)/10^6,
          va_tot = vbp_tot - ci_extr,
          ebe_tot = va_tot - ms_extr ,
-         pv = ebe_tot - consumo_k_fijo, 
+         pv = ebe_tot - consumo_k_fijo - (vbp_tot * imp_prom_97), 
          vbp_extr =  NA ,
          ebe_extr =NA,
-         va_extr=NA,
+         va_extr=NA, 
          fuente = "Criterio propio")
 
 ```
@@ -4119,13 +4124,15 @@ graf_tg_petrobras
 ```{r echo=FALSE, message=FALSE, warning=FALSE   ,fig.width=10, fig.height=5}
 #Estimación de tasa de ganancia total rama
 
-tasa_ganancia_rama_flujo <- valor_total_produccion %>%
-  filter(variable == "excedente_bruto_explotacion" & fuente == "Criterio propio con VBP CCNN" ) %>% 
-  select(anio, unidad, excedente_bruto_explotacion = valor) %>% 
+tasa_ganancia_rama_flujo <- criterio_propio %>%
+  select(anio, unidad, pv) %>% 
+  left_join(ipc_promedio , by = "anio") %>% 
+  mutate(pv = pv /ipc_18,
+         unidad = "Millones de pesos de 2018") %>% 
   left_join(stock_y_pozos %>% 
               select(anio,  ppye = ppye_estimado, stock_seleccionado = fuente_ppye, fuente_pozo),
             by = c("anio")) %>% 
-  mutate(tasa_ganancia = excedente_bruto_explotacion/ppye)
+  mutate(tasa_ganancia = pv/ppye)
 
 graf_tg_rama_1 <- tasa_ganancia_rama_flujo %>% 
   filter(anio >1960) %>% 
@@ -4255,9 +4262,9 @@ ggplotly(graf_renta_emp, width = 800, height = 600)
 
 
 
-```{r include=FALSE}
+```{r echo=FALSE}
 ejercicio <- valor_total_produccion %>% 
-  filter(variable == "valor_agregado") %>% 
+  filter(variable == "va_tot") %>% 
   # full_join(stock_rama %>%
   #             select(anio, rama = sector, activos = variable, valor_activos = valor, 
   #                    fuente_activos = fuente) %>% 
@@ -4282,7 +4289,7 @@ graf_relacion <- ejercicio %>%
   labs(title = "Activo sobre valor agregado")+
   facet_wrap(~activos) 
 
-ggplotly(graf_relacion, width = 600, height = 400)
+  ggplotly(graf_relacion, width = 600, height = 400)
 
 
 ```
@@ -4529,10 +4536,6 @@ $$RC = PCMi * CrudoP$$
 
 * $PCMi$ = Precio ponderado a Consumidores del Mercado Interno.
 
-```{r message=FALSE, warning=FALSE, include=FALSE}
-
-```
-
 
 
 
@@ -4568,21 +4571,20 @@ $$Impuestos\_netos\_específicos = Retenciones + Regalías - Subsidios$$
 renta_hidrocarburifera_total <- renta_tg %>% 
   select(anio, stock_seleccionado, ppye,
          tg_hidrocarburos, union_tg) %>% 
-  left_join(valor_total_produccion %>% 
-              filter(variable == "excedente_bruto_explotacion") %>% 
-              rename(excedente_bruto_explotacion = valor) %>% 
-              select(-c(variable)) %>% 
-              rename(fuente_gcia = fuente)) %>% 
+  left_join(criterio_propio %>% 
+              select(anio, excedente_bruto_explotacion =pv) )%>% 
   left_join(subsidios_hidrocarburos %>% 
               left_join(ipc_promedio %>% select(anio, ipc_18), by ="anio") %>%
               mutate(subsidios = (subsidios_ejes/10^6)/ipc_18, 
                      subsidios =replace_na(subsidios, 0) ) %>% 
               select(anio, subsidios)) %>% 
+  left_join(ipc_promedio %>% select(anio, ipc_18), by ="anio") %>% 
   mutate(renta_con_union_tg = ppye* (tg_hidrocarburos - union_tg),
          gcia_normal_hidrocarburos = ppye * union_tg,
-         renta_total = excedente_bruto_explotacion - gcia_normal_hidrocarburos -subsidios,
+         renta_total = (excedente_bruto_explotacion/ipc_18) - gcia_normal_hidrocarburos -subsidios,
          proporcion_subsidios = subsidios/
-           (excedente_bruto_explotacion - gcia_normal_hidrocarburos)) %>% 
+           (excedente_bruto_explotacion - gcia_normal_hidrocarburos),
+         unidad = "Millones de pesos de 2018") %>% 
   select(anio , unidad, everything(.))
 renta_hidrocarburifera_total
 
@@ -4592,35 +4594,34 @@ renta_hidrocarburifera_total %>%
   geom_line()+
   labs(title = "Renta hidrocarburífera total a partir de estimación propia del VBP",
        y = "Millones de pesos de 2018")+
-  theme(axis.text.x = element_text(angle = 90))+
-  facet_wrap(~fuente_gcia)
+  theme(axis.text.x = element_text(angle = 90))
 
 
 
 renta_total_pbi_pv <- renta_hidrocarburifera_total %>% 
   left_join(ganancia_y_pbi %>% rename(unidad_pbi_gcia = unidad),  by = "anio") %>% 
-  left_join(ipc_promedio %>% select(anio, ipc_18),  by = "anio") %>% 
+  # left_join(ipc_promedio %>% select(anio, ipc_18),  by = "anio") %>% 
   mutate(renta_pv =(renta_total*ipc_18 )/ganancia, 
          renta_pbi =(renta_total*ipc_18 )/pbi )
 
 
 graf_renta_total_pbi_pv <- renta_total_pbi_pv %>% 
-  select(anio, fuente_gcia, renta_pv,renta_pbi ) %>%
+  select(anio, renta_pv,renta_pbi ) %>%
   # filter(anio >= 1962, fuente_gcia == "Propia") %>%
   filter(anio >= 1962) %>%
   gather(key = tipo_renta,
          value = valor,
-         3:4) %>%
+         2:3) %>%
   ggplot(aes(anio, valor))+
   # geom_col(position = "dodge")+
   geom_line()+
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+
   labs(title = "Renta hidrocarburífera total sobre PBI y Ganancias Totales",
-       sbutitle = "A partir de estimación propia del VBP",
+       subtitle = "A partir de estimación propia del VBP",
        y = "%")+
   scale_y_continuous(labels=scales::percent_format(accuracy = 2))+
-  facet_grid(fuente_gcia~tipo_renta )
+  facet_grid(~tipo_renta )
 
 # graf_renta_total_pbi_pv
 ggplotly(graf_renta_total_pbi_pv, height = 400, width = 600)
@@ -4733,8 +4734,7 @@ graf_comparacion_rentas <- renta_pbi_pv %>%
   mutate(fuente = "Propia via suma de mecanismos") %>% 
   select(anio, unidad,fuente,  renta_total ) %>% 
   bind_rows(renta_total_pbi_pv %>% 
-                filter( fuente_gcia == "Propia") %>%
-               mutate(fuente = "Propia via descuentos sobre VBP") %>% 
+                mutate(fuente = "Propia via descuentos sobre VBP") %>% 
                select(anio,fuente,  renta_total ) ) %>% 
   bind_rows(renta_hidrocarburos_fr %>% 
               mutate(fuente = "Fárfaro Ruiz y Bill") %>%
@@ -4873,11 +4873,16 @@ costos <- produccion_total %>%
   select(anio, unidad_produccion=unidad,
          produccion_crudo =prod_crudo, produccion_gas=prod_gas,
          produccion_total=produccion_total_bep) %>% 
+ left_join(stock_estimado %>%
+               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+              # filter(variable == "ppye_estimado_bolsar") %>% 
+              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
+               select(anio, consumo_k_fijo)) %>%
   left_join(valor_total_produccion %>% 
               left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
               left_join(tcp_anual_b %>% select(-sobrevaluacion)) %>%
-              filter(variable %in% c("consumo_intermedio", "masa_salarial","consumo_k_fijo" ),
-                     fuente%in% c("Criterio CCNN", "CCNN")) %>%
+              filter(variable %in% c("ci_extr", "ms_extr"),
+                     fuente%in% c("Criterio CCNN", "CCNN oficial")) %>%
               mutate(valor = (valor*10^6)*ipc_18/tcc,
                      unidad ="USD tcc") %>% 
               spread(key=variable, value=valor)) %>% 
@@ -4889,7 +4894,7 @@ costos <- produccion_total %>%
   mutate(ppye = (ppye*10^6)*ipc_18/tcc,
          renta_total = (renta_total*10^6)*ipc_18/tcc,
          unidad_costos= "USD/boe",
-         costos_totales = (consumo_intermedio +masa_salarial + consumo_k_fijo),
+         costos_totales = (ci_extr +ms_extr + consumo_k_fijo),
          costos_totales_sum_gcia_normal = costos_totales + (ppye  * tg_normal),
          precio_costo = costos_totales/produccion_total,
          precio_costo_mmbtu = conversor_bepMMBTU_p(precio_costo),
@@ -5014,7 +5019,7 @@ writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo,
 
 writexl::write_xlsx(list(renta_total_pv_pbi = renta_pbi_pv,
                          valor_produccion = valor_total_produccion ,
-                         VA_propio = vbp_va_ci_propia,
+                         va_criterio_propio = criterio_propio,
                          crudo_dif_precios_ms = renta_dif_precios_crudo, 
                          gas_dif_precios_ms = renta_diferencial_precios_gas,
                          crudo_sobrevaluacion_ms = renta_tcp_crudo,
