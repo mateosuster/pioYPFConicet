@@ -3543,69 +3543,157 @@ Se presentan a continuación distintas estimaciones sobre la magnitud de riqueza
 
 
 
-## Formulación matemática de estimaciones con criterio propio y criterio CCNN
+## Formulación matemática de estimaciones
 
-VBP total
+Valor Bruto de Producción total, estimación con criterio propio
 $$VBP_{propia} = (Pext_{petróleo} * Q_{petróleo} + Pext_{gas} * Q_{gas}) * TCP$$
-
-VBP total criterio CCNN
-$$VBP_{CCNN} = (Pint_{petróleo} * QMInt_{petróleo} + Pext_{petróleo} * Expo_{petróleo} + Pint_{gas} * QMInt_{gas} + Pext_{gas} * Expo_{gas})* TCC$$
-
-VBP extracción criterio CCNN
-
-$$VBP\_extraccion_{CCNN} = VBP_{CCNN} * (1-prop\_servicios)$$
-$$prop\_servicios = \frac{VBP\_servicios_{COU}}{VBP\_extraccion_{COU}}$$
 
 Donde: 
 
 * $VBP_{propia}$ = Valor Bruto de la Producción total, estimación propia
-* $VBP_{CCNN}$ = Valor Bruto de la Producción total,  estimación propia con criterio de las CCNN
-* $VBP\extraccion_{CCNN}$ = Valor Bruto de la Producción extracción,  estimación propia con criterio de las CCNN
 * $Pext_{petróleo}$ = Precio de exportación o referencia internacional del petróleo crudo (según corresponda)
 * $Pext_{gas}$ = Precio de exportación o referencia internacional del gas natural (según corresponda)
-* $Pint_{petróleo}$ = Precio mercado interno del petróleo crudo
-* $Pint_{gas}$ = Precio mercado interno del gas natural
 * $Q_{petróleo}$ = Cantidades producidas totales de petróleo crudo
 * $Q_{gas}$ = Cantidades producidas totales de gas natural
+* $TCP$ = Tipo de Cambio de Paridad
+
+
+Valor Bruto de Producción total, estimación con criterio CCNN
+$$VBP_{CCNN} = (Pint_{petróleo} * QMInt_{petróleo} + Pext_{petróleo} * Expo_{petróleo} + Pint_{gas} * QMInt_{gas} + Pext_{gas} * Expo_{gas})* TCC$$
+
+Donde:
+
+* $VBP_{CCNN}$ = Valor Bruto de la Producción total,  estimación propia con criterio de las CCNN
+* $Pint_{petróleo}$ = Precio mercado interno del petróleo crudo
+* $Pint_{gas}$ = Precio mercado interno del gas natural
 * $QMInt_{petróleo}$ = cantidades vendidas al mercado interno de petróleo crudo
 * $QMInt_{gas}$ = cantidades vendidas al mercado interno del gas natural
 * $Expo_{petróleo}$ = exportaciones de petróleo crudo
 * $Expo_{gas}$ = exportaciones de gas natural
 * $TCC$ = Tipo de Cambio Comercial
-* $TCP$ = Tipo de Cambio de Paridad
-* $prop\_extraccion$ = proporción del VBP de servicios de apoyo sobre VBP de extracción de petróleo y gas
+
+
+<br>
+
+Valor Bruto de Producción extracción, estimación con criterio CCNN
+
+$$VBP\_extr_{CCNN} = VBP_{CCNN} * (1-prop\_servicios)$$
+
+Donde:
+
+* $VBP\_extr_{CCNN}$ = Valor Bruto de la Producción extracción,  estimación propia con criterio de las CCNN
+* $prop\_extr$ = proporción del VBP de servicios de apoyo sobre VBP de extracción de petróleo y gas
+
+
+Proporción de los servicios de apoyo sobre la extracción de petróleo y gas
+<br>
+$$prop\_servicios = \frac{VBP\_servicios_{COU}}{VBP\_extr_{COU}}$$
+
+Donde:
+
 * $VBP\_servicios_{COU}$ = VBP de servicios de apoyo del Cuadro de Utilización de Oferta
 * $VBP\_extracción_{COU}$ = VBP de extracción de petróleo y gas del Cuadro de Utilización de Oferta
 
 
-Como se mencionó, en todos los casos en los que se presenta dato de consumo intermedio y masa salarial de las CCNN, se realizó el reemplazo de los valores estimados por los datos oficiales de las CCNN.
 
-Consumo Intermedio, valores oficiales de las CCNN:
+<br>
+Consumo Intermedio, valores oficiales de las CCNN
 $$ CI_{CCNN} = VBP_{CCNN} -  VA_{CCNN} $$
-Consumo Intermedio, valores estimados bajo criterio de las CCNN:
-$$ CI_{CCNN} = VBP_{CCNN} *  Coef\_tec $$
-
-
-
 
 Donde:
 
-* $CI_{CCNN}$ = Consumo Intermedio, estimación propia
+* $CI_{CCNN}$ = Consumo Intermedio total, estimación propia
 * $VA_{CCNN}$ = Valor Agregado, estimación de las CCNN 
+
+<br>
+Consumo Intermedio, estimación con criterio CCNN
+$$ CI_{CCNN} = VBP_{CCNN} *  Coef\_tec $$
+Donde:
+
 * $Coef\_tec$ = Coeficiente técnico de Matriz Insumo Producto
 
-Masa Salarial, valores oficiales de las CCNN:
-$$MS = W * Emp * 13$$
-Masa Salarial, valores estimados bajo criterio de las CCNN:
-$$MS =  VBP_{CCNN} *  Coef\_MS$$
+<br>
+Consumo Intermedio de extracción, estimación con criterio CCNN
 
+$$ CI\_extr_{CCNN} = VBP\_extr_{CCNN} *  Coef\_tec $$
+
+Donde:
+
+* $ CI\_extr_{CCNN}$ = Consumo Intermedio de extracción, estimación criterio CCNN
+
+<br>
+Masa Salarial, valores oficiales de las CCNN
+$$MS = W * Emp * 13$$
 Donde: 
 
 * $MS$ = Masa Salarial 
 * $W$ =  Salario anual promedio
 * $Emp$ = Empleo
+
+<br>
+Masa Salarial, estimación con criterio CCNN
+$$MS =  VBP_{CCNN} *  Coef\_MS$$
+
+Donde: 
+
 * $Coef\_MS$ = Coeficiente de la proporción de MS sobre VBP
 
+<br>
+Masa Salarial de extracción, estimación con criterio CCNN
+$$MS\_extr =  VBP\_extr_{CCNN} *  Coef\_MS$$
+
+Donde: 
+
+  * $MS\_extr$ = Masa salarial del sector extracción
+
+<br>
+Valor agregado, estimación criterio CCNN
+$$VA_{CCNN}  = VBP_{CCNN} – CI_{CCNN} $$
+Donde:
+
+* $VA_{CCNN}$ = Valor Agregado, estimación propia con criterio CCNN
+
+<br>
+Valor agregado de extracción, estimación con criterio CCNN
+$$VA\_extr_{CCNN}  = VBP\_extr_{CCNN} – CI\_extr_{CCNN} $$
+
+Donde:
+
+* $VA\_extr_{CCNN}$ = Valor Agregado de extracción, estimación propia con criterio CCNN 
+
+
+<br>
+Valor agregado, estimación con criterio propio
+$$VA_{propia}  = VBP_{propia} – CI\_extr_{CCNN} $$
+
+Donde:
+
+* $VA_{propia}$ = Valor Agregado, estimación con criterio propio 
+
+
+<br>
+
+Excedente Bruto de Explotación, estimación con criterio CCNN
+$$EBE_{CCNN}  = VA_{CCNN} – MS   $$
+<br>
+
+Excedente Bruto de Explotación de extracción, estimación con criterio CCNN
+$$EBE\_extr_{CCNN}  = VA\_extr_{CCNN} – MS\_extr   $$
+
+<br>
+
+Excedente Bruto de Explotación, estimación con criterio propio
+$$EBE_{propia}  = VA_{propia} – MS\_extr   $$
+
+
+Donde:
+
+* $EBE$ = Excedente Bruto de Explotación
+* $CI\_extr_{CCNN}$ = Consumo intermedio del sector extracción, estimación con criterio CCNN
+
+
+<br>
+Consumo de Capital Fijo, estimación con criterio propio
 $$ConKfijo = PPyE *  prom(\frac{Dep}{PPyE}) $$
 
 Donde: 
@@ -3615,18 +3703,16 @@ Donde:
 * $prom(\frac{Dep}{PPyE}) $ =  tasa de depreciación promedio
 * $Dep$ = Depreciaciones (cuenta gastos por naturaleza)
 
+<br>
 
-$$VA_{propia}  = VBP_{propia} – CI\_extraccion_{CCNN} $$
-
-$$PV_{propia}  = VA_{propia} – MS_{propia}  – ConKfijo - IMP $$
+Plusvalía (Excedente Neto de Explotación), estimación con criterio propio
+$$PV_{propia} = VA_{propia} - ConKfijo - Imp $$
 
 
 Donde:
 
-* $VA_{propia}$ = Valor Agregado, estimación propia 
-* $CI\_extraccion_{CCNN}$ = Consumo intermedio del sector extracción, estimación con criterio CCNN
-*  $PV_{propia}$ = Plusvalía (*Excedente Neto de Explotación*)
-*  $IMP$ = Impuestos normales
+* $PV_{propia}$ = Plusvalía (*Excedente Neto de Explotación*)
+* $Imp$ = Impuestos normales
 
 
 
@@ -3780,10 +3866,11 @@ ccnn_oficial <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e
   mutate(unidad = "Millones de pesos corrientes") %>% 
   left_join(masa_salarial_hidrocarburos %>% 
               select(anio,  unidad,
-                     ms_total = masa_salarial_total_oede,
-                     ms_extraccion =masa_salarial_extraccion_oede ), by = c("anio", "unidad")) %>% 
-  mutate(ebe_total = va_extraccion_y_servicios_hidrocarburos - ms_total,
-         ebe_extraccion = va_extraccion_hidrocarburos -ms_extraccion) %>% 
+                     ms_tot = masa_salarial_total_oede,
+                     ms_extr =masa_salarial_extraccion_oede ), by = c("anio", "unidad")) %>% 
+  mutate(ebe_tot = va_extraccion_y_servicios_hidrocarburos - ms_tot,
+         ebe_extr = va_extraccion_hidrocarburos -ms_extr,
+         fuente = "CCNN oficial" ) %>% 
   rename(vbp_extr = vbp_extraccion_hidrocarburos,
          ci_extr = ci_extraccion_hidrocarburos,
          va_extr =va_extraccion_hidrocarburos,
@@ -3797,11 +3884,11 @@ ccnn_oficial
 #con base de VBP de elaboracion propia
 mean_coef_ms <-  ccnn_oficial %>% 
   summarise(coef_ms_tot = mean(ms_total/vbp_tot,na.rm= T),
-              coef_ms_extr= mean(ms_extraccion/vbp_extr ,na.rm= T))
+              coef_ms_extr= mean(ms_extr/vbp_extr ,na.rm= T))
 
 median_coef_ms <-  ccnn_oficial %>% 
   summarise(coef_ms_tot = median(ms_total/vbp_tot,na.rm= T),
-              coef_ms_extr= median(ms_extraccion/vbp_extr ,na.rm= T))
+              coef_ms_extr= median(ms_extr/vbp_extr ,na.rm= T))
 
 # # estimacion propia coef tecnico
 # ccnn_oficial %>% 
@@ -3839,15 +3926,10 @@ precios_y_cantidades <- prod_merge_crudo %>%
 
 ## Criterio CCNN 
 criterio_ccnn <- precios_y_cantidades %>% 
-   left_join(stock_estimado %>%
-               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-              # filter(variable == "ppye_estimado_bolsar") %>% 
-              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
-               select(anio, consumo_k_fijo)) %>% 
   mutate(crudo_mdo_interno = prod_crudo - expo_crudo,
          expo_gas = replace_na(expo_gas, 0 ),
          gas_mdo_interno = prod_gas - expo_gas,
-         unidad_valor_produccion = "Millones de pesos corrientes",
+         unidad = "Millones de pesos corrientes",
          
         # criterio CCNN
          vbp_tot = ((crudo_mdo_interno*precio_crudo_mdoint+
@@ -3862,7 +3944,8 @@ criterio_ccnn <- precios_y_cantidades %>%
         ms_extr = vbp_extr *mean_coef_ms$coef_ms_extr,
          ms_tot = vbp_tot *mean_coef_ms$coef_ms_tot,
          ebe_tot = va_tot - ms_tot,
-         ebe_extr=va_extr - ms_tot      )
+         ebe_extr=va_extr - ms_tot     ,
+        fuente = "Criterio CCNN")
 criterio_ccnn
 
 
@@ -3897,29 +3980,36 @@ empalme_ccnn <- ccnn_oficial %>%
                                    T ~ va_tot),
     va_extr = case_when(is.na(va_extr) ~ vbp_extr - ci_extr ,
                                    T ~ va_extr),
-    ms_total = case_when(is.na(ms_total) ~ vbp_tot*mean_coef_ms$coef_ms_tot,
-                                   T ~ ms_total) ,
-    ms_extraccion = case_when(is.na(ms_extraccion) ~ vbp_tot*mean_coef_ms$coef_ms_extr,
-                                   T ~ ms_extraccion), 
-    ebe_total = case_when(is.na(ebe_total) ~ va_tot -ms_total,
-                                   T ~ ebe_total),
-    ebe_extraccion = case_when(is.na(ebe_extraccion) ~ va_tot -ms_total,
-                                   T ~ ebe_extraccion))
+    ms_tot = case_when(is.na(ms_tot) ~ vbp_tot*mean_coef_ms$coef_ms_tot,
+                                   T ~ ms_tot) ,
+    ms_extr = case_when(is.na(ms_extr) ~ vbp_tot*mean_coef_ms$coef_ms_extr,
+                                   T ~ ms_extr), 
+    ebe_tot = case_when(is.na(ebe_tot) ~ va_tot -ms_tot,
+                                   T ~ ebe_tot),
+    ebe_extr = case_when(is.na(ebe_extr) ~ va_tot -ms_tot,
+                                   T ~ ebe_extr),
+    fuente = "Empalme CCNN")
 
-## Criterio propio con emapalme
-criterio_ccnn %>% 
-  rename(unidad = unidad_valor_produccion) %>% 
+## Criterio propio 
+criterio_propio <- precios_y_cantidades %>%
   left_join(empalme_ccnn %>% 
-              select(-c(vbp_criterio_ccnn_04, vbp_criterio_ccnn_12, vbp_tot))) %>% 
+              select(anio,unidad, ci_tot, ci_extr, ms_tot, ms_extr ) ) %>% 
+  left_join(stock_estimado %>%
+               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+              # filter(variable == "ppye_estimado_bolsar") %>% 
+              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
+               select(anio, consumo_k_fijo)) %>% 
   mutate(
         # criterio propio
-         valor_bruto_crudo = (prod_crudo*precio_me_crudo*tcp)/10^6,
-         valor_bruto_gas =   (prod_gas * precio_externo_gas*tcp)/10^6,
-         vbp_tot_criterio_propio = valor_bruto_crudo + valor_bruto_gas,
-         va_tot_propio = vbp_tot_criterio_propio - ci_extr,
-         ebe_tot_criterio_propio = va_tot_propio- ms_extr   )
+         vbp_tot =( (prod_crudo*precio_me_crudo  + prod_gas * precio_externo_gas) * tcp)/10^6,
+         va_tot = vbp_tot - ci_extr,
+         ebe_tot = va_tot - ms_extr ,
+         pv = ebe_tot - consumo_k_fijo, 
+         vbp_extr =  NA ,
+         ebe_extr =NA,
+         va_extr=NA,
+         fuente = "Criterio propio")
 
-glimpse(criterio_ccnn)
 ```
 
 
@@ -3928,9 +4018,40 @@ glimpse(criterio_ccnn)
 ## Plusvalía total del sector
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+filtro <- c("anio", "unidad", "fuente", "vbp_tot", "vbp_extr",
+            "ci_tot", "ci_extr",  "ms_tot", "ms_extr",
+            "va_tot",  "va_extr" , "ebe_tot", "ebe_extr"  )
+
+valor_total_produccion <- ccnn_oficial %>% 
+  rbind(criterio_ccnn %>%select(filtro)) %>% 
+  rbind(empalme_ccnn %>% select(filtro)) %>% 
+  rbind(criterio_propio %>% select(filtro)) %>% 
+  gather(key = variable, value=valor, 3:12) %>% 
+  left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+  mutate(valor = valor /ipc_18,
+         unidad = "Millones de pesos de 2018")
 
 
+  
 
+graf_valor_produccion <- valor_total_produccion %>% 
+  filter(anio > 1960) %>% 
+  ggplot( aes(anio, valor, color = fuente))+
+  geom_line(alpha = 0.7)+
+  geom_point(size = 0.435, alpha = 0.2)+
+  theme_classic()+
+  theme(legend.position = "bottom")+
+  labs(title = "Valor de la Producción hidrocarburífera", 
+       subtitle = "Valor total y componentes",
+       y = "Millones de pesos de 2018")+
+  facet_wrap(~variable)
+ggplotly(graf_valor_produccion, width = 750, height = 400)
+
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 ###
 valor_total_produccion <- ccnn_oficial %>%  # no tiene descontado servicios
  mutate(fuente = "CCNN") %>% 
@@ -4000,40 +4121,6 @@ valor_total_produccion <- ccnn_oficial %>%  # no tiene descontado servicios
   filter(!is.na(fuente))
 valor_total_produccion
 
-```
-
-```{r echo=FALSE}
-#Grafico
-graf_valor_produccion <- valor_total_produccion %>% 
-  filter(anio > 1960) %>% 
-  ggplot( aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.7)+
-  geom_point(size = 0.435, alpha = 0.2)+
-  theme_classic()+
-  theme(legend.position = "bottom")+
-  labs(title = "Valor de la Producción hidrocarburífera", 
-       subtitle = "Valor total y componentes",
-       y = "Millones de pesos de 2018")+
-  facet_wrap(~variable)
-ggplotly(graf_valor_produccion, width = 750, height = 400)
-
-
-```
-
-
-```{r echo=FALSE}
-vbp_va_ci_propia %>% 
-  select(anio, valor_bruto_crudo, valor_bruto_gas) %>% 
-  gather(key = variable, value =  valor, 2:3) %>% 
-    left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
-  mutate(valor = valor /ipc_18,
-         unidad = "Millones de pesos de 2018") %>% 
-  select(-ipc_18) %>% 
-  ggplot(aes(anio, valor, fill = variable))+
-  geom_col()+
-   labs(title = "Valor Bruto de la Producción hidrocarburífera", 
-       subtitle = "Desagregación en petróleo y gas", 
-       y = "Millones de pesos de 2018")
 ```
 
 
