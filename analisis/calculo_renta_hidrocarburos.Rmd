@@ -3583,8 +3583,7 @@ Como se mencionó, en todos los casos en los que se presenta dato de consumo int
 Consumo Intermedio, valores oficiales de las CCNN:
 $$ CI_{CCNN} = VBP_{CCNN} -  VA_{CCNN} $$
 Consumo Intermedio, valores estimados bajo criterio de las CCNN:
-$$ CI_{CCNN} = VBP\_extraccion_{CCNN} *  Coef\_tec $$
- 
+$$ CI_{CCNN} = VBP_{CCNN} *  Coef\_tec $$
 
 
 
@@ -3592,7 +3591,7 @@ $$ CI_{CCNN} = VBP\_extraccion_{CCNN} *  Coef\_tec $$
 Donde:
 
 * $CI_{CCNN}$ = Consumo Intermedio, estimación propia
-* $VA_{propia}$ = Valor Agregado, estimación propia 
+* $VA_{CCNN}$ = Valor Agregado, estimación de las CCNN 
 * $Coef\_tec$ = Coeficiente técnico de Matriz Insumo Producto
 
 Masa Salarial, valores oficiales de las CCNN:
@@ -3617,14 +3616,16 @@ Donde:
 * $Dep$ = Depreciaciones (cuenta gastos por naturaleza)
 
 
-$$VA_{propia}  = VBP_{propia} – CI_{CCNN} $$
+$$VA_{propia}  = VBP_{propia} – CI\_extraccion_{CCNN} $$
 
 $$PV_{propia}  = VA_{propia} – MS_{propia}  – ConKfijo - IMP $$
 
 
 Donde:
 
-*  $PV_{propia}$ = Plusvalía (*Excedente Bruto de Explotación*)
+* $VA_{propia}$ = Valor Agregado, estimación propia 
+* $CI\_extraccion_{CCNN}$ = Consumo intermedio del sector extracción, estimación con criterio CCNN
+*  $PV_{propia}$ = Plusvalía (*Excedente Neto de Explotación*)
 *  $IMP$ = Impuestos normales
 
 
@@ -3779,35 +3780,33 @@ ccnn_oficial <- read_excel("C:/Archivos/Datos/Hidrocarburos/Mecon/base-mineria-e
   mutate(unidad = "Millones de pesos corrientes") %>% 
   left_join(masa_salarial_hidrocarburos %>% 
               select(anio,  unidad,
-                     masa_salarial_total = masa_salarial_total_oede,
-                     masa_salarial_extraccion =masa_salarial_extraccion_oede ), by = c("anio", "unidad")) %>% 
-  mutate(ebe_total = va_extraccion_y_servicios_hidrocarburos - masa_salarial_total,
-         ebe_extraccion = va_extraccion_hidrocarburos -masa_salarial_extraccion) %>% 
-  rename(vbp_extraccion = vbp_extraccion_hidrocarburos,
-         ci_extraccion = ci_extraccion_hidrocarburos,
-         va_extraccion =va_extraccion_hidrocarburos,
-         vbp_total= vbp_extraccion_y_servicios_hidrocarburos , 
-         va_total= va_extraccion_y_servicios_hidrocarburos,
-         ci_total = ci_extraccion_y_servicios_hidrocarburos)
+                     ms_total = masa_salarial_total_oede,
+                     ms_extraccion =masa_salarial_extraccion_oede ), by = c("anio", "unidad")) %>% 
+  mutate(ebe_total = va_extraccion_y_servicios_hidrocarburos - ms_total,
+         ebe_extraccion = va_extraccion_hidrocarburos -ms_extraccion) %>% 
+  rename(vbp_extr = vbp_extraccion_hidrocarburos,
+         ci_extr = ci_extraccion_hidrocarburos,
+         va_extr =va_extraccion_hidrocarburos,
+         vbp_tot= vbp_extraccion_y_servicios_hidrocarburos , 
+         va_tot= va_extraccion_y_servicios_hidrocarburos,
+         ci_tot = ci_extraccion_y_servicios_hidrocarburos) %>% 
+  ungroup()
 ccnn_oficial
 
-ccnn_oficial <- ccnn_oficial
+
 #con base de VBP de elaboracion propia
-mean_coef_ms <-  mean((ccnn_oficial %>% 
-  group_by(anio) %>% 
-  summarise(coef_masa_salarial = masa_salarial/vbp_extraccion) %>% 
-  filter(!(is.na(coef_masa_salarial))))$coef_masa_salarial)
+mean_coef_ms <-  ccnn_oficial %>% 
+  summarise(coef_ms_tot = mean(ms_total/vbp_tot,na.rm= T),
+              coef_ms_extr= mean(ms_extraccion/vbp_extr ,na.rm= T))
 
-median_coef_ms <-  median((ccnn_oficial %>% 
-  group_by(anio) %>% 
-  summarise(coef_masa_salarial = masa_salarial/vbp_extraccion) %>% 
-  filter(!(is.na(coef_masa_salarial))))$coef_masa_salarial)
+median_coef_ms <-  ccnn_oficial %>% 
+  summarise(coef_ms_tot = median(ms_total/vbp_tot,na.rm= T),
+              coef_ms_extr= median(ms_extraccion/vbp_extr ,na.rm= T))
 
-
-# estimacion propia coef tecnico
-ccnn_oficial %>% 
-  summarise(coef_req_extr_y_serv =mean(ci_extraccion_y_servicios_hidrocarburos/vbp_extraccion_y_servicios_hidrocarburos, na.rm=T),
-         coef_req_extr = mean(ci_extraccion_hidrocarburos/vbp_extraccion_hidrocarburos, na.rm=T))
+# # estimacion propia coef tecnico
+# ccnn_oficial %>% 
+#   summarise(coef_req_extr_y_serv =mean(ci_extr_y_servicios_hidrocarburos/vbp_extr_y_servicios_hidrocarburos, na.rm=T),
+#          coef_req_extr = mean(ci_extr_hidrocarburos/vbp_extr_hidrocarburos, na.rm=T))
 
 
 ```
@@ -3838,35 +3837,89 @@ precios_y_cantidades <- prod_merge_crudo %>%
   left_join(tcp_anual_b %>% 
               select(anio, tcp, tcc), by = "anio")
 
-vbp_va_ci_propia <- precios_y_cantidades %>% 
+## Criterio CCNN 
+criterio_ccnn <- precios_y_cantidades %>% 
+   left_join(stock_estimado %>%
+               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+              # filter(variable == "ppye_estimado_bolsar") %>% 
+              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
+               select(anio, consumo_k_fijo)) %>% 
   mutate(crudo_mdo_interno = prod_crudo - expo_crudo,
          expo_gas = replace_na(expo_gas, 0 ),
          gas_mdo_interno = prod_gas - expo_gas,
          unidad_valor_produccion = "Millones de pesos corrientes",
-         vbp_tot_criterio_ccnn = ((crudo_mdo_interno*precio_crudo_mdoint+
+         
+        # criterio CCNN
+         vbp_tot = ((crudo_mdo_interno*precio_crudo_mdoint+
                                  expo_crudo*precio_me_crudo
                                + gas_mdo_interno * precio_gas_mdoint 
                                +expo_gas*precio_expo_gas_comtrade )*tcc)/10^6,
-         vbp_extr_criterio_ccnn =vbp_tot_criterio_ccnn*(1-servicios_s_extraccion),
-         ci_tot_criterio_ccnn = vbp_tot_criterio_ccnn *coef_tecnico_97 ,
-         ci_ext_criterio_ccnn = vbp_extr_criterio_ccnn * coef_tecnico_97,
-         valor_bruto_crudo = (prod_crudo*precio_me_crudo*tcp)/10^6,
-         valor_bruto_gas =   (prod_gas * precio_externo_gas*tcp)/10^6,
-         vbp_tot_criterio_propio = valor_bruto_crudo + valor_bruto_gas,
-         va_tot_propio = vbp_criterio_propio - ci_ext_criterio_ccnn )
-vbp_va_ci_propia
+         vbp_extr =vbp_tot*(1-servicio_s_extraccion),
+         ci_tot = vbp_tot *coef_tecnico_97$`Extracción de petróleo, gas, carbón y uranio` ,
+         ci_extr = vbp_extr * coef_tecnico_97$`Extracción de petróleo, gas, carbón y uranio`,
+        va_tot=   vbp_tot - ci_tot,
+        va_extr=   vbp_extr - ci_extr,
+        ms_extr = vbp_extr *mean_coef_ms$coef_ms_extr,
+         ms_tot = vbp_tot *mean_coef_ms$coef_ms_tot,
+         ebe_tot = va_tot - ms_tot,
+         ebe_extr=va_extr - ms_tot      )
+criterio_ccnn
 
-indice_vbp_criterio_ccnn <- vbp_va_ci_propia %>% 
+
+# Empalme CCNN
+indice_vbp_criterio_ccnn <- criterio_ccnn %>% 
   ungroup() %>% 
-  mutate(vbp_criterio_ccnn_04 = generar_indice(vbp_criterio_ccnn,
+  mutate(vbp_criterio_ccnn_04 = generar_indice(vbp_tot,
                                                fecha = anio,
                                                fecha_base = 2004),
-         vbp_criterio_ccnn_12 = generar_indice(vbp_criterio_ccnn,
+         vbp_criterio_ccnn_12 = generar_indice(vbp_tot,
                                                fecha = anio,
                                                fecha_base = 2012)) %>% 
   select(anio, vbp_criterio_ccnn_04,vbp_criterio_ccnn_12)
 
 
+empalme_ccnn <- ccnn_oficial %>% 
+  full_join(indice_vbp_criterio_ccnn, by = "anio") %>% 
+  arrange(anio) %>% 
+  mutate(vbp_extr = case_when(anio < 2004 ~ ccnn_oficial$vbp_extr[ccnn_oficial$anio == 2004] * vbp_criterio_ccnn_04,
+                                    anio > 2012 ~ ccnn_oficial$vbp_extr[ccnn_oficial$anio == 2012]  * vbp_criterio_ccnn_12,
+                                    T ~ vbp_extr) ,
+    vbp_tot = case_when( anio < 2004 ~ ccnn_oficial$vbp_tot[ccnn_oficial$anio == 2004] * vbp_criterio_ccnn_04,
+                           anio > 2012 ~ ccnn_oficial$vbp_tot[ccnn_oficial$anio == 2012]  * vbp_criterio_ccnn_12,
+                           T ~ vbp_tot),
+    ci_extr = case_when( (anio < 2004) | (anio > 2012)  ~ 
+                                 vbp_extr *coef_tecnico_97$`Extracción de petróleo, gas, carbón y uranio`  ,
+                               T ~ ci_extr),
+    ci_tot = case_when( (anio < 2004) | (anio > 2012)  ~ 
+                                 vbp_tot *coef_tecnico_97$`Extracción de petróleo, gas, carbón y uranio`  ,
+                               T ~ ci_tot) ,
+    va_tot = case_when(is.na(va_tot) ~ vbp_tot - ci_tot ,
+                                   T ~ va_tot),
+    va_extr = case_when(is.na(va_extr) ~ vbp_extr - ci_extr ,
+                                   T ~ va_extr),
+    ms_total = case_when(is.na(ms_total) ~ vbp_tot*mean_coef_ms$coef_ms_tot,
+                                   T ~ ms_total) ,
+    ms_extraccion = case_when(is.na(ms_extraccion) ~ vbp_tot*mean_coef_ms$coef_ms_extr,
+                                   T ~ ms_extraccion), 
+    ebe_total = case_when(is.na(ebe_total) ~ va_tot -ms_total,
+                                   T ~ ebe_total),
+    ebe_extraccion = case_when(is.na(ebe_extraccion) ~ va_tot -ms_total,
+                                   T ~ ebe_extraccion))
+
+## Criterio propio con emapalme
+criterio_ccnn %>% 
+  rename(unidad = unidad_valor_produccion) %>% 
+  left_join(empalme_ccnn %>% 
+              select(-c(vbp_criterio_ccnn_04, vbp_criterio_ccnn_12, vbp_tot))) %>% 
+  mutate(
+        # criterio propio
+         valor_bruto_crudo = (prod_crudo*precio_me_crudo*tcp)/10^6,
+         valor_bruto_gas =   (prod_gas * precio_externo_gas*tcp)/10^6,
+         vbp_tot_criterio_propio = valor_bruto_crudo + valor_bruto_gas,
+         va_tot_propio = vbp_tot_criterio_propio - ci_extr,
+         ebe_tot_criterio_propio = va_tot_propio- ms_extr   )
+
+glimpse(criterio_ccnn)
 ```
 
 
@@ -3878,85 +3931,12 @@ indice_vbp_criterio_ccnn <- vbp_va_ci_propia %>%
 
 
 
-#restimacion de VBP criterio CCNN
-vbp_ccnn <- ccnn_oficial %>% 
-  select(anio,unidad, vbp_extraccion_hidrocarburos, 
-         va_extraccion_hidrocarburos, ci_extraccion_hidrocarburos) %>% 
-  full_join(indice_vbp_criterio_ccnn, by = "anio") %>% 
-  arrange(anio) %>% 
-  mutate(vbp_extraccion_ccnn = case_when(
-    anio < 2004 ~ ccnn_oficial$vbp_extraccion_hidrocarburos[ccnn_oficial$anio == 2004] *
-      vbp_criterio_ccnn_04,
-    anio > 2012 ~ ccnn_oficial$vbp_extraccion_hidrocarburos[ccnn_oficial$anio == 2012]  *
-      vbp_criterio_ccnn_12,
-    T ~ vbp_extraccion_hidrocarburos),
-    ci_extraccion_ccnn = vbp_extraccion_ccnn*coef_tecnico_97,
-    # ci_extraccion_ccnn = vbp_extraccion_ccnn*mean_coef_req_extr_ccnn,
-    va_extraccion_ccnn = vbp_extraccion_ccnn- ci_extraccion_ccnn,
-    unidad = "Millones de pesos corrientes") %>%
-  left_join(masa_salarial_hidrocarburos %>% 
-              select(anio,  unidad, ms_ccnn = masa_salarial_oede),
-            by = c("anio", "unidad")) %>%
-  left_join(stock_estimado %>%
-               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
-               select(anio, consumo_k_fijo)) %>% 
-  mutate(ms_ccnn = case_when(is.na(ms_ccnn) ~vbp_extraccion_ccnn*mean_coef_ms,
-                                   T ~ ms_ccnn),
-         ebe_ccnn = va_extraccion_ccnn -ms_ccnn -consumo_k_fijo,
-         fuente = "CCNN reestimado") %>% 
-   select(anio, fuente, unidad, 
-          vbp_extraccion_ccnn, ci_extraccion_ccnn, va_extraccion_ccnn, 
-          ms_ccnn, consumo_k_fijo, ebe_ccnn) %>% 
-  arrange(anio)
-vbp_ccnn
-
-
-
-# criterio propia
-pv_hidrocarburos_propia <-  vbp_va_ci_propia %>% 
-  select(anio, unidad = unidad_valor_produccion, 
-         vbp_criterio_propio, consumo_intermedio,valor_agregado ) %>% 
-   left_join(stock_estimado %>%
-               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-              # filter(variable == "ppye_estimado_bolsar") %>% 
-              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
-               select(anio, consumo_k_fijo)) %>% 
-  mutate( # masa_salarial = valor_agregado * coef_salario,
-    masa_salarial = vbp_criterio_propio * mean_coef_ms,
-        excedente_bruto_explotacion =  valor_agregado - masa_salarial - consumo_k_fijo)
-  
-# "Criterio propio con VBP CCNN" 
-pv_hidrocarburos <- ccnn_oficial %>% 
-  rename(vbp_ccnn = valor_bruto_produccion,
-         va_ccnn = valor_agregado,
-         ci_ccnn = consumo_intermedio,
-         ms_ccnn = masa_salarial,
-         coef_req_ccnn = coef_req_extr,
-         ebe_ccnn= excedente_bruto_explotacion) %>% 
-  full_join(pv_hidrocarburos_propia %>% 
-              select(anio, unidad ,
-                vbp_criterio_propio, ci_criterio_propio = consumo_intermedio,
-                va_criterio_propio = valor_agregado , consumo_k_fijo_propio = consumo_k_fijo))  %>%
-  # left_join(vbp_va_ci_propia %>% 
-  #             select(anio, vbp_criterio_ccnn )) %>% 
-  left_join(vbp_ccnn %>% 
-              select(anio, vbp_criterio_ccnn = vbp_extraccion_ccnn,
-                     ci = ci_extraccion_ccnn, ms = ms_ccnn)) %>% 
-  arrange(anio) %>% 
-  mutate(vbp = vbp_criterio_propio ,
-         # ci = case_when(is.na(ci_ccnn) ~ vbp_criterio_ccnn * coef_tecnico_97  , T ~  ci_ccnn),
-         va = vbp_criterio_propio - ci,
-         # ms = case_when(is.na(ms_ccnn) ~ vbp_criterio_ccnn* mean_coef_ms, T ~  ms_ccnn),
-         ebe =  va - ms -consumo_k_fijo_propio)
-          
-
 ###
 valor_total_produccion <- ccnn_oficial %>%  # no tiene descontado servicios
  mutate(fuente = "CCNN") %>% 
    full_join(pv_hidrocarburos_propia %>% 
               select(anio, consumo_k_fijo)) %>%  
-  select(anio, unidad, fuente,vbp_extraccion,valor_agregado,
+  select(anio, unidad, fuente,vbp_extr,valor_agregado,
          consumo_intermedio, masa_salarial, excedente_bruto_explotacion, consumo_k_fijo) %>% 
   gather(key = variable,
          value = valor,
@@ -4005,9 +3985,9 @@ valor_total_produccion <- ccnn_oficial %>%  # no tiene descontado servicios
                       4:ncol(.))) %>%
   bind_rows(vbp_ccnn %>% # CCNN Reestimado, tiene descontado serivicios
               #select(-consumo_k_fijo) %>% 
-              rename(valor_bruto_produccion = vbp_extraccion_ccnn, 
-                   consumo_intermedio = ci_extraccion_ccnn,
-                   valor_agregado =va_extraccion_ccnn,
+              rename(valor_bruto_produccion = vbp_extr_ccnn, 
+                   consumo_intermedio = ci_extr_ccnn,
+                   valor_agregado =va_extr_ccnn,
                    masa_salarial =ms_ccnn,
                    excedente_bruto_explotacion =ebe_ccnn) %>% 
               gather(key = variable,
