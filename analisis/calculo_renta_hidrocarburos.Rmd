@@ -4,10 +4,10 @@ author:
 - affiliation: UNGS/CONICET
   name: Mateo Suster y Juan Kornblihtt
 output:
+  pdf_document:
+    toc: yes
   html_document:
     df_print: paged
-    toc: yes
-  pdf_document:
     toc: yes
   html_notebook:
     toc: yes
@@ -4926,21 +4926,21 @@ costos %>%
 
 #renta usd vs autores
 renta_usd <- renta_pbi_pv %>% 
-  select(anio,tcc, ipc_18, retenciones_crudo_jk, regalias_total, contains("renta")) %>% 
+  select(anio,tcc, tcp, ipc_18, retenciones_crudo_jk, regalias_total, contains("renta")) %>% 
   select( -(12:ncol(.))) %>% 
   filter(anio > 1962) %>%
   mutate( retenciones_crudo_jk= retenciones_crudo_jk*ipc_18/tcc,       
           regalias_total = regalias_total*ipc_18/tcc, 
-          renta_diferencial_precios_crudo = renta_diferencial_precios_crudo*ipc_18/tcc,
-          renta_diferencial_precios_gas = renta_diferencial_precios_gas*ipc_18/tcc,
-          renta_expo_sobrevaluada_crudo = renta_expo_sobrevaluada_crudo*ipc_18/tcc,  
-          renta_expo_sobrevaluada_gas = renta_expo_sobrevaluada_gas*ipc_18/tcc  ,
+          renta_diferencial_precios_crudo = renta_diferencial_precios_crudo*ipc_18/tcp,
+          renta_diferencial_precios_gas = renta_diferencial_precios_gas*ipc_18/tcp,
+          renta_expo_sobrevaluada_crudo = renta_expo_sobrevaluada_crudo*ipc_18/tcp,  
+          renta_expo_sobrevaluada_gas = renta_expo_sobrevaluada_gas*ipc_18/tcp  ,
           renta_sobrevaluacion = renta_expo_sobrevaluada_crudo+ renta_expo_sobrevaluada_gas,
           renta_diferencial_precios = 
             renta_diferencial_precios_gas+ renta_diferencial_precios_crudo,
           # renta_empresas = renta_empresas*ipc_18/tcc,
           # renta_empresas_desp_impuestos = renta_empresas_desp_impuestos*ipc_18/tcc,
-          renta_total = (renta_total*ipc_18) / tcc,
+          renta_total = (renta_total*ipc_18) / tcp,
           unidad = "Millones de USD",
          autor = "Propia") %>% 
   rename(retenciones = retenciones_crudo_jk,
