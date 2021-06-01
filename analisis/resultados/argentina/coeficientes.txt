@@ -1,0 +1,19 @@
+$`Proporción de los servicios sobre extraccion`
+[1] 0.1076546
+
+$`Tasa de depreciación de YPF`
+[1] 0.1289928
+
+$`Impuestos promedios MIP 97`
+[1] 0.02436658
+
+$`Coeficiente tecnico MIP 97`
+  Extracción de petróleo, gas, carbón y uranio
+1                                    0.2469233
+
+$`Proporción de la Masa Salarial total promedio 2004-2012`
+[1] 0.1014079
+
+$`Proporción de la Masa Salarial extraccion promedio 2004-2012`
+[1] 0.04089172
+

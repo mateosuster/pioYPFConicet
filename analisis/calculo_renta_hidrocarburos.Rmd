@@ -4,12 +4,12 @@ author:
 - affiliation: UNGS/CONICET
   name: Mateo Suster y Juan Kornblihtt
 output:
-  pdf_document: 
-    toc: yes
-    keep_tex: yes
   html_document:
     df_print: paged
     toc: yes
+  pdf_document: 
+    toc: yes
+    keep_tex: yes
   html_notebook:
     toc: yes
     toc_float: yes
@@ -3858,6 +3858,8 @@ var((read_csv("C:/Archivos/Datos/Balances/gas y petroleo_datos/datos_r/resultado
   group_by(fecha) %>%
   summarise(tasa_depreciacion = mean(depreciaciones/ppye)))$tasa_depreciacion)
 
+
+
 ```
 
 
@@ -4908,7 +4910,7 @@ costos <- produccion_total %>%
               left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
               left_join(tcp_anual_b %>% select(-sobrevaluacion)) %>%
               filter(variable %in% c("ci_extr", "ms_extr"),
-                     fuente%in% c("Criterio CCNN", "CCNN oficial")) %>%
+                     fuente%in% c("Criterio CCNN", "CCNN oficial", "Empalme CCNN")) %>%
               mutate(valor = (valor*10^6)*ipc_18/tcc,
                      unidad ="USD tcc") %>% 
               spread(key=variable, value=valor)) %>% 
@@ -4936,9 +4938,9 @@ costos
 
 ```{r}
 costos %>% 
-           filter(anio > 1960) %>% 
+           filter(anio > 1997) %>% 
   ggplot(aes(anio, precio_costo, color = fuente))+ 
-  geom_line()+
+  geom_line(alpha = 0.5, size = 1.4)+
     labs(title = "Precio de costo",
          subtitle= "Estimacion propia a partir de CCNN y reestimacion de VBP con criterio CCNN", 
          y = "USD/BOE", x = "Año")
@@ -5044,6 +5046,14 @@ writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo,
                          ipc = ipc_promedio),
                     path =  "resultados/argentina/variables.xlsx")
 
+coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_s_extraccion,
+                     "Tasa de depreciación de YPF" = consumo_k_fijo_ypf,
+                     "Impuestos promedios MIP 97" = imp_prom_97,
+                     "Coeficiente tecnico MIP 97" = coef_tecnico_97,
+                     "Proporción de la Masa Salarial total promedio 2004-2012"= mean_coef_ms$coef_ms_tot,
+                     "Proporción de la Masa Salarial extraccion promedio 2004-2012"= mean_coef_ms$coef_ms_extr)
+
+capture.output(coeficientes, file = "resultados/argentina/coeficientes.txt")
 
 writexl::write_xlsx(list(metodo_indirecto = renta_indirecto[,c(1:13, 17)],
                          crudo_dif_precios_ms = renta_dif_precios_crudo[,-14], 
@@ -5061,10 +5071,15 @@ writexl::write_xlsx(list(va_criterio_propio = criterio_propio,
                           metodo_directo = renta_directo),
                     path = "resultados/argentina/renta_metodo_directo.xlsx")
 
-writexl::write_xlsx(list(valor_produccion = valor_total_produccion,
-                         metodo_directo_pbi = renta_directo_pbi[,c(1,14:15)],
+writexl::write_xlsx(list( metodo_directo_pbi = renta_directo_pbi[,c(1,14:15)],
                          metodo_indirecto_pbi=renta_indirecto[,c(1,19:20)]),
-                    path = "resultados/argentina/valor_total_y_renta_pbi.xlsx")
+                    path = "resultados/argentina/renta_sobre_pbi.xlsx")
+
+writexl::write_xlsx(list(ccnn_oficial = ccnn_oficial,
+                         criterio_ccnn=criterio_ccnn,
+                         empalme_ccnn=empalme_ccnn,
+                         criterio_propio =criterio_propio),
+                    path= "/Archivos/repos/hidrocarburos/analisis/resultados/argentina/valor_total_produccion.xlsx")
 
 
 writexl::write_xlsx(list(comparacion_autores = renta_autores),
@@ -5076,8 +5091,8 @@ writexl::write_xlsx(list( "renta empresas" = renta_empresas_balances,
                          segmento_YPF_PetBR =union_segmentos), 
                     path = "resultados/argentina/stock, tg y renta empresas argentina.xlsx")
 
-# writexl::write_xlsx(costos_ccnn=costos,
-#                     path = "resultados/argentina/costos_ccnn.xlsx")
+writexl::write_xlsx(list(costos_ccnn=costos),
+                    path = "resultados/argentina/costos_ccnn.xlsx")
 
 
 # writexl::write_xlsx(list(produccion = prod_merge_crudo, 
@@ -5105,21 +5120,21 @@ writexl::write_xlsx(list( "renta empresas" = renta_empresas_balances,
 # writexl::write_xlsx(list("con pozos perforados por año"= stock_y_pozos), 
 #                     path = "resultados/estimacion de stock a partir de pozos.xlsx")
 
-
-writexl::write_xlsx(list("flujo"= comparacion_pozos,
-                         "flujo_total"= listado_pozos,
-                         "stock" = pozos_iapg_centenario), 
-                    path = "resultados/argentina/pozos.xlsx")
-
-
-writexl::write_xlsx(list(afip = stock_afip,
-                         balances_bolsar = stock_balances_empresas,
-                         segmento_YPF_PetBR =union_segmentos,
-                         bolsar_v2 = stock_balances_rama,
-                         "inversion por pozo (IAPG)" = inversion_pozos,
-                          "inversion por pozo (Cap IV)"= inversion_pozos_capiv),
-                    path = "resultados/argentina/stock_petroleo.xlsx")
-
+# 
+# writexl::write_xlsx(list("flujo"= comparacion_pozos,
+#                          "flujo_total"= listado_pozos,
+#                          "stock" = pozos_iapg_centenario), 
+#                     path = "resultados/argentina/pozos.xlsx")
+# 
+# 
+# writexl::write_xlsx(list(afip = stock_afip,
+#                          balances_bolsar = stock_balances_empresas,
+#                          segmento_YPF_PetBR =union_segmentos,
+#                          bolsar_v2 = stock_balances_rama,
+#                          "inversion por pozo (IAPG)" = inversion_pozos,
+#                           "inversion por pozo (Cap IV)"= inversion_pozos_capiv),
+#                     path = "resultados/argentina/stock_petroleo.xlsx")
+# 
 
 
 
