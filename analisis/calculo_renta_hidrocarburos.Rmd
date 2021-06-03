@@ -467,7 +467,8 @@ prod_sesco_crudo_a <- read_csv("C:/Archivos/Datos/Hidrocarburos/SESCO/produccin-
   select(anio, mes,idconcepto, concepto, Cantidad ) %>%
   rename(cantidad = Cantidad) %>%
   # filter(!idconcepto %in% c(4, 5, 7, 8, 9	)) %>%
-  filter(idconcepto %in% c(1,2,3, 6)) %>%
+  filter(concepto %in% c("Producción Primaria (m3)","Producción Secundaria (m3)",
+                         "Producción por Recuperación Aisistida (m3)")) %>%
   group_by(anio) %>%
   summarise(crudo_sesco = sum(cantidad, na.rm = T)) %>%
   mutate(unidad = "m3")
@@ -477,13 +478,23 @@ prod_sesco_crudo_b <- read_csv(
   "C:/Archivos/Datos/Hidrocarburos/SESCO/produccin-de-petrleo-por-yacimiento.csv") %>% 
   select(anio, mes,idconcepto, concepto, cantidad ) %>%
   # filter(!idconcepto %in% c(4, 5, 7, 8, 9	)) %>%
-  filter(idconcepto %in% c(1,2,3, 6))%>%
+  # filter(idconcepto %in% c(1,2,3, 6))%>%
+    filter(concepto %in% c("Producción Primaria (m3)","Producción Secundaria (m3)",
+                         "Producción por Recuperación Aisistida (m3)")) %>%
   group_by(anio) %>%
   summarise(crudo_sesco = sum(cantidad, na.rm = T)) %>%
   mutate(unidad = "m3")
 
 prod_sesco_crudo <- prod_sesco_crudo_a %>% 
   bind_rows(prod_sesco_crudo_b)
+
+# SESCO desde 1950
+  
+prod_sec_energia <- read.csv("data/secretaria_energia/sesco/serie-produccion-petroleo-total-pais-desde-1950.csv") %>% 
+  mutate(produccion_petroleo = produccion_petroleo*1000,
+         unidad = "m3") %>% 
+  rename(crudo_sec_energia = produccion_petroleo) 
+
 
 #EIA
 
@@ -529,14 +540,16 @@ prod_merge_crudo <-  prod_regalias_crudo %>%
   full_join(prod_anuario %>% 
               select(anio, crudo_anuario) %>% 
               mutate(unidad = "m3")) %>% 
+  left_join(prod_sec_energia, by = c("anio", "unidad")) %>% 
   # mutate(dif =  crudo_regalias/crudo_mecon-1) %>% 
   mutate_at(.vars = c(   "crudo_regalias" ,"crudo_mecon",   
-                       "crudo_sesco",    "crudo_anuario" ), 
+                       "crudo_sesco",    "crudo_anuario", "crudo_sec_energia" ), 
             .funs = conversor_m3bbl_q) %>%  
   left_join(prod_eia_crudo %>% 
               select(anio, crudo_eia = crude_oil_condensate)) %>% 
-   mutate(prod_crudo =  case_when(anio < 1993 ~ crudo_anuario,
-                                  anio > 1992 ~ crudo_sesco),
+   mutate(prod_crudo =  case_when(anio < 1950 ~ crudo_anuario,
+                                  anio %in% 1950:2015 ~crudo_sec_energia , 
+                                  anio > 2015 ~ crudo_sesco ),
           unidad = "barriles", 
           variable =  "Producción de crudo según distintas fuentes")  %>%
   arrange(anio) %>% 
@@ -1676,7 +1689,9 @@ precio_mdomundial_gas_MMBTU <- price_eeuu_MMBTU %>%
   left_join(precio_expo_gas_usd) %>% 
   mutate(precio_impo_gas_bolivia_idee = conversor_m3MMBTU_p(precio_gas_bolivia_usd_idee/1000),#ok
          precio_externo_gas = case_when( anio < 1966 ~ precio_impo_gas_arg_bolivia_comtrade,
-                                         T~ precio_expo_gas_bolivia_arg_comtrade)) %>% 
+                                         T~ precio_expo_gas_bolivia_arg_comtrade),
+         precio_exportacion_gas_ar = case_when(anio <1999 ~precio_expo_gas_comtrade,
+                                            anio >= 1999 ~ precio_expo_gas_regalias)) %>% 
   select(anio, unidad, precio_externo_gas, everything(.), -precio_gas_bolivia_usd_idee) %>% 
   filter(anio < 2021)
 
@@ -1971,7 +1986,9 @@ expo_q_crudo <- comex_crudo_sesco %>%
               select(-expo_indec_gas)) %>% 
   full_join(expo_crudo_sitc %>% 
               select(anio, unidad = unidad_cantidad, expo_comtrade_crudo = expo_bbl )) %>% 
-  mutate(expo_crudo = case_when(anio < 1994 | anio == 1999 ~ expo_comtrade_crudo,
+  mutate(expo_crudo = case_when(anio < 1999  ~ expo_comtrade_crudo,
+                                # anio %in% 1999:2014 ~ expo_mecon_crudo ,
+                                anio >= 1999 ~ expo_sesco_crudo,
                                   is.na(expo_sesco_crudo) ~ expo_mecon_crudo,
                                 T ~ expo_sesco_crudo),
          unidad = "barriles",
@@ -3602,7 +3619,7 @@ Donde:
 
 Proporción de los servicios de apoyo sobre la extracción de petróleo y gas
 <br>
-$$prop\_servicios = \frac{VBP\_servicios_{COU}}{VBP\_extr_{COU}}$$
+$$prop\_servicios = \frac{VBP\_servicios_{COU}}{VBP\_extr_{COU} + VBP\_servicios_{COU}}$$
 
 Donde:
 
@@ -3835,7 +3852,7 @@ COU <- read_excel("C:/Archivos/Datos/MIP/sh_cou_06_16.xls",
   group_by(producto) %>% 
   mutate_all(as.double)
 
-servicio_s_extraccion <-  sum(COU[12])/sum(COU[11])
+servicio_s_extraccion <-  sum(COU[12])/( sum(COU[11]) + sum(COU[12]) )
 nrow(COU)
 
 
@@ -3999,20 +4016,25 @@ valor_produccion_93 <- va_93 %>%  inner_join(vbp_93) %>%
 
 consumo_intermedio_93 <- valor_produccion_93 %>% 
   filter(grepl("C - EXPLOTACION DE MINAS Y CANTERAS", sector)) %>% 
-  mutate(coef_tec_93 = 1-(va_tot/vbp_tot))
+  mutate(coef_tec_93 = 1-(va_tot/vbp_tot), 
+           coef_tec_93_index = generar_indice(coef_tec_93, fecha = anio, fecha_base = 2004))
   
 ## Serie de CI
 # < 1997 : MIP 97
 # 97 a 2004 : progresion de mip97 a indec
 # 2004 a 2019: indec
-consumo_intermedio <- data.frame(anio = 1960:2020) %>%
+coef_consumo_intermedio <- data.frame(anio = 1960:2020) %>%
   left_join(ccnn_oficial %>%  select(anio, vbp_tot, va_tot), by = "anio") %>% 
-  left_join(consumo_intermedio_93 %>% select(anio, coef_tec_93)) %>% 
-  mutate(coef_ci = case_when( anio >= 2004 ~ 1-(va_tot/vbp_tot),
-                              anio < 2004 ~ coef_tec_93 ),
-         coef_ci = imputeTS::na.interpolation(coef_ci, option = "linear" )) %>% 
+  left_join(consumo_intermedio_93 %>% select(anio, coef_tec_93_index)) %>% 
+  mutate(coef_ci = 1-(va_tot/vbp_tot))
+ci_base = coef_consumo_intermedio$coef_ci[coef_consumo_intermedio$anio ==2004]
+
+coef_consumo_intermedio <- coef_consumo_intermedio %>% 
+  mutate(coef_ci = case_when( anio <= 2004 ~ coef_tec_93_index * ci_base,
+                              T ~ coef_ci)) %>% 
+         # coef_ci = imputeTS::na.interpolation(coef_ci, option = "linear" )) %>% 
   select(anio, coef_ci)
-consumo_intermedio
+coef_consumo_intermedio
 ```
 
 ### Estimaciones propias 
@@ -4035,15 +4057,17 @@ precios_y_cantidades <- prod_merge_crudo %>%
               select(anio, unidad_cant_gas= unidad,prod_gas), by = "anio") %>%
   left_join(expo_q_gas_MMBTU %>% select(anio, unidad_cant_gas= unidad, expo_gas)) %>% 
   left_join(precio_mdomundial_gas_MMBTU %>% 
-              select(anio, unidad_precio_gas = unidad, precio_externo_gas, precio_expo_gas_comtrade), by = "anio") %>% 
+              select(anio, unidad_precio_gas = unidad, precio_externo_gas, precio_exportacion_gas_ar), by = "anio") %>% 
   left_join(precio_interno_gas_mmbtu_usd %>% 
               select(anio,  precio_gas_mdoint)) %>% 
   left_join(tcp_anual_b %>% 
               select(anio, tcp, tcc), by = "anio")
 
+writexl::write_xlsx(precios_y_cantidades, path = "resultados/argentina/insumos_criterio_ccnn.xlsx")
+
 ## Criterio CCNN 
 criterio_ccnn <- precios_y_cantidades %>% 
-  left_join(consumo_intermedio) %>% 
+  left_join(coef_consumo_intermedio, by ="anio") %>% 
   mutate(crudo_mdo_interno = prod_crudo - expo_crudo,
          expo_gas = replace_na(expo_gas, 0 ),
          gas_mdo_interno = prod_gas - expo_gas,
@@ -4053,14 +4077,14 @@ criterio_ccnn <- precios_y_cantidades %>%
          vbp_tot = ((crudo_mdo_interno*precio_crudo_mdoint+
                                  expo_crudo*precio_me_crudo
                                + gas_mdo_interno * precio_gas_mdoint 
-                               +expo_gas*precio_expo_gas_comtrade )*tcc)/10^6,
+                               +expo_gas*precio_exportacion_gas_ar )*tcc)/10^6,
          vbp_extr =vbp_tot*(1-servicio_s_extraccion),
          ci_tot = vbp_tot *coef_ci ,
          ci_extr = vbp_extr * coef_ci,
         va_tot=   vbp_tot - ci_tot,
         va_extr=   vbp_extr - ci_extr,
-        ms_extr = vbp_extr *mean_coef_ms$coef_ms_extr,
-         ms_tot = vbp_tot *mean_coef_ms$coef_ms_tot,
+        ms_extr = vbp_extr * mean_coef_ms$coef_ms_extr,
+         ms_tot = vbp_tot * mean_coef_ms$coef_ms_tot,
          ebe_tot = va_tot - ms_tot,
          ebe_extr=va_extr - ms_tot  ,
         fuente = "Criterio CCNN")
@@ -4072,29 +4096,22 @@ indice_vbp_criterio_ccnn <- criterio_ccnn %>%
   ungroup() %>% 
   mutate(vbp_criterio_ccnn_04 = generar_indice(vbp_tot,
                                                fecha = anio,
-                                               fecha_base = 2004),
-         vbp_criterio_ccnn_12 = generar_indice(vbp_tot,
-                                               fecha = anio,
-                                               fecha_base = 2012)) %>% 
-  select(anio, vbp_criterio_ccnn_04,vbp_criterio_ccnn_12)
-
+                                               fecha_base = 2004) ) %>% # ,
+         # vbp_criterio_ccnn_12 = generar_indice(vbp_tot,
+         #                                       fecha = anio,
+         #                                       fecha_base = 2012)) %>% 
+  select(anio, vbp_criterio_ccnn_04)
 
 empalme_ccnn <- ccnn_oficial %>% 
-  left_join(consumo_intermedio) %>% 
+  full_join(coef_consumo_intermedio, by = "anio") %>% 
   full_join(indice_vbp_criterio_ccnn, by = "anio") %>% 
   arrange(anio) %>% 
   mutate(vbp_extr = case_when(anio < 2004 ~ ccnn_oficial$vbp_extr[ccnn_oficial$anio == 2004] * vbp_criterio_ccnn_04,
-                                    anio > 2012 ~ ccnn_oficial$vbp_extr[ccnn_oficial$anio == 2012]  * vbp_criterio_ccnn_12,
                                     T ~ vbp_extr) ,
     vbp_tot = case_when( anio < 2004 ~ ccnn_oficial$vbp_tot[ccnn_oficial$anio == 2004] * vbp_criterio_ccnn_04,
-                           anio > 2012 ~ ccnn_oficial$vbp_tot[ccnn_oficial$anio == 2012]  * vbp_criterio_ccnn_12,
                            T ~ vbp_tot),
-    ci_extr = case_when( (anio < 2004) | (anio > 2012)  ~ 
-                                 vbp_extr *coef_ci  ,
-                               T ~ ci_extr),
-    ci_tot = case_when( (anio < 2004) | (anio > 2012)  ~ 
-                                 vbp_tot *coef_ci  ,
-                               T ~ ci_tot) ,
+    ci_extr = vbp_extr * coef_ci ,
+    ci_tot = vbp_tot *coef_ci   ,
     va_tot = case_when(is.na(va_tot) ~ vbp_tot - ci_tot ,
                                    T ~ va_tot),
     va_extr = case_when(is.na(va_extr) ~ vbp_extr - ci_extr ,
@@ -4138,12 +4155,14 @@ filtro <- c("anio", "unidad", "fuente", "vbp_tot", "vbp_extr",
             "ci_tot", "ci_extr",  "ms_tot", "ms_extr",
             "va_tot",  "va_extr" , "ebe_tot", "ebe_extr"  )
 
-valor_total_produccion <- ccnn_oficial %>% 
+valor_total_produccion_corr <- ccnn_oficial %>% 
   select(filtro) %>% 
   rbind(criterio_ccnn %>%select(filtro)) %>% 
   rbind(empalme_ccnn %>% select(filtro)) %>% 
   rbind(criterio_propio %>% select(filtro)) %>% 
-  gather(key = variable, value=valor, 4:12) %>% 
+  gather(key = variable, value=valor, 4:12) 
+
+valor_total_produccion <-  valor_total_produccion_corr %>% 
   left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
   mutate(valor = valor /ipc_18,
          unidad = "Millones de pesos de 2018")
@@ -4240,25 +4259,29 @@ graf_tg_petrobras
 #Estimación de tasa de ganancia total rama
 
 tasa_ganancia_rama_flujo <- criterio_propio %>%
+    filter(anio >1997) %>% 
   select(anio, unidad, pv) %>% 
   left_join(ipc_promedio , by = "anio") %>% 
   mutate(pv = pv /ipc_18,
          unidad = "Millones de pesos de 2018") %>% 
-  left_join(stock_y_pozos %>% 
-              select(anio,  ppye = ppye_estimado, stock_seleccionado = fuente_ppye, fuente_pozo),
+  # left_join(stock_y_pozos %>% 
+  #             select(anio,  ppye = ppye_estimado, stock_seleccionado = fuente_ppye, fuente_pozo),
+  #           by = c("anio")) %>% 
+  left_join(stock_estimado %>% 
+              mutate(fuente_pozo = "Estimación sin pozos") %>% 
+              select(anio,  ppye = valor, stock_seleccionado = fuente_ppye, fuente_pozo),
             by = c("anio")) %>% 
   mutate(tasa_ganancia = pv/ppye)
 
 graf_tg_rama_1 <- tasa_ganancia_rama_flujo %>% 
-  filter(anio >1960) %>% 
   ggplot(aes(anio, tasa_ganancia, color =fuente_pozo ))+
   geom_line(alpha = 0.5)+
   geom_point()+
   scale_y_continuous(labels = scales::percent)+
   theme(axis.text.x = element_text(angle = 90),
         legend.position = "bottom")+
-  labs(title = "Tasa de ganancia hidrocarburífera con PPyE a partir de flujo de pozos(1960 - 2018)")+
-  facet_wrap(~stock_seleccionado)
+  labs(title = "Tasa de ganancia hidrocarburífera con PPyE de extracción") #+
+  # facet_wrap(~stock_seleccionado)
 # ggplotly(graf_tg_rama_1, width = 800, height = 600)
 graf_tg_rama_1
 
@@ -4317,7 +4340,7 @@ tg_industrial <- read_delim("C:/Archivos/Datos/Hidrocarburos/TG/tg_industrial.cs
 
 renta_tg <-  tasa_ganancia_rama_flujo %>%
   select(anio, unidad, stock_seleccionado, fuente_pozo, ppye , tasa_ganancia) %>% 
-  filter(stock_seleccionado == "ppye_bolsar",fuente_pozo == "pozos_cargados_sec_energia" ) %>% 
+  # filter(stock_seleccionado == "ppye_bolsar",fuente_pozo == "pozos_cargados_sec_energia" ) %>% 
   left_join(tg_industrial, by = "anio") %>% 
   rename(tg_hidrocarburos = tasa_ganancia) %>% 
   mutate(renta_con_tg_jic = ppye *(tg_hidrocarburos - tg_indu_jic),
@@ -4370,7 +4393,7 @@ graf_renta_emp <- renta_empresas_balances %>%
        subtitle = "Millones de pesos corrientes")+
   facet_wrap(~sector)
 
-ggplotly(graf_renta_emp, width = 800, height = 600)
+ggplotly(graf_renta_emp, width = 600, height = 400)
 
 ```
 
@@ -5146,8 +5169,8 @@ coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_
                      "Coeficiente tecnico MIP 97" = coef_tecnico_97,
                      "Proporción de la Masa Salarial total promedio 2004-2012"= mean_coef_ms$coef_ms_tot,
                      "Proporción de la Masa Salarial extraccion promedio 2004-2012"= mean_coef_ms$coef_ms_extr,
-                     "Coeficiente consumo intermedio (Año)" =consumo_intermedio$anio,
-                     "Coeficiente consumo intermedio (1- VA/VBP)" =consumo_intermedio$coef_ci)
+                     "Coeficiente consumo intermedio (Año)" =coef_consumo_intermedio$anio,
+                     "Coeficiente consumo intermedio (1- VA/VBP)" =coef_consumo_intermedio$coef_ci)
 
 capture.output(coeficientes, file = "resultados/argentina/coeficientes.txt")
 
