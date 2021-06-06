@@ -1,0 +1,130 @@
+---
+title: "Neuquén"
+output: html_notebook
+---
+
+ 
+```{r}
+library(readxl)
+library(dplyr)
+library(lubridate)
+library(tidyverse)
+
+conversor_m3bbl_p <- function(x) {x / 6.2898}
+conversor_m3bbl_q <- function(x) {x * 6.2898}
+conversor_m3MMBTU_p <- function(x){x / 0.0353}
+
+```
+
+```{r}
+tc_bna <- read.csv("data/tcp/tc_bna.csv", sep=";") %>% 
+  mutate(fecha = as.Date(Fecha.cotizacion, "%d/%m/%Y" ) ,
+         anio = year(fecha),
+         mes = month(fecha) ,
+         compra = as.double(str_replace(Compra, ",", ".")),
+         venta = as.double(str_replace(Venta, ",", "."))) %>% 
+  select(fecha, anio, mes, compra, venta)
+```
+
+
+# Producción y precios del crudo
+```{r}
+produccion_provincia_crudo <- read_excel("data/regalias/produccion_provincia_crudo.xlsx" , 
+    skip = 10) %>%
+  rename(anio = "AÑO", mes = "MES") %>% 
+  mutate(unidad = "m3",         
+         variable = "Producción de Crudo",         
+         anio =zoo::na.locf(anio),
+         fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, mes, anio, variable, unidad, everything(.)) %>% 
+  group_by(fecha, mes, anio, variable, unidad) %>% 
+  mutate_all(conversor_m3bbl_q) %>%
+  ungroup() %>% 
+  mutate(unidad = "barriles")
+
+precio_tipo_crudo <- read_excel("data/regalias/precio_tipo_crudo.xlsx", skip = 12) %>% 
+  rename(anio = "AÑO", mes = "MES") %>% 
+  mutate(unidad = "USD/m3",
+         variable = "Precio Mercado Interno del Crudo ",
+         anio =zoo::na.locf(anio),
+         fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, mes, anio, variable, unidad, everything(.)) %>% 
+  group_by(fecha, mes, anio, variable, unidad) %>% 
+  mutate_all(conversor_m3bbl_p) %>%
+  ungroup() %>% 
+  mutate(unidad = "USD/barriles")
+precio_tipo_crudo
+
+
+precio_provincia_crudo <- read_excel("data/regalias/precio_provincia_crudo.xlsx", skip = 12) %>% 
+  rename(anio = "AÑO", mes = "MES") %>% 
+  mutate(unidad = "USD/m3",
+         variable = "Precio Mercado Interno del Crudo ",
+         anio =zoo::na.locf(anio),
+         fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, mes, anio, variable, unidad, everything(.)) %>% 
+  group_by(fecha, mes, anio, variable, unidad) %>% 
+  mutate_all(conversor_m3bbl_p) %>%
+  ungroup() %>% 
+  mutate(unidad = "USD/barriles")
+precio_provincia_crudo
+```
+
+# Producción y precios del gas
+```{r}
+precio_interno_gas <- read_excel("data/regalias/precio_provincia_gas.xlsx", skip = 12) %>% 
+  rename(anio = "AÑO", mes = "MES") %>% 
+  mutate(unidad = "ARS/Mm3",
+         variable = "Precio Mercado Interno del gas",
+         anio =zoo::na.locf(anio),
+         fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>%
+  gather(key = provincia, value = precio_interno, 3:13) %>% 
+  filter(precio_interno > 0 & provincia == "NEUQUEN") %>% 
+  left_join(tc_bna %>% 
+              group_by(anio, mes) %>% 
+              summarise(tcn_vendedor = mean(venta, na.rm=T)) %>% 
+              ungroup(), by = c("anio", "mes")) %>% 
+  mutate(precio_interno = conversor_m3MMBTU_p((precio_interno/1000)/tcn_vendedor),
+         unidad = "USD/MMBTU") %>% 
+  na.omit()
+precio_interno_gas
+```
+
+
+```{r}
+#precio internacional
+precio_internacional_gas <- read_excel("resultados/argentina/variables.xlsx", 
+    sheet =  "precio_externo_gas") %>% 
+  filter(anio >=2003 ) %>%
+  mutate(unidad = "USD/MMBTU") %>% 
+  gather(key = precio_internacional, value = valor_precio_internacional, 3:ncol(.))
+precio_internacional_gas
+```
+
+
+```{r}
+brecha_gas <- precio_interno_gas %>%
+  group_by(anio, unidad, variable, provincia ) %>% 
+  summarise(precio_interno=mean(precio_interno )) %>% 
+  left_join(precio_internacional_gas, by = c("anio", "unidad")) %>% 
+  mutate(brecha_interno_externo = precio_interno/valor_precio_internacional - 1,
+         brecha_interno_externo_porcentaje = scales::label_percent()(brecha_interno_externo))
+brecha_gas
+```
+
+```{r}
+unique(brecha_gas$precio_internacional)
+brecha_gas %>% 
+  filter(precio_internacional =="precio_impo_gas_arg_bolivia_comtrade" )
+```
+
+
+```{r}
+writexl::write_xlsx(x = list("prod_prov_crudo" = produccion_provincia_crudo, 
+                            "precio_prov_crudo"  = precio_provincia_crudo, 
+                            "precio_tipo_crudo" =precio_tipo_crudo, 
+                            "brecha_int_ext_gas" = brecha_gas),
+                      path = "resultados/neuquen/produccion_y_precios_x_provincia (Base Regalias).xlsx")
+
+```
+

@@ -1,0 +1,439 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+Cuadro comparativo
+```{r}
+library(tidyverse)
+library(readxl)
+library(zoo)
+library(ggplot2)
+library(readxl)
+
+comparacion_estimaciones_renta_hidrocarburifera <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/comparacion_estimaciones_renta_hidrocarburifera.xlsx") %>% 
+  select(-fuente) %>% 
+  spread(key = tipo_de_renta,
+         value = criterio_calculo)  
+
+
+# writexl::write_xlsx(comparacion_estimaciones_renta_hidrocarburifera,
+#                     path = "cuadro_columnas.xlsx")
+```
+
+# Renta
+
+## Ramon
+```{r}
+renta_total_ramon <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Ramon.xlsx", 
+    sheet = "Renta total", skip = 6) %>% 
+  select(1:5) %>% 
+  rename(anio = "...1",
+         trimestre = "...2",
+          renta_total = "(RD+RM)...3",
+         renta_diferencial = "...4", 
+         renta_monopolio = "...5") %>% 
+  mutate(anio =  na.locf(anio),
+         unidad = "Millones de USD") %>%
+  select(anio, trimestre, unidad, everything(.)) %>% 
+  filter(trimestre != "Total") 
+         
+
+renta_total_distribucion_ramon <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Ramon.xlsx", 
+    sheet = 2, skip = 7) %>% 
+   rename(anio = "...1",
+         trimestre = "...2",
+          renta_total = "...3",
+         renta_empresas_directa = Directa,
+         renta_empresas_con_subsidio = "c/Promoción",
+         renta_apropiada_otros_total = "...6", 
+         renta_estado_total = "...7",
+         renta_estado_total_con_promocion = "(sin descontar promoción)",
+         transferencias_del_estado = "...9",
+         retenciones = "...10",
+         regalias_nacion = "Nación",
+         regalias_provincias = "Provincias",
+         renta_sobrevaluacion = "...13",
+         renta_refinadoras = "...14",
+         renta_consumidores = "...15") %>% 
+    mutate(anio =  na.locf(anio),
+         unidad = "Millones de USD") %>% 
+  select(anio, trimestre, unidad, everything(.))
+  
+renta_total_distribucion_ramon
+```
+
+
+
+## Barrera
+```{r}
+renta_total_barrera <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Barrera.xlsx", 
+    sheet = 2, skip = 1) %>% 
+  select(-7) %>% 
+  filter(!is.na(anio)) %>% 
+  rename(produccion_petroleo_millones_bbl = "Extracción de petroleo" ,
+         costo_local_usd_bbl = "Costo local del barril" ,
+         precio_produccion_local_usd_bbl =  "Precio de producción por barril", 
+         precio_wti_usd_bbl =  "Precio del barril WTI", 
+         renta_total_millones_usd = "Renta petrolera" ) %>% 
+  group_by(anio) %>% 
+  mutate_all(as.double)
+renta_total_barrera
+```
+
+## Campodonico
+```{r}
+renta_total_campodonico  <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Campodonico.xlsx", 
+    sheet = 1, skip = 1) %>% 
+  filter(anio != "unidad") %>%
+  rename(produccion_millones_bbl = "Producción",
+         precio_produccion_local_usd_bbl = "Precio_crudo_interno",
+         precio_wti_usd_bbl  = "WTI", 
+         costo_local_usd_bbl = "Costo_de_Producción_arg",
+         renta_unitaria_usd_bbl = "Renta_Unitaria",
+         renta_total_millones_usd = "Renta_Petrolera") %>% 
+  mutate_all(as.double)
+
+renta_distribucion_campodonico <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Campodonico.xlsx", 
+    sheet = 3, skip = 1) %>% 
+  rename(anio ="Años"   ,
+         unidad = "Unidad",
+         renta_total = "Total",
+         renta_empresas = "Empresas Privadas",
+         renta_estado_total =  "Estado",
+         renta_consumidores = "Consumidor") %>% 
+  mutate(unidad = "Millones de USD")
+
+renta_estado_campodonico <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Campodonico.xlsx", 
+    sheet = "Capturada_Estado") %>% 
+  select(-Renta_captada_estado) %>% 
+  rename(anio ="Años"   ,
+         unidad = "Unidad",
+         regalias = "Regalías",
+         impuesto_ganancias = Impuesto_a_las_ganancias,
+         retenciones = Retenciones) %>% 
+  mutate( unidad = "Millones de USD",
+          retenciones = as.double(retenciones))
+         
+         
+renta_total_campodonico
+renta_distribucion_campodonico
+```
+
+## Mansilla
+```{r}
+renta_total_mansilla  <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Mansilla.xlsx", 
+    sheet = 1, skip = 1) %>% 
+  rename(anio = Anio,
+         produccion_millones_bbl = "Extraccion",
+         precio_produccion_local_usd_bbl = "Precio de produccion",
+         precio_internacional_usd_bbl  = "Precio internacional", 
+         costo_local_usd_bbl = "Costo total",
+         renta_unitaria_usd_bbl = "Renta petrolera",
+         renta_total_millones_usd = "Renta petrolera total") %>% 
+    filter(anio != "Unidad") %>% 
+  mutate_all(as.double)
+
+renta_diferencial_y_monopolica_mansilla <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Mansilla.xlsx", 
+    sheet = 2, skip = 1) %>% 
+  rename(anio = Anio,
+         precio_produccion_arg = "precio de produccion argentina",
+         precio_poduccion_marginal = "precio de produccion area marginal",
+         renta_diferencial_argentina = "renta diferencial argentina",
+         precio_wti = "precio wti",
+         renta_absoluta_monopolio = "renta absoluta de monopolio",
+         renta_diferencial_sobre_total = "porcentaje renta diferencial sobre renta total")
+
+renta_distribucion_mansilla <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Mansilla.xlsx", 
+    sheet = 3, skip = 1) %>% 
+  rename(renta_total = "Renta petrolera total",
+         renta_empresas = "Empresas",
+         renta_estado_nacional =  "Estado Nacional",
+         renta_estado_provincial =  "Estados provinciales",
+         renta_consumidores = "Refinadores/consumidores")
+
+renta_total_mansilla 
+renta_diferencial_y_monopolica_mansilla
+# renta_distribucion_mansilla
+```
+
+## Scheimberg
+```{r}
+renta_total_scheimberg  <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Scheimberg.xlsx", 
+    sheet = 1, skip = 3) %>% 
+  rename(variable = "...1") %>% 
+  gather(key = anio,
+         value = valor,
+         2:4) %>% 
+    filter(!is.na(valor)) %>% 
+  spread(key = variable,
+         value = valor) %>% 
+  rename(venta_gas_millon_m3 = "Gas (millon m3)",
+         ingreso_gas_millones_usd = "Gas (millón us$)",
+         precio_medio_gas_usd_m3 = "Gas (us$/Mm3)",
+         ingresos_petroleros_totales_millones_usd = "Ingresos Petroleros",
+         venta_petroleo_miles_m3 = "Petróleo (mil m3)",
+         ingreso_petroleo_millones_usd = "Petróleo (millón us$)",
+         precio_medio_petroleo_usd_m3 = "Petróleo (us$/m3)",
+         costo_boe_usd = "Costo por BOE (en US$)" ,
+         costos_de_produccion_totales_millones_usd = "Petróleo + Gas (millón us$)",
+         precio_internacional_usd_bbl = "Precio Internacional (US$/bl)",
+         renta_petrolera_total_millones_usd = "Renta Petrolera") %>% 
+   mutate_all(as.double)
+
+renta_distribucion_scheimberg <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Scheimberg.xlsx", 
+    sheet = 2, skip = 3) %>% 
+   rename(variable = "En millones de USD") %>% 
+  gather(key = anio,
+         value = valor,
+         2:4) %>% 
+    filter(!is.na(valor),
+           variable != "En %") %>% 
+   spread(key = variable,
+         value = valor) %>% 
+  rename(impuesto_ganancias = "Impuesto a las Ganancias",
+         ingresos_brutos_sellos = "Ingresos Brutos + Sellos",
+         regalias = "Regalías",
+         retenciones = "Retención exportación",
+         subsidio_consumo_gas = "Subsidio consumo gas",
+         subsidio_consumo_petroleo = "Subsidio consumo petróleo",
+         subsidio_consumo_total = "Total subsidio consumo",
+         corporate_take_total = "Total Corporate take",
+         goverment_take_total = "Total Government take" ) %>% 
+  mutate_all(as.double) %>% 
+  mutate(unidad = "Millones de USD") %>% 
+  select(anio, unidad, everything(.))
+  
+  
+
+tg_empresas_scheimberg <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/Autores/Scheimberg.xlsx", 
+    sheet = 3, skip = 6) %>% 
+  rename(empresa = "...1") %>% 
+  gather(key = anio,
+         value = valor,
+         2:ncol(.)) %>% 
+  filter(!is.na(valor)) %>% 
+  group_by(empresa) %>% 
+  mutate_all(as.double) %>% 
+  rename(resultado_operativo_sobre_activo = valor)
+
+renta_total_scheimberg
+renta_distribucion_scheimberg
+tg_empresas_scheimberg
+```
+
+```{r}
+renta_total <- renta_total_ramon %>% 
+  group_by(anio) %>% 
+  summarise(ramon = sum(renta_total)) %>% 
+  full_join(renta_total_barrera %>% 
+              select(anio,barrera = renta_total_millones_usd )) %>%
+  left_join(renta_total_campodonico %>%
+              select(anio, campodonico = renta_total_millones_usd)) %>% 
+  left_join(renta_total_mansilla %>% 
+              select(anio,mansilla = renta_total_millones_usd )) %>% 
+  left_join(renta_total_scheimberg %>% 
+              select(anio,scheimberg = renta_petrolera_total_millones_usd )) %>% 
+  mutate(unidad = "Millones de USD") %>% 
+  arrange(anio)
+
+renta_total
+```
+
+
+## Comparación entre autores
+```{r}
+renta_autores <- renta_total_distribucion_ramon %>% 
+  rename(renta_empresas = renta_empresas_con_subsidio) %>% 
+  mutate(regalias = regalias_nacion + regalias_provincias) %>% 
+  select(-c(regalias_nacion , regalias_provincias))%>% 
+  gather(key = tipo_de_renta,
+         value = valor,
+         4:ncol(.)) %>% 
+  filter(!(tipo_de_renta %in% c("renta_empresas_directa", "renta_apropiada_otros_total",
+                               # "renta_estado_total",
+                               "renta_estado_total_con_promocion",  "transferencias_del_estado" ))) %>% 
+  group_by(anio, unidad, tipo_de_renta) %>% 
+  summarise(valor = sum(valor)) %>% 
+  mutate(autor = "Ramon") %>% 
+  full_join(renta_total_barrera %>% 
+              select(anio, valor = renta_total_millones_usd ) %>% 
+              mutate(autor = "Barrera",
+                     tipo_de_renta = "renta_total"),
+            by = c("anio", "tipo_de_renta", "valor", "autor")) %>%
+  full_join(renta_distribucion_campodonico %>% 
+              gather(key = tipo_de_renta,
+                     value = valor,
+                     3:ncol(.)) %>% 
+              mutate(autor = "Campodonico")) %>% 
+  full_join(renta_estado_campodonico %>% 
+              gather(key = tipo_de_renta, 
+                     value = valor, 
+                     3:ncol(.)) %>% 
+              mutate(autor = "Campodonico")) %>%
+  full_join(renta_distribucion_mansilla %>% 
+              mutate(renta_estado_total = renta_estado_provincial + renta_estado_nacional ) %>%
+              select(-c(renta_estado_provincial, renta_estado_nacional)) %>%
+              gather(key = tipo_de_renta,
+                     value = valor,
+                     3:ncol(.)) %>% 
+              mutate(autor = "Mansilla"))  %>% 
+  full_join(renta_distribucion_scheimberg %>% 
+              left_join(renta_total_scheimberg %>% 
+                          select(anio, renta_total = renta_petrolera_total_millones_usd)) %>% 
+              rename(renta_estado_total = goverment_take_total,
+                     renta_empresas = corporate_take_total) %>% 
+              gather(key = tipo_de_renta,
+                     value = valor,
+                     3:ncol(.)) %>% 
+              mutate(autor = "Scheimberg") %>% 
+              filter(!(tipo_de_renta %in% c("subsidio_consumo_gas", "subsidio_consumo_petroleo")))) %>% 
+  ungroup() %>% 
+  mutate(unidad = "Millones de USD")
+  # anio = as.Date(paste0(anio, "-12-31"), format = "%Y-%m-%d"))
+renta_autores
+
+# write.csv(renta_autores, "renta_autores.csv")
+```
+
+
+```{r}
+
+graf_renta_total_autores <- renta_autores %>% 
+  filter(tipo_de_renta%in% c("renta_total", "renta_estado_total")) %>% 
+  ggplot(aes(anio, valor, color = autor))+
+  geom_line()+
+  geom_point()+
+  facet_wrap(~tipo_de_renta)+
+  labs(title = "Renta hidrocarburífera", 
+       subtitle = "Comparación de estimaciones. Millones USD", 
+       y = "Millones de USD")+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+graf_tipos_renta <- renta_autores %>% 
+  filter(!(tipo_de_renta%in% c("renta_total", "renta_estado_total"))) %>% 
+  ggplot(aes(anio, valor, color = autor))+
+  geom_line()+
+  geom_point()+
+  facet_wrap(~tipo_de_renta)+
+  labs(title = "Renta hidrocarburífera", 
+       subtitle = "Comparación de estimaciones. Millones USD", 
+       y = "Millones de USD")+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotly::ggplotly(graf_renta_total_autores)  
+plotly::ggplotly(graf_tipos_renta)  
+```
+# Costos
+
+```{r}
+tcp_3500 <- read_csv("/Archivos/repos/hidrocarburos/analisis/resultados/auxiliares/tc_3500.csv") %>% 
+  select(-X1)
+
+#costos propios
+costos_ccnn <- read_xlsx("/Archivos/repos/hidrocarburos/analisis/resultados/argentina/costos_ccnn.xlsx") %>%
+  select(anio, fuente, costo_boe = precio_costo, costo_mmbtu = precio_costo_mmbtu) %>% 
+  filter(anio %in% (1990:2020) & fuente =="Empalme CCNN") %>% 
+  mutate(autor = "Propia (Empalme CCNN)")
+
+
+YPF_costos <- read_excel("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/YPF costos.xlsx") %>%
+  select(anio = "Año", lifting_cost = "Costo \"lifting\" al cambio BNA" ,
+         exp_cost = "Costos de Exploración/boe" ,des_cost= "Costos de Desarrollo/boe",
+         trans_cost = "Costos de Transporte y otros/boe"  ) %>% 
+  mutate(all_cost= lifting_cost +exp_cost +trans_cost + des_cost, 
+         unidad= "USD/BOE", autor = "Propia (YPF)",
+         anio = as.double(anio))
+
+  
+#     select(1,2,3)
+#    rename(anio = "Año", tc = "Tasa de Cambio BNA",
+#          costo_produccion_avg  =   "Costos de Producción Promedio", costo_lifting = 'Costo \"lifting\"', 
+#          impuestos = "Costo por Impuestos locales y similares", otros_costos =   "Otros Costos") %>% 
+# str(YPF_costos)
+names(YPF_costos)
+```
+
+
+```{r}
+costos_ypf <-  read_csv("C:/Archivos/Datos/Hidrocarburos/Estimacion calculo renta otros/YPF costos.xlsx - Hoja1.csv",
+    col_types = cols(`Año` = col_double()),  locale = locale(decimal_mark = ",")) %>% 
+  rename(anio = "Año", 
+         costo_produccion_avg  =   "Costos de Producción Promedio", costo_lifting = 'Costo \"lifting\"', 
+         impuestos = "Costo por Impuestos locales y similares", otros_costos =   "Otros Costos") %>% 
+  select(anio, costo_produccion_avg, costo_lifting, impuestos, otros_costos) %>% 
+  filter(!is.na(anio)) %>% 
+  # mutate(costo = str_replace(costo, ",", ".")) %>% 
+  # mutate_all(function(x) str_replace(x, ",", ".")) %>% 
+  mutate_all(as.double) %>% 
+  left_join(tcp_3500 %>% select(anio, tcc =tcc_avg)) %>%
+  gather(key = variable, value = valor, 2:5  ) %>% 
+  mutate( valor = valor/tcc, unidad= "USD/BOE", autor = "Propia (YPF)")
+
+# mice::md.pattern(costos_ypf, rotate.names = T)
+
+```
+
+
+```{r}
+#bolivia EMI
+costo_bolivia <- read_excel( "/Archivos/repos/hidrocarburos/analisis/data/bolivia/TG YPFB.xlsx", 
+    sheet = "Costos II sin ponderación", skip = 4) %>%
+  rename(anio = "...1", costo_boe = "u$s/BPE", costo_mmbtu = "u$d/MMBTU") %>% 
+  select(anio, costo_boe, costo_mmbtu) %>%
+  filter(!is.na(costo_boe)) %>% 
+  mutate(autor = "Mussi (Bolivia)",
+         anio = as.double(anio))
+
+# Costos en BOE o bbl
+costos <- renta_total_scheimberg %>% 
+  select(anio, costo = costo_boe_usd) %>% 
+  mutate(autor = "Scheimberg") %>%
+  rbind(renta_total_mansilla %>% 
+          select(anio, costo = costo_local_usd_bbl) %>% 
+          mutate( autor = "Mansilla")) %>%
+  rbind(renta_total_campodonico %>% 
+          select(anio, costo = costo_local_usd_bbl) %>% 
+          mutate( autor = "Campodonico"))  %>% 
+  rbind(renta_total_barrera %>% 
+          select(anio, costo = costo_local_usd_bbl) %>% 
+          mutate( autor = "Barrera")) %>% 
+  rbind(costos_ccnn %>% select(costo= costo_boe, everything(.), -c(fuente, costo_mmbtu))) %>%
+  # rbind(costos_ypf %>% filter(variable == "costo_produccion_avg") %>% select(anio, costo= valor, autor)) %>% 
+  rbind(YPF_costos %>%  select(anio, costo= all_cost, autor)) %>% 
+  # rbind(costo_bolivia %>% select(-costo_mmbtu)) %>%
+  mutate(unidad = "USD/BOE")
+
+#Costos en BOE
+ggplot(costos, aes(anio, costo, color = autor))+
+  geom_line()+
+  geom_point()+
+  labs(title= "Costos de producción hidrocarburífero en Argentina", subtitle = "Comparacion propia (CCNN e YPF) versus otros autores (balances)",
+       caption = "Nota: Sólo Scheimberg y estimación propia presentan costos en BOE",
+       y = "USD/barril", x ="Año")+
+  scale_color_discrete(name= "Autor")+
+  theme(legend.position = "bottom")#+
+  # scale_y_continuous(breaks=seq(0,16,2))
+
+#Costos en MMBTU
+costos_ccnn %>% 
+  select(-c(fuente, costo_boe)) %>% 
+  mutate(autor = "Argentina (Propia)") %>% 
+  rbind(costo_bolivia %>% select(-costo_boe)) %>% 
+  ggplot( aes(anio, costo_mmbtu, color = autor))+
+  geom_line()+
+  geom_point()+
+  labs(title= "Costos de producción hidrocarburífero en Argentina y Bolivia", 
+       subtitle = "Comparacion propia (CCNN) versus EM (YPFB)",
+       y = "USD/MMBTU", x ="Año")+
+  scale_color_discrete(name= "País")+
+  theme(legend.position = "bottom")#+
+
+writexl::write_xlsx(costos, path = "/Archivos/repos/hidrocarburos/analisis/resultados/argentina/costos.xlsx")
+
+```
+
+
