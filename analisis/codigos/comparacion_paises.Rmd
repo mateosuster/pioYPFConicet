@@ -126,7 +126,7 @@ renta_bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Comparación pr
 ```{r}
 
 renta_paises <-  rbind(renta_arg, renta_bzl, renta_vzl, renta_bol)
-
+  
 moneda_lab <- c( "TCP", "TCC") 
 names(moneda_lab) <- unique(renta_paises$unidad)
 
@@ -150,7 +150,7 @@ renta_paises %>%
   scale_color_manual("Paises", values=c( "dodgerblue1", "chartreuse2" ,  "green4", "#CC6666"))+
   facet_wrap(   unidad ~ variable, scales = "free", 
                 labeller = labeller(unidad = moneda_lab, variable = renta_lab) )
-
+ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petróleo (TCP y TCC).png")
 ```
 
 # Renta sobre PBI y plusvalía 
@@ -217,6 +217,7 @@ paises_lab <- unique(sobrepv_paises$pais)
 names(paises_lab  ) <- c( "Argentina", "Brasil"  ,  "Venezuela")
 
 
+
 sobrepv_paises %>% 
   filter(anio > 1997, metodo =="indirecto" ) %>%
   gather(., key = variable, value = valor, 2:3) %>% 
@@ -233,7 +234,7 @@ sobrepv_paises %>%
   facet_wrap(   pais ~ variable, scales = "free", ncol = 2,
                 labeller = labeller(variable = renta_lab, pais= paises_lab) )
                 # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
-
+ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petróleo (como porcentaje PV y PBI).png")
 ```
 
 
@@ -268,6 +269,12 @@ sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl) %>%
   rbind(renta_wb) %>% 
   mutate(anio = as.Date((anio), format = "%Y" ) )
 
+writexl::write_xlsx(list(renta_total = renta_paises,
+                         sobre_pbi_pv = sobrepv_paises,
+                         comparacion_wb = sobrepib_paises), 
+                    path = "../resultados/comparacion_paises/renta_por_pais.xlsx" )
+
+
 # metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
 # names(metodo_lab) <- c("indirecto" ,"directo")
 # 
@@ -292,7 +299,7 @@ sobrepib_paises %>%
   facet_wrap(   ~ pais , scales = "free", ncol = 1)
                 # labeller = labeller( pais= paises_lab) )
                 # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
-
+  ggsave("../resultados/comparacion_paises/Renta de la tierra comparada con Banco Mundial (como porcentaje del PBI).png")
 ```
 
 
