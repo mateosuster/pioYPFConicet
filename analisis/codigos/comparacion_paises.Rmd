@@ -109,16 +109,20 @@ renta_vzl
 
 ## Bolivia
 ```{r}
-renta_bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Comparación precio") %>% 
-  select(anio = "Gas Natural", tcc= "...35", tcp= "...36", renta_indirecto_tcp="...45") %>% 
+bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Comparación precio") %>% 
+  select(anio = "Gas Natural", tcc= "...35", tcp= "...36", renta_indirecto_tcp="...45", renta_pbi = "...49") %>% 
   slice(-c(1:19)) %>% 
   mutate_all(as.double) %>% 
+  mutate( pais = "Bolivia") %>% 
+  select(anio, pais, everything(.))
+
+renta_bol <- bol %>% 
   mutate(renta_indirecto_tcc = renta_indirecto_tcp*tcp/tcc) %>% 
-  select(-c(tcc, tcp)) %>% 
-  gather(key = unidad, value = renta_indirecto, 2:3) %>% 
+  select(-c(tcc, tcp, renta_pbi)) %>% 
+  gather(key = unidad, value = renta_indirecto, 3:4) %>% 
   mutate(unidad = case_when(unidad == "renta_indirecto_tcc" ~ "Millones de USD (TCC)", 
                             unidad == "renta_indirecto_tcp" ~ "Millones de USD (TCP)") ,
-         renta_directo = NA, pais = "Bolivia")
+         renta_directo = NA)
 ```
 
 
@@ -202,10 +206,18 @@ sobrepv_vzl <- vzl %>%
   select(anio, pais,metodo, renta_pv, renta_pbi)
 
 ```
+## Bolivia
+```{r}
+sobrepv_bol <- bol %>% 
+  select(anio , pais, renta_pbi) %>% 
+  mutate(renta_pv = NA, 
+         metodo = "indirecto")
+```
+
 
 ### Comparacion
 ```{r}
-sobrepv_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl)
+sobrepv_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol)
 
 metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
 names(metodo_lab) <- c("indirecto" ,"directo")
@@ -214,7 +226,7 @@ renta_lab <- c("Renta de la tierra sobre plusvalía", "Renta de la tierra sobre 
 names(renta_lab) <- c("renta_pv" ,"renta_pbi")
 
 paises_lab <- unique(sobrepv_paises$pais)
-names(paises_lab  ) <- c( "Argentina", "Brasil"  ,  "Venezuela")
+names(paises_lab  ) <- c( "Argentina", "Brasil"  ,  "Venezuela", "Bolivia")
 
 
 
@@ -227,13 +239,14 @@ sobrepv_paises %>%
   # theme_bw()+
   theme_light()+
    theme(strip.text.x = element_text(size = 8))+
-  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina, Brasil y Venezuela (1997-2018)",
+  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI y plusvalía total", subtitle = "Argentina, Brasil y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
-  scale_fill_manual("Paises", values=c(  "dodgerblue1","green4", "#CC6666"  ))+
-  facet_wrap(   pais ~ variable, scales = "free", ncol = 2,
-                labeller = labeller(variable = renta_lab, pais= paises_lab) )
-                # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
+  scale_fill_manual("Paises", values=c(  "dodgerblue1",  "chartreuse2", "green4", "#CC6666"))+
+  facet_grid(pais ~ variable, scales = "free", labeller = labeller(variable = renta_lab, pais= paises_lab) )
+  # facet_wrap(   pais ~ variable, scales = "free", ncol = 2,
+  #               labeller = labeller(variable = renta_lab, pais= paises_lab) )
+  #               # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
 ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petróleo (como porcentaje PV y PBI).png")
 ```
 
@@ -253,17 +266,13 @@ renta_wb <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/banco mundia
 renta_wb
 
 
-sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl) %>% 
+sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol) %>% 
     mutate(fuente = "Estimación propia") %>% 
   filter( metodo == "indirecto", anio >1962) %>% 
   select(-c(renta_pv, metodo)) %>% 
   rbind(renta_wb) %>% 
   mutate(anio = as.Date((anio), format = "%Y" ) )
 
-writexl::write_xlsx(list(renta_total = renta_paises,
-                         sobre_pbi_pv = sobrepv_paises,
-                         comparacion_wb = sobrepib_paises), 
-                    path = "../resultados/comparacion_paises/renta_por_pais.xlsx" )
 
 
 # metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
@@ -277,16 +286,16 @@ writexl::write_xlsx(list(renta_total = renta_paises,
 
 
 sobrepib_paises %>% 
-  filter(pais %in% c("Argentina", "Venezuela"), anio > "1996-06-06") %>% 
+  filter(pais %in% c("Argentina", "Venezuela", "Bolivia"), anio > "1996-06-06") %>% 
   # gather(., key = variable, value = valor, 2:3) %>% 
   ggplot(aes(anio, renta_pbi, color = fuente)) +
   geom_line(position = "dodge")+
   theme_light()+
    theme(strip.text.x = element_text(size = 8))+
-  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina y Venezuela (1997-2018)",
+  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina, Bolivia y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
-  # scale_fill_manual("Paises", values=c(  "dodgerblue1", "#CC6666"  ))+
+  scale_color_discrete(name = "Fuente" )+
   facet_wrap(   ~ pais , scales = "free", ncol = 1)
                 # labeller = labeller( pais= paises_lab) )
                 # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
@@ -303,7 +312,7 @@ costo total, precio de produccion, renta vía costos,
 ## Argentina
 ```{r}
 read_excel("../resultados/argentina/costos.xlsx") %>% 
-  filter(str_detect(autor, "Propia", ))
+  filter(str_detect(autor, "Propia"))
 ```
 
  
@@ -317,4 +326,18 @@ read_excel("../resultados/argentina/stock, tg y renta empresas argentina.xlsx")
 
 
 tg petrolera total, tg empresas x segmento y país, renta apropiada por empresas
+
+
+```{r}
+writexl::write_xlsx(list(renta_total = renta_paises,
+                         sobre_pbi_pv = sobrepv_paises,
+                         comparacion_wb = sobrepib_paises), 
+                    path = "../resultados/comparacion_paises/renta_por_pais.xlsx" )
+
+```
+
+
+ tg, los mecanismos de apropiacion, y componentes del descuento p*q y los tcp, el
+Pv
+Total y el pbi total
  

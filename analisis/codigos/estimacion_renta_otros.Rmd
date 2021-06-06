@@ -334,7 +334,7 @@ tcp_3500 <- read_csv("/Archivos/repos/hidrocarburos/analisis/resultados/auxiliar
   select(-X1)
 
 #costos propios
-costos_ccnn <- read_xlsx("/Archivos/repos/hidrocarburos/analisis/resultados/argentina/costos_ccnn.xlsx") %>%
+costos_ccnn <- read_xlsx("/Archivos/repos/hidrocarburos/analisis/resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "costos_ccnn") %>%
   select(anio, fuente, costo_boe = precio_costo, costo_mmbtu = precio_costo_mmbtu) %>% 
   filter(anio %in% (1990:2020) & fuente =="Empalme CCNN") %>% 
   mutate(autor = "Propia (Empalme CCNN)")
