@@ -227,7 +227,7 @@ sobrepv_paises %>%
   # theme_bw()+
   theme_light()+
    theme(strip.text.x = element_text(size = 8))+
-  labs(title = "Renta de la tierra del gas y el petróleo", subtitle = "Argentina, Brasil y Venezuela (1997-2018)",
+  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina, Brasil y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
   scale_fill_manual("Paises", values=c(  "dodgerblue1","green4", "#CC6666"  ))+
@@ -235,15 +235,6 @@ sobrepv_paises %>%
                 labeller = labeller(variable = renta_lab, pais= paises_lab) )
                 # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
 ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petróleo (como porcentaje PV y PBI).png")
-```
-
-
-
-# Costos
-## Argentina
-```{r}
-read_excel("../resultados/argentina/costos.xlsx") %>% 
-  filter(str_detect(autor, "Propia", ))
 ```
 
 #### Banco Mundial
@@ -286,13 +277,13 @@ writexl::write_xlsx(list(renta_total = renta_paises,
 
 
 sobrepib_paises %>% 
-  filter(pais %in% c("Argentina", "Venezuela")) %>% 
+  filter(pais %in% c("Argentina", "Venezuela"), anio > "1996-06-06") %>% 
   # gather(., key = variable, value = valor, 2:3) %>% 
   ggplot(aes(anio, renta_pbi, color = fuente)) +
   geom_line(position = "dodge")+
   theme_light()+
    theme(strip.text.x = element_text(size = 8))+
-  labs(title = "Renta de la tierra del gas y el petróleo", subtitle = "Argentina y Venezuela (1997-2018)",
+  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
   # scale_fill_manual("Paises", values=c(  "dodgerblue1", "#CC6666"  ))+
@@ -306,6 +297,15 @@ sobrepib_paises %>%
 costo total, precio de produccion, renta vía costos, 
  
  
+
+
+# Costos
+## Argentina
+```{r}
+read_excel("../resultados/argentina/costos.xlsx") %>% 
+  filter(str_detect(autor, "Propia", ))
+```
+
  
 # Tasas de ganancia
 ## Argentina

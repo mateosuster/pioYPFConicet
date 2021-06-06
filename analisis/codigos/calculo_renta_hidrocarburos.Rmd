@@ -5170,32 +5170,25 @@ datos <-  list( prod_merge_crudo, precio_mi_crudo, expo_q_crudo, precios_referen
  renta_indirecto[,c(1,19:20)],  ccnn_oficial, criterio_ccnn, empalme_ccnn, criterio_propio, 
 renta_autores, renta_empresas_balances,  stock_balances_empresas, union_segmentos, costos)
 
-cuatro <- colnames(datos[[4]])
-cuatro
-
-columnas
-append(columnas, cuatro)
-
+## variables de todos los dataframes
 columnas <- c()
 for(i in 1:length(datos)){
   columnas <- c(columnas, colnames(datos[[i]]))
 }
 
-length(columnas)
-
 list_col <-  as.data.frame(unique(columnas))
 
 
-x <- readxl::read_excel("columnas.xlsx") %>% 
-  # rename(variable = "unique(columnas)") %>% 
-  mutate(unidad = case_when(str_detect(variable, regex("gas|bolivia"))  & str_detect(variable, regex("precio|price")) ~ "USD/MMBTU",
-                            str_detect(variable, regex("gas|lng"))  & str_detect(variable, regex("prod")) ~ "MMBTU",
-                            str_detect(variable, regex("crudo|petroleo"))  & str_detect(variable, regex("precio")) ~ "USD/Barril",
-                            str_detect(variable, regex("crudo|petroleo")) ~ "Barriles",
-                            str_detect(variable, regex("crudo|petroleo"))  & str_detect(variable, regex("prod|expo")) ~ "Barriles"))
-                            
+# x <- readxl::read_excel("columnas.xlsx") %>% 
+#   # rename(variable = "unique(columnas)") %>% 
+#   mutate(unidad = case_when(str_detect(variable, regex("gas|bolivia"))  & str_detect(variable, regex("precio|price")) ~ "USD/MMBTU",
+#                             str_detect(variable, regex("gas|lng"))  & str_detect(variable, regex("prod")) ~ "MMBTU",
+#                             str_detect(variable, regex("crudo|petroleo"))  & str_detect(variable, regex("precio")) ~ "USD/Barril",
+#                             str_detect(variable, regex("crudo|petroleo")) ~ "Barriles",
+#                             str_detect(variable, regex("crudo|petroleo"))  & str_detect(variable, regex("prod|expo")) ~ "Barriles"))
+#                             
 
-writexl::write_xlsx(x, path =  "columnas.xlsx")
+# writexl::write_xlsx(x, path =  "columnas.xlsx")
 
 ```
 
@@ -5228,44 +5221,69 @@ coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_
 
 capture.output(coeficientes, file = "resultados/argentina/coeficientes.txt")
 
-writexl::write_xlsx(list(metodo_indirecto = renta_indirecto[,c(1:13, 17)],
-                         crudo_dif_precios_ms = renta_dif_precios_crudo[,-14], 
-                         gas_dif_precios_ms = renta_diferencial_precios_gas[,-13],
-                           crudo_sobrevaluacion_ms = renta_tcp_crudo[,-c(12:13)],
-                           gas_sobrevaluacion_ms = renta_tcp_gas,
+writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)],
+                         descuentos_vbp = renta_directo, 
+                         va_criterio_propio = criterio_propio,
+                           sobre_pib_descuentos = renta_directo_pbi[,c(1,14:15)],
+                         sobre_pib_mecanismos =renta_indirecto[,c(1,19:20)], 
+                         crudo_dif_precios = renta_dif_precios_crudo[,-14], 
+                         gas_dif_precios = renta_diferencial_precios_gas[,-13],
+                           crudo_sobrevaluacion = renta_tcp_crudo[,-c(12:13)],
+                           gas_sobrevaluacion = renta_tcp_gas,
                          regalias = regalias_usd,
                          retenciones = retenciones_crudo,
                          subsidios = subsidios_hidrocarburos,
-                         renta_balances = renta_produccion_balances  ), 
-                    path = "resultados/argentina/renta_metodo_indirecto.xlsx")
-
-
-writexl::write_xlsx(list(va_criterio_propio = criterio_propio,
-                          metodo_directo = renta_directo),
-                    path = "resultados/argentina/renta_metodo_directo.xlsx")
-
-writexl::write_xlsx(list( metodo_directo_pbi = renta_directo_pbi[,c(1,14:15)],
-                         metodo_indirecto_pbi=renta_indirecto[,c(1,19:20)]),
-                    path = "resultados/argentina/renta_sobre_pbi.xlsx")
-
-writexl::write_xlsx(list(ccnn_oficial = ccnn_oficial,
+                         renta_balances = renta_produccion_balances  , 
+                         ccnn_oficial = ccnn_oficial,
                          criterio_ccnn=criterio_ccnn,
                          empalme_ccnn=empalme_ccnn,
-                         criterio_propio =criterio_propio),
-                    path= "/Archivos/repos/hidrocarburos/analisis/resultados/argentina/valor_total_produccion.xlsx")
-
-
-writexl::write_xlsx(list(comparacion_autores = renta_autores),
-                    path = "resultados/argentina/renta_comparacion_autores.xlsx")
-
-
-writexl::write_xlsx(list( "renta empresas" = renta_empresas_balances,
+                         criterio_propio =criterio_propio ,
+                         comparacion_autores = renta_autores , 
+                         "renta empresas" = renta_empresas_balances,
                            stock_balances = stock_balances_empresas,
-                         segmento_YPF_PetBR =union_segmentos), 
-                    path = "resultados/argentina/stock, tg y renta empresas argentina.xlsx")
+                         segmento_YPF_PetBR =union_segmentos,
+                          costos_ccnn=costos),
+                    path = "resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx") 
 
-writexl::write_xlsx(list(costos_ccnn=costos),
-                    path = "resultados/argentina/costos_ccnn.xlsx")
+
+# Exportacion vieja
+# writexl::write_xlsx(list(metodo_indirecto = renta_indirecto[,c(1:13, 17)],
+#                          crudo_dif_precios_ms = renta_dif_precios_crudo[,-14], 
+#                          gas_dif_precios_ms = renta_diferencial_precios_gas[,-13],
+#                            crudo_sobrevaluacion_ms = renta_tcp_crudo[,-c(12:13)],
+#                            gas_sobrevaluacion_ms = renta_tcp_gas,
+#                          regalias = regalias_usd,
+#                          retenciones = retenciones_crudo,
+#                          subsidios = subsidios_hidrocarburos,
+#                          renta_balances = renta_produccion_balances  ), 
+#                     path = "resultados/argentina/renta_metodo_indirecto.xlsx")
+
+# writexl::write_xlsx(list(va_criterio_propio = criterio_propio,
+#                           metodo_directo = renta_directo),
+#                     path = "resultados/argentina/renta_metodo_directo.xlsx")
+
+# writexl::write_xlsx(list( metodo_directo_pbi = renta_directo_pbi[,c(1,14:15)],
+#                          metodo_indirecto_pbi=renta_indirecto[,c(1,19:20)]),
+#                     path = "resultados/argentina/renta_sobre_pbi.xlsx")
+
+# writexl::write_xlsx(list(ccnn_oficial = ccnn_oficial,
+#                          criterio_ccnn=criterio_ccnn,
+#                          empalme_ccnn=empalme_ccnn,
+#                          criterio_propio =criterio_propio),
+#                     path= "/Archivos/repos/hidrocarburos/analisis/resultados/argentina/valor_total_produccion.xlsx")
+# 
+# 
+# writexl::write_xlsx(list(comparacion_autores = renta_autores),
+#                     path = "resultados/argentina/renta_comparacion_autores.xlsx")
+# 
+# 
+# writexl::write_xlsx(list( "renta empresas" = renta_empresas_balances,
+#                            stock_balances = stock_balances_empresas,
+#                          segmento_YPF_PetBR =union_segmentos), 
+#                     path = "resultados/argentina/stock, tg y renta empresas argentina.xlsx")
+# 
+# writexl::write_xlsx(list(costos_ccnn=costos),
+#                     path = "resultados/argentina/costos_ccnn.xlsx")
 
 
 # writexl::write_xlsx(list(produccion = prod_merge_crudo, 
