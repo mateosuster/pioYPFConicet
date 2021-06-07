@@ -5289,7 +5289,7 @@ writexl::write_xlsx(list(indice = indice,
                          VBPextTcp  =criterio_propio ,
                          RTPG_comparacion = renta_autores , 
                          costos_pg_comparacion = costos_comparacion ,
-                          costos_pg_ccnn=costos),
+                          costos_pg_ccnn=costos %>% filter(anio >1993)),
                     path = "../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx")
 
 

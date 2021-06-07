@@ -80,11 +80,11 @@ renta_bzl
 ## Venezuela
 ```{r}
 
-tc_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "Tipos de cambio") %>% 
+tc_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "10. Tipos de cambio") %>% 
   rename(anio = "...1", tcc = "Tipo de Cambio Comercial", tcp = "Tipo de Cambio de paridad")
 
 # Las vbls de vzla estan todas en corrientes
-vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "Renta") %>% 
+vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "9. Renta") %>% 
   select(anio = "...1",  renta_indirecto = "Renta Total" , renta_directo ="Renta P*Q") %>% 
   slice(-1) %>% 
   left_join(tc_vzl, by = "anio") %>% 
@@ -194,10 +194,10 @@ sobrepv_bzl <- bzl  %>%
 
 ```{r}
 
-vzl_pbi <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet ="PIB") %>% 
+vzl_pbi <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet ="1. PIB") %>% 
   select(anio = "...1", pbi = "PIB Total")
 
-vzl_pv <-  read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = 3) %>% 
+vzl_pv <-  read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "6. Plusvalía ") %>% 
   select(anio = "...1", pv = "Plusvalía total")
 
 sobrepv_vzl <- vzl %>%  
@@ -233,7 +233,7 @@ paises_lab <- unique(sobrepv_paises$pais)
 names(paises_lab  ) <- c( "Argentina", "Brasil"  ,  "Venezuela", "Bolivia")
 
 
-
+# CON METODO DIRECTO
 sobrepv_paises %>% 
   mutate(metodo = case_when(pais == "Bolivia" & metodo == "indirecto" ~ "directo" ,T ~metodo)) %>% 
   filter(anio > 1997, metodo =="directo" ) %>%
@@ -294,7 +294,7 @@ sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol) %>
 # paises_lab <- unique(sobrepib_paises$pais)
 # names(paises_lab  ) <- c( "Argentina",    "Venezuela")
 
-
+# CON METODO DIRECTO
 sobrepib_paises %>% 
   # filter(pais %in% c("Argentina", "Venezuela", "Bolivia") ) %>%
   filter( anio > "1996-06-06") %>%
@@ -338,6 +338,7 @@ x1 <-  sobrepib_paises %>%
   mutate( #anio = year(anio),
          variable = "renta_pbi") 
 
+# CON METODO DIRECTO
 ggplot() +
   geom_col(data = x, mapping = aes(anio, valor, fill = pais), position = "dodge")+
   geom_line(data = x1, mapping = aes(anio, renta_pbi, color = fuente)  , label = "Banco Mundial" )+
@@ -384,7 +385,7 @@ bzl_tg <- bzl %>%
 
 ## Venezuela
 ```{r}
-vzl_tg <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "Tasas de ganancia",
+vzl_tg <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "7. Tasas de ganancia",
                      skip = 1) %>% 
   select(anio = "...1", tg = "TGPetrolera") %>% 
   mutate(pais = "Venezuela")
@@ -448,11 +449,11 @@ mecanismos_bzl <-read_excel("../data/brazil/Grinberg (2021) Renta petrolera Bras
 ```
 ## Venezuela
 ```{r}
-mecanismos_vzl <-read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "Renta" ) %>% 
+mecanismos_vzl <-read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "9. Renta" ) %>% 
   slice(-1) %>% 
   select(anio = "...1", renta_empresas = "Renta petrolera (TgP-Tgnop)" ,
          renta_expo_sobrevaluada = "Renta apropiada por tipo de cambio" , impuestos = Impuestos,
-         renta_diferencial_precios = "Venta de petróleo por debajo del precio internacional") %>% 
+         renta_diferencial_precios = "Renta apropiada en mercad interno por compra petróleo por debajo de precio internacional (con tcc)") %>% 
     gather(key = tipo_renta, value = valor_renta, 2:ncol(.)) %>%
     left_join(tc_vzl %>% rename(TCP =tcp, TCC = tcc)) %>% 
   gather(key = tipo_tc , value = valor_tc , c(TCC,TCP) ) %>% 
@@ -463,20 +464,24 @@ mecanismos_vzl <-read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", 
 
 ## Bolivia
 ```{r}
-bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Renta") %>% 
-  select(anio = "...1", TCC= "...14", TCP= "...15", renta_indirecto_tcp="...45", 
-         renta_pbi = "...50", renta_pv = "...51") %>% 
+mecanismos_bol <-   read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Renta") %>% 
+  select(anio = "...1", TCC= "...14", TCP= "...15",  
+         renta_empresas = "...28" , impuestos = "...29", renta_expo_sobrevaluada = "...30" ) %>% 
   slice(-c(1:19)) %>% 
-  mutate_all(as.double) %>% 
-  mutate( pais = "Bolivia") %>% 
-  select(anio, pais, everything(.))
+  mutate_all(as.double) %>%
+  filter(anio > 0) %>% 
+  select(anio,  everything(.)) %>% 
+  gather(key = tipo_renta, value = valor_renta, 4:ncol(.)) %>%
+  gather(key = tipo_tc , value = valor_tc , c(TCC,TCP) ) %>% 
+  mutate(pais = "Bolivia", unidad = "Millones de USD",
+           valor_renta = valor_renta /valor_tc) 
 
 ```
 
 
 ### Comparacion
 ```{r}
-mecanismos <- rbind(mecanismos_arg, mecanismos_bzl, mecanismos_vzl)
+mecanismos <- rbind(mecanismos_arg, mecanismos_bzl, mecanismos_vzl, mecanismos_bol)
 
 # metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
 # names(metodo_lab) <- c("indirecto" ,"directo")
@@ -497,12 +502,13 @@ mecanismos %>%
   geom_col(position = "identity")+
   # theme_bw()+
   theme_light()+
-   theme(strip.text.x = element_text(size = 8), strip.text.y = element_text(size = 7))+
+   theme(strip.text.x = element_text(size = 8), strip.text.y = element_text(size = 9))+
   labs(title = "Renta de la tierra del gas y el petróleo, por mecanismos de apropiacion", 
-       subtitle = "Argentina, Brasil y Venezuela (1997-2018)",
+       subtitle = "Argentina, Bolivia, Brasil y Venezuela (1997-2018)", fill = "Mecanismos",
        y = "Millones de USD", x="Año")+
     scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
-  # scale_fill_manual("Paises", values=c(  "dodgerblue1",   "green4","#CC6666" )) +#, "chartreuse2" ))+
+  scale_fill_discrete(name = "Mecanismos", labels = c("RTPG por impuestos", "RTPG diferencial de precios",
+                                 "RTPG apropiada por empresas", "RTPG por sobrevaluación"))+
   facet_grid(pais ~tipo_tc , scales = "free",labeller = labeller(tipo_renta = renta_lab) )
   # facet_wrap(pais ~tipo_tc ,ncol=2, scales = "free",labeller = labeller(tipo_renta = renta_lab) )
   
@@ -529,26 +535,26 @@ descuentos_arg <-  read_excel("../resultados/argentina/renta_de_la_tierra_hidroc
   gather(key = variable, value = valor, 4:ncol(.)) %>% 
   left_join(mecanismos_arg %>% select(anio, tipo_tc, valor_tc)) %>% 
   mutate(valor = valor/valor_tc,
-         unidad = "Millones de USD")
+         unidad = "Millones de USD") 
   
 ```
 ## Venezuela
 ```{r}
 tc_vzl
 
-pbi_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "PIB") %>% 
+pbi_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "1. PIB") %>% 
   select(anio = "...1", "valor agregado" = "PIB Petrolero")
 
-pv_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "Plusvalía ") %>% 
+pv_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "6. Plusvalía ") %>% 
   select(anio = "...1", "plusvalia" = "Plusvalía petrolera")
 
-ci_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "CI") %>% 
+ci_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "2. CI") %>% 
   select(anio = "...1", "consumo intermedio" = "CI Petro")
 
-w_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "Remuneraciones") %>% 
+w_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "3. Remuneraciones") %>% 
   select(anio = "...1", "masa salarial" = "Rem Petro")
 
-consK_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "Consumo capital fijo") %>% 
+consK_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "5. Consumo capital fijo") %>% 
   select(anio = "...1", "consumo capital fijo" = "Consumo capital fijo Petrolero")
 
 descuentos_vzl <- pbi_vzl %>% 
@@ -571,13 +577,57 @@ descuentos <- rbind(descuentos_arg, descuentos_vzl)
 # Costos
 ## Argentina
 ```{r}
-# read_excel("../resultados/argentina/costos.xlsx") %>% 
-#   filter(str_detect(autor, "Propia"))
+x <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
+           sheet = "costos_pg_comparacion") %>%
+  filter(str_detect(autor, "Propia"), anio >0) %>% 
+  rename(valor = costo) %>% 
+  mutate( variable =case_when(autor == "Propia (Empalme CCNN)" ~ "Precio de costo (CCNN)", 
+                                                   autor == "Propia (YPF)" ~ "Precio de costo (Balances)") ) %>% 
+  select(-autor)
+
+y <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
+           sheet = "costos_pg_ccnn") %>% 
+  select(anio, valor = precio_produccion, unidad =unidad_costos) %>% 
+  mutate(variable = "Precio de produccion")
+
+costos_arg <- rbind(x, y) %>% mutate(pais = "Argentina") %>%  filter(anio >0)
+  
+```
+## Venezuela
+```{r}
+costos_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "14. Costos x barril") %>% 
+  select(anio = "...1", "Precio de costo (CCNN)" = "Costo por barril TCC (CCNN)", 
+         "Precio de produccion" = "Precio de producción TCC", 
+         "Precio de costo (Balances)" = "Costo por barril extracción PDVSA USD (TC Pdvsa)") %>% 
+  gather(key = variable, value = valor, 2:ncol(.)) %>% 
+  mutate(unidad = "USD/BOE", pais = "Venezuela")
+  
+```
+## Brazil
+```{r}
+costos_blz <- read_excel("../data/brazil/Grinberg (2021) Renta petrolera Brasil_informePIOYPFConicet.xlsx", sheet = 1) %>%
+  select(anio = "...1", tcp = "TCP...7",tcc = "TCC...8", 
+         "Precio de costo (CCNN)" = "CT...4","Precio de produccion" = "PP...15",
+       "Precio de costo (Balances)" =  "CT...26" ) %>% 
+  slice(-1) %>% 
+  mutate_all(as.double) %>% 
+   gather(key = variable, value = valor, 4:ncol(.)) %>% 
+  mutate(unidad = "USD/BOE", pais = "Brasil", valor = valor /tcc) %>% 
+  select(-c(tcc,tcp))
+ 
+  
 ```
 
 
-# Exportacion de resultados
+### Comparacion
+```{r}
+costos <-  rbind(costos_arg, costos_vzl, costos_blz) %>% 
+  rename(valor_costo = valor, tipo_costo = variable)
+```
 
+
+
+# Exportacion de resultados
 
 ```{r}
 
@@ -604,7 +654,8 @@ writexl::write_xlsx(list(indice = indice,
                          RTPG_vs_banco_mundial = sobrepib_paises_ex,
                          # tg = tg_paises, 
                          RTPG_mecanismos= mecanismos_ex,
-                         RTPG_PextQ= descuentos), 
+                         RTPG_PextQ= descuentos,
+                         costos = costos), 
                     path = "../resultados/comparacion_paises/renta_por_pais.xlsx" )
 
 datos <-  list( renta_paises, sobrepv_paises, sobrepib_paises, mecanismos, descuentos)
