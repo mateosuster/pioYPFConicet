@@ -53,7 +53,8 @@ bzl <-  read_excel("../data/brazil/Grinberg (2021) Renta petrolera Brasil_inform
   select(anio = "...1", tcp = "TCP...7",tcc = "TCC...8", 
          costo_boe = "CT...4", produccion = PROD, 
          kta = "K total...13", gcia_normal = "GAN...14",
-         renta_directo = RHT1, renta_indirecto =  RTH2, pv = plusvalia ) %>% 
+         renta_directo = RHT1, renta_indirecto =  RTH2, 
+         pv = plusvalia, pbi = PBI ) %>% 
   slice(-1) %>% 
   mutate_all(as.double) %>% 
   mutate(pais = "Brasil")
@@ -175,13 +176,15 @@ sobrepv_arg <- rbind(sobrepv_dir_arg, sobrepv_ind_arg) %>%
 
 sobrepv_bzl <- bzl  %>% 
   mutate(renta_pv = renta_directo/pv, 
+         renta_pbi = renta_directo/pbi,
          metodo = "directo") %>% 
-  select(anio, renta_pv, metodo) %>% 
+  select(anio, renta_pv,renta_pbi, metodo) %>% 
   rbind(bzl  %>% 
             mutate(renta_pv = renta_indirecto/pv, 
-                   metodo = "indirecto") %>% 
-            select(anio, renta_pv, metodo)  ) %>% 
-  mutate(pais = "Brasil", renta_pbi = NA)
+                   metodo = "indirecto",
+                   renta_pbi = renta_indirecto/pbi,) %>% 
+            select(anio, renta_pv,renta_pbi, metodo)  ) %>% 
+  mutate(pais = "Brasil")
 ```
 
 ## Venezuela
@@ -220,7 +223,7 @@ sobrepv_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol)
 metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
 names(metodo_lab) <- c("indirecto" ,"directo")
 
-renta_lab <- c("RTPG_PextQ sobre plusvalía", "RTPG_PextQ sobre PBI")
+renta_lab <- c("RTPG sobre plusvalía", "RTPG sobre PBI")
 names(renta_lab) <- c("renta_pv" ,"renta_pbi")
 
 paises_lab <- unique(sobrepv_paises$pais)
@@ -290,18 +293,18 @@ sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol) %>
 
 
 sobrepib_paises %>% 
-  filter(pais %in% c("Argentina", "Venezuela", "Bolivia") ) %>%
+  # filter(pais %in% c("Argentina", "Venezuela", "Bolivia") ) %>%
   filter( anio > "1996-06-06") %>%
   # gather(., key = variable, value = valor, 2:3) %>% 
   ggplot(aes(anio, renta_pbi, color = fuente)) +
   geom_line(position = "dodge")+
   theme_light()+
    theme(strip.text.x = element_text(size = 8) , legend.text = element_text( size = 8))+ #, plot.title = element_text(size=15))+
-  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina, Bolivia y Venezuela (1997-2018)",
+  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina, Brasil, Bolivia y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
   scale_color_discrete(name = "Fuente" )+
-  facet_wrap(   ~ pais , scales = "free", ncol = 1)
+  facet_wrap(   ~ pais , scales = "free", ncol = 2)
                  # labeller = labeller( pais= paises_lab) )
                 # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
   ggsave("../resultados/comparacion_paises/Renta de la tierra comparada con Banco Mundial (como porcentaje del PBI).png")
@@ -312,7 +315,7 @@ sobrepib_paises %>%
 # metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
 # names(metodo_lab) <- c("indirecto" ,"directo")
 
-renta_lab <- c("RTPG_PextQ/PV", "RTPG_PextQ/PBI")
+renta_lab <- c("RTPG/PV", "RTPG/PBI")
 names(renta_lab) <- c("renta_pv" ,"renta_pbi")
 
 paises_lab <- unique(sobrepv_paises$pais)
@@ -327,7 +330,7 @@ x <-   sobrepv_paises %>%
 
 
 x1 <-  sobrepib_paises %>% 
-  filter(pais %in% c("Argentina", "Venezuela", "Bolivia") ) %>%
+  # filter(pais %in% c("Argentina", "Venezuela", "Bolivia") ) %>%
   filter( anio > "1997-06-06", fuente == "Banco Mundial") %>% 
   mutate( #anio = year(anio),
          variable = "renta_pbi") 
@@ -337,12 +340,13 @@ ggplot() +
   geom_line(data = x1, mapping = aes(anio, renta_pbi, color = fuente)  , label = "Banco Mundial" )+
   theme_light()+
    theme(strip.text.x = element_text(size = 7), 
-         axis.text.x = element_text(angle = 90, size=7))+# , vjust = 0.5, hjust=0.5))+
-  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI y plusvalía total", subtitle = "Argentina, Brasil, Bolivia y Venezuela (1997-2018)",
+         axis.text.x = element_text(angle = 90, size=7) ,
+         plot.title = element_text(size=14))+# , vjust = 0.5, hjust=0.5))+
+  labs(title = "Renta de la tierra del gas y el petróleo sobre PBI y plusvalía total", subtitle = "Cálculo propio y del Banco Mundial de Argentina, Brasil, Bolivia y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
-  scale_fill_manual("Paises (RTPG_PextQ)", values=c(  "dodgerblue1",  "chartreuse2", "green4", "#CC6666"))+
-    scale_color_manual(name = "Fuente",  values = c("black"))+
+  scale_fill_manual("Propio", values=c(  "dodgerblue1",  "chartreuse2", "green4", "#CC6666"))+
+    scale_color_manual(name = "",  values = c("black"))+
   facet_wrap(pais ~ variable, scales = "free_y", labeller = labeller(variable = renta_lab, pais= paises_lab), ncol=4)
 
   ggsave("../resultados/comparacion_paises/RTPG_PextQPBI, WB y propia juntos.png")
@@ -452,7 +456,6 @@ mecanismos_vzl <-read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", 
   mutate(pais = "Venezuela",
            unidad = "Millones de USD",
            valor_renta = valor_renta /valor_tc) 
-mecanismos[is.na(mecanismos$tipo_renta), ]
 ```
 
 ## Bolivia

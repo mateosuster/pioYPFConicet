@@ -5220,6 +5220,7 @@ list_col <-  as.data.frame(unique(columnas))
 
 ```{r include=FALSE}
 ## Exportación de resultados
+costos_comparacion <- readxl::read_excel("../resultados/argentina/costos.xlsx")
 
 writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo, 
                          precio_interno_crudo = precio_mi_crudo, 
@@ -5257,6 +5258,7 @@ writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)] %>% filt
                          regalias = regalias_usd,
                          retenciones = retenciones_crudo,
                          subsidios = subsidios_hidrocarburos,
+                         "renta empresas" = renta_empresas_balances,
                          renta_balances = renta_produccion_balances  , 
                          ccnn_oficial = ccnn_oficial,
                          criterio_ccnn=criterio_ccnn,
@@ -5264,9 +5266,9 @@ writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)] %>% filt
                          criterio_propio =criterio_propio ,
                          comparacion_autores = renta_autores , 
                          tg_total =renta_tg,
-                         "renta empresas" = renta_empresas_balances,
                            stock_balances = stock_balances_empresas,
                          segmento_YPF_PetBR =union_segmentos,
+                         costos_comparacion = costos_comparacion ,
                           costos_ccnn=costos),
                     path = "../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx")
 ```
