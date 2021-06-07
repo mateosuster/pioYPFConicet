@@ -5220,7 +5220,6 @@ list_col <-  as.data.frame(unique(columnas))
 
 ```{r include=FALSE}
 ## Exportación de resultados
-costos_comparacion <- readxl::read_excel("../resultados/argentina/costos.xlsx")
 
 writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo, 
                          precio_interno_crudo = precio_mi_crudo, 
@@ -5244,9 +5243,9 @@ coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_
                      "Proporción de la Masa Salarial extraccion promedio 2004-2012"= mean_coef_ms$coef_ms_extr,
                      "Coeficiente consumo intermedio (Año)" =coef_consumo_intermedio$anio,
                      "Coeficiente consumo intermedio (1- VA/VBP)" =coef_consumo_intermedio$coef_ci)
-
 capture.output(coeficientes, file = "../resultados/argentina/coeficientes.txt")
 
+costos_comparacion <- readxl::read_excel("../resultados/argentina/costos.xlsx")
 writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)] %>% filter(anio >1961),
                          descuentos_vbp = renta_directo, 
                            sobre_pib_descuentos = renta_directo_pbi[,c(1,14:15)],
@@ -5287,24 +5286,24 @@ writexl::write_xlsx(x, path = "../resultados/argentina/tabla_comparacion_autores
 
 
 # Exportacion vieja
-writexl::write_xlsx(list(metodo_indirecto = renta_indirecto[,c(1:13, 17)],
-                         crudo_dif_precios_ms = renta_dif_precios_crudo[,-14],
-                         gas_dif_precios_ms = renta_diferencial_precios_gas[,-13],
-                           crudo_sobrevaluacion_ms = renta_tcp_crudo[,-c(12:13)],
-                           gas_sobrevaluacion_ms = renta_tcp_gas,
-                         regalias = regalias_usd,
-                         retenciones = retenciones_crudo,
-                         subsidios = subsidios_hidrocarburos,
-                         renta_balances = renta_produccion_balances  ),
-                    path = "../resultados/argentina/renta_metodo_indirecto.xlsx")
-
-writexl::write_xlsx(list(va_criterio_propio = criterio_propio,
-                          metodo_directo = renta_directo),
-                    path = "../resultados/argentina/renta_metodo_directo.xlsx")
-
-writexl::write_xlsx(list( metodo_directo_pbi = renta_directo_pbi[,c(1,14:15)],
-                         metodo_indirecto_pbi=renta_indirecto[,c(1,19:20)]),
-                    path = "../resultados/argentina/renta_sobre_pbi.xlsx")
+# writexl::write_xlsx(list(metodo_indirecto = renta_indirecto[,c(1:13, 17)],
+#                          crudo_dif_precios_ms = renta_dif_precios_crudo[,-14],
+#                          gas_dif_precios_ms = renta_diferencial_precios_gas[,-13],
+#                            crudo_sobrevaluacion_ms = renta_tcp_crudo[,-c(12:13)],
+#                            gas_sobrevaluacion_ms = renta_tcp_gas,
+#                          regalias = regalias_usd,
+#                          retenciones = retenciones_crudo,
+#                          subsidios = subsidios_hidrocarburos,
+#                          renta_balances = renta_produccion_balances  ),
+#                     path = "../resultados/argentina/renta_metodo_indirecto.xlsx")
+# 
+# writexl::write_xlsx(list(va_criterio_propio = criterio_propio,
+#                           metodo_directo = renta_directo),
+#                     path = "../resultados/argentina/renta_metodo_directo.xlsx")
+# 
+# writexl::write_xlsx(list( metodo_directo_pbi = renta_directo_pbi[,c(1,14:15)],
+#                          metodo_indirecto_pbi=renta_indirecto[,c(1,19:20)]),
+#                     path = "../resultados/argentina/renta_sobre_pbi.xlsx")
 
 # writexl::write_xlsx(list(ccnn_oficial = ccnn_oficial,
 #                          criterio_ccnn=criterio_ccnn,
