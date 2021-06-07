@@ -3030,7 +3030,8 @@ stock_estimado %>%
 
 #cambio stock solo para los años que tenemos BOLSAR
 stock_estimado <- stock_rama %>% 
-              filter(fuente=="Bolsar", variable =="ppye", sector == "produccion") %>% 
+              filter(fuente %in% c("Bolsar", "AFIP"), variable =="ppye", 
+                     sector %in% c("produccion", "extraccion_petroleo_gas")) %>% 
               select(anio, unidad,fuente_ppye=fuente , valor)
   
   
@@ -4120,9 +4121,17 @@ empalme_ccnn <- ccnn_oficial %>%
                                    T ~ ms_extr), 
     ebe_tot = case_when(is.na(ebe_tot) ~ va_tot -ms_tot,
                                    T ~ ebe_tot),
-    ebe_extr = case_when(is.na(ebe_extr) ~ va_tot -ms_tot,
+    ebe_extr = case_when(is.na(ebe_extr) ~ va_extr -ms_extr,
                                    T ~ ebe_extr),
-    fuente = "Empalme CCNN")
+    fuente = "Empalme CCNN",
+    unidad = "Millones de pesos corrientes") %>% 
+   left_join(stock_estimado %>%
+               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+              filter(fuente_ppye == "Bolsar") %>%
+              mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
+               select(anio, consumo_k_fijo)) %>%
+  mutate( pv = ebe_extr - consumo_k_fijo - (vbp_tot * imp_prom_97))
+  
 
 ## Criterio propio 
 criterio_propio <- precios_y_cantidades %>%
@@ -4131,6 +4140,7 @@ criterio_propio <- precios_y_cantidades %>%
   left_join(stock_estimado %>%
                left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
               # filter(variable == "ppye_estimado_bolsar") %>% 
+                            filter(fuente_ppye == "Bolsar") %>% 
               mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
                select(anio, consumo_k_fijo)) %>% 
   mutate(
@@ -4138,11 +4148,11 @@ criterio_propio <- precios_y_cantidades %>%
          vbp_tot =( (prod_crudo*precio_me_crudo  + prod_gas * precio_externo_gas) * tcp)/10^6,
          va_tot = vbp_tot - ci_extr,
          ebe_tot = va_tot - ms_extr ,
-         pv = ebe_tot - consumo_k_fijo - (vbp_tot * imp_prom_97), 
          vbp_extr =  NA ,
          ebe_extr =NA,
          va_extr=NA, 
-         fuente = "Criterio propio")
+         fuente = "Criterio propio", unidad ="Millones de pesos corrientes" ,
+          pv = ebe_tot - consumo_k_fijo - (vbp_tot * imp_prom_97))
 
 ```
 
@@ -4208,7 +4218,7 @@ ypf_segmentos <- read_csv("C:/Archivos/Datos/Balances/gas y petroleo_datos/datos
 
 ```
 
-
+## Por empresa
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 graf_tg_emp <- balances_arg %>%
   filter(tg_ant != Inf) %>% 
@@ -4221,8 +4231,30 @@ graf_tg_emp <- balances_arg %>%
   theme(axis.text.x = element_text(angle = 90))+
   facet_wrap(~sector)
 
-ggplotly(graf_tg_emp, width = 800, height = 600)
+ggplotly(graf_tg_emp, width = 600, height = 400)
 ```
+
+## Por subsector
+
+```{r}
+balances_arg %>% 
+  filter(unidad == "Millones de pesos") %>% 
+  group_by(fecha, sector) %>% 
+  summarise("TG antes de impuestos" = sum(gcia_ant,na.rm = T)/sum (KTA,na.rm = T),
+         "TG despues de impuestos" = sum(gcia_ant, impuesto_gcia, na.rm = T)/sum(KTA, na.rm = T ) ) %>%
+  gather(key = variable, value = valor, 3:4) %>% 
+  filter(variable =="TG despues de impuestos") %>%
+  ggplot(aes(fecha, valor, color = sector))+ 
+  geom_line()+
+  geom_point()+
+  scale_y_continuous(labels = scales::percent)+
+  labs(title = "Tasa de ganancia empresas hidrocarburos",
+       subtitle =  "Antes y después de impuestos")+
+  theme(axis.text.x = element_text(angle = 90))+
+  facet_wrap(~variable)
+
+```
+
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 graf_tg_ypf <- ypf_seg %>% 
@@ -4251,34 +4283,35 @@ graf_tg_petrobras <- petrobras_ar_seg %>%
   labs(title = "Tasa de ganancia de segmentos Petrobras Argentina")
 graf_tg_petrobras
 ```
-
+##Total rama
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE   ,fig.width=10, fig.height=5}
-#Estimación de tasa de ganancia total rama
 
-tasa_ganancia_rama_flujo <- criterio_propio %>%
+tasa_ganancia_rama <- empalme_ccnn %>%
+  distinct() %>% 
     filter(anio >1997) %>% 
   select(anio, unidad, pv) %>% 
-  left_join(ipc_promedio , by = "anio") %>% 
-  mutate(pv = pv /ipc_18,
-         unidad = "Millones de pesos de 2018") %>% 
-  # left_join(stock_y_pozos %>% 
+    # left_join(stock_y_pozos %>% 
   #             select(anio,  ppye = ppye_estimado, stock_seleccionado = fuente_ppye, fuente_pozo),
   #           by = c("anio")) %>% 
-  left_join(stock_estimado %>% 
-              mutate(fuente_pozo = "Estimación sin pozos") %>% 
-              select(anio,  ppye = valor, stock_seleccionado = fuente_ppye, fuente_pozo),
+  left_join(stock_estimado %>%
+              left_join(ipc_promedio , by = "anio") %>% 
+                      mutate(fuente_pozo = "Estimación sin pozos",
+                             valor = valor *ipc_18) %>% 
+                      select(anio,  ppye = valor, stock_seleccionado = fuente_ppye, fuente_pozo),
             by = c("anio")) %>% 
-  mutate(tasa_ganancia = pv/ppye)
+  mutate(tasa_ganancia = pv/ppye) %>% 
+  filter(!is.na(stock_seleccionado)) %>% 
+  select(-fuente_pozo)
 
-graf_tg_rama_1 <- tasa_ganancia_rama_flujo %>% 
-  ggplot(aes(anio, tasa_ganancia, color =fuente_pozo ))+
+graf_tg_rama_1 <- tasa_ganancia_rama%>%
+  ggplot(aes(anio, tasa_ganancia, color =stock_seleccionado ))+
   geom_line(alpha = 0.5)+
   geom_point()+
   scale_y_continuous(labels = scales::percent)+
   theme(axis.text.x = element_text(angle = 90),
         legend.position = "bottom")+
-  labs(title = "Tasa de ganancia hidrocarburífera con PPyE de extracción") #+
+  labs(title = "Tasa de ganancia hidrocarburífera con PPyE de extracción") 
   # facet_wrap(~stock_seleccionado)
 # ggplotly(graf_tg_rama_1, width = 800, height = 600)
 graf_tg_rama_1
@@ -4336,28 +4369,32 @@ tg_industrial <- read_delim("C:/Archivos/Datos/Hidrocarburos/TG/tg_industrial.cs
     ";", escape_double = FALSE, trim_ws = TRUE) %>% 
   mutate(anio = as.double(anio))
 
-renta_tg <-  tasa_ganancia_rama_flujo %>%
-  select(anio, unidad, stock_seleccionado, fuente_pozo, ppye , tasa_ganancia) %>% 
+renta_tg <-  tasa_ganancia_rama %>%
+  select(anio, unidad, stock_seleccionado,  ppye , tasa_ganancia) %>% 
   # filter(stock_seleccionado == "ppye_bolsar",fuente_pozo == "pozos_cargados_sec_energia" ) %>% 
   left_join(tg_industrial, by = "anio") %>% 
   rename(tg_hidrocarburos = tasa_ganancia) %>% 
-  mutate(renta_con_tg_jic = ppye *(tg_hidrocarburos - tg_indu_jic),
+  mutate(union_tg = case_when(anio < 1993 ~ tg_indu_jic,
+                              anio >= 1993 ~ tg_indu_em),
+         renta_con_tg_jic = ppye *(tg_hidrocarburos - tg_indu_jic),
          renta_con_tg_em = ppye *(tg_hidrocarburos - tg_indu_em),
-         union_tg = case_when(anio < 1993 ~ tg_indu_jic,
-                              anio >= 1993 ~ tg_indu_em)) %>% 
+         renta_con_tg_union = ppye *(tg_hidrocarburos - union_tg)) %>% 
   distinct()
 
 graf_tg_rama <- renta_tg %>%
+  filter(!is.na(stock_seleccionado)) %>% 
   gather(key = tipo_renta,
          value = renta,
-         9:10) %>% 
+         c(renta_con_tg_jic, renta_con_tg_em,renta_con_tg_union )) %>% 
   filter(anio >1960) %>% 
+  left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
+  mutate(renta = renta/ipc_18) %>% 
   ggplot(aes(anio, renta, fill = tipo_renta))+ 
   geom_col(position ="dodge")+
   # geom_point()+
   labs(title = "Renta hidrocarburífera por diferencial de tasas de ganancia",
        y = "Millones de pesos de 2018")+
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90))+  facet_wrap(~stock_seleccionado, ncol = 1)
 ggplotly(graf_tg_rama, width = 600, height = 400)
 ```
 
@@ -4784,7 +4821,10 @@ renta_indirecto <- renta_dif_precios_crudo %>%
   mutate_all(function(x) {x / 10^6}) %>% #las vbles cargadas anteriormente se pasan a MM
   mutate_all(function(x) replace_na(x, 0)) %>% 
   ungroup() %>% 
-  left_join(renta_produccion_balances %>% select(anio, renta_empresas_desp_impuestos)) %>%
+  left_join(renta_tg %>% 
+              filter(stock_seleccionado == "Bolsar") %>% 
+              select(anio, renta_empresas = renta_con_tg_union) ) %>%
+  # left_join(renta_produccion_balances %>% select(anio, renta_empresas)) %>%
   # left_join(renta_directo %>%
   #             filter(stock_seleccionado == "ppye_bolsar") %>%
   #             select(anio, renta_empresas = renta_con_tg_normal) %>% 
@@ -4801,11 +4841,11 @@ renta_indirecto <- renta_dif_precios_crudo %>%
          regalias_total = regalias_total / ipc_18,
          retenciones = retenciones / ipc_18, 
          subsidios = subsidios/ipc_18,
-    renta_empresas_desp_impuestos =replace_na(renta_empresas_desp_impuestos,  0),
-         renta_empresas_desp_impuestos = renta_empresas_desp_impuestos/ipc_18,
+    renta_empresas =replace_na(renta_empresas,  0),
+         renta_empresas = renta_empresas/ipc_18,
          renta_total = renta_dif_precios_gas+ renta_dif_precios_crudo +
            renta_sobrevaluacion_crudo + renta_sobrevaluacion_gas +
-           renta_empresas_desp_impuestos+
+           renta_empresas+
            regalias_total +  retenciones - subsidios,
          proporcion_subsidios = subsidios/(renta_dif_precios_gas+ renta_dif_precios_crudo +
            renta_sobrevaluacion_crudo + renta_sobrevaluacion_gas +
@@ -5049,9 +5089,6 @@ costos <- produccion_total %>%
 #expresar en usd tcc y tcp
 costos
 
-```
-
-```{r}
 costos %>% 
            filter(anio > 1997) %>% 
   ggplot(aes(anio, precio_costo, color = fuente))+ 
@@ -5083,13 +5120,13 @@ renta_autores <- renta_indirecto %>%
           renta_diferencial_precios = 
             renta_diferencial_precios_gas+ renta_diferencial_precios_crudo,
           # renta_empresas = renta_empresas*ipc_18/tcc,
-          # renta_empresas_desp_impuestos = renta_empresas_desp_impuestos*ipc_18/tcc,
+          # renta_empresas = renta_empresas*ipc_18/tcc,
           renta_total = (renta_total*ipc_18) / tcp,
           unidad = "Millones de USD",
          autor = "Propia") %>% 
   rename(retenciones = retenciones,
          regalias = regalias_total
-          # renta_empresas = renta_empresas_desp_impuestos,
+          # renta_empresas = renta_empresas,
          # renta_total_gas = renta_diferencial_precios_gas,
          # renta_total_crudo = renta_diferencial_precios_crudo,
          ) %>% 
@@ -5209,9 +5246,8 @@ coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_
 
 capture.output(coeficientes, file = "../resultados/argentina/coeficientes.txt")
 
-writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)],
+writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)] %>% filter(anio >1961),
                          descuentos_vbp = renta_directo, 
-                         va_criterio_propio = criterio_propio,
                            sobre_pib_descuentos = renta_directo_pbi[,c(1,14:15)],
                          sobre_pib_mecanismos =renta_indirecto[,c(1,19:20)], 
                          crudo_dif_precios = renta_dif_precios_crudo[,-14], 
@@ -5227,13 +5263,16 @@ writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)],
                          empalme_ccnn=empalme_ccnn,
                          criterio_propio =criterio_propio ,
                          comparacion_autores = renta_autores , 
+                         tg_total =renta_tg,
                          "renta empresas" = renta_empresas_balances,
                            stock_balances = stock_balances_empresas,
                          segmento_YPF_PetBR =union_segmentos,
                           costos_ccnn=costos),
-                    path = "../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx") 
+                    path = "../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx")
+```
 
 
+```{r include=FALSE}
 x <- renta_autores %>% 
   filter(anio >1997,tipo_de_renta =="renta_total") %>% 
   group_by(anio, unidad, autor) %>% 
@@ -5276,7 +5315,8 @@ writexl::write_xlsx(list( metodo_directo_pbi = renta_directo_pbi[,c(1,14:15)],
 #                     path = "resultados/argentina/renta_comparacion_autores.xlsx")
 # 
 # 
-# writexl::write_xlsx(list( "renta empresas" = renta_empresas_balances,
+# writexl::write_xlsx(list( tg_total =renta_tg,
+                            # "renta empresas" = renta_empresas_balances,
 #                            stock_balances = stock_balances_empresas,
 #                          segmento_YPF_PetBR =union_segmentos), 
 #                     path = "resultados/argentina/stock, tg y renta empresas argentina.xlsx")

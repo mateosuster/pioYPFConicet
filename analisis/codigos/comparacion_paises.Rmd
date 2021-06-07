@@ -44,9 +44,6 @@ renta_arg <- renta_indirecto_arg %>%
 renta_arg
 ```
 
-```{r}
-read_excel("../data/brazil/Grinberg (2021) Renta petrolera Brasil_informePIOYPFConicet.xlsx", sheet = 1)
-```
 
 
 ## Brasil
@@ -110,7 +107,8 @@ renta_vzl
 ## Bolivia
 ```{r}
 bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Comparación precio") %>% 
-  select(anio = "Gas Natural", tcc= "...35", tcp= "...36", renta_indirecto_tcp="...45", renta_pbi = "...49") %>% 
+  select(anio = "Gas Natural", tcc= "...35", tcp= "...36", renta_indirecto_tcp="...45", 
+         renta_pbi = "...50", renta_pv = "...51") %>% 
   slice(-c(1:19)) %>% 
   mutate_all(as.double) %>% 
   mutate( pais = "Bolivia") %>% 
@@ -118,7 +116,7 @@ bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Comparación precio")
 
 renta_bol <- bol %>% 
   mutate(renta_indirecto_tcc = renta_indirecto_tcp*tcp/tcc) %>% 
-  select(-c(tcc, tcp, renta_pbi)) %>% 
+  select(-c(tcc, tcp, renta_pbi, renta_pv)) %>% 
   gather(key = unidad, value = renta_indirecto, 3:4) %>% 
   mutate(unidad = case_when(unidad == "renta_indirecto_tcc" ~ "Millones de USD (TCC)", 
                             unidad == "renta_indirecto_tcp" ~ "Millones de USD (TCP)") ,
@@ -137,7 +135,7 @@ names(moneda_lab) <- unique(renta_paises$unidad)
 renta_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
 names(renta_lab) <- c("renta_indirecto" ,"renta_directo")
 
-options(facet_size_manual = list(width = c(1,1), height = NULL))
+# options(facet_size_manual = list(width = c(1,1), height = NULL))
 
 renta_paises %>% 
   filter(anio > 1997) %>% 
@@ -209,9 +207,8 @@ sobrepv_vzl <- vzl %>%
 ## Bolivia
 ```{r}
 sobrepv_bol <- bol %>% 
-  select(anio , pais, renta_pbi) %>% 
-  mutate(renta_pv = NA, 
-         metodo = "indirecto")
+  select(anio , pais, renta_pbi, renta_pv) %>% 
+  mutate(metodo = "indirecto")
 ```
 
 
@@ -267,7 +264,7 @@ renta_wb
 
 
 sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol) %>% 
-    mutate(fuente = "Estimación propia") %>% 
+    mutate(fuente = "Estimación propia (mecanismos)") %>% 
   filter( metodo == "indirecto", anio >1962) %>% 
   select(-c(renta_pv, metodo)) %>% 
   rbind(renta_wb) %>% 
@@ -291,13 +288,13 @@ sobrepib_paises %>%
   ggplot(aes(anio, renta_pbi, color = fuente)) +
   geom_line(position = "dodge")+
   theme_light()+
-   theme(strip.text.x = element_text(size = 8))+
+   theme(strip.text.x = element_text(size = 8) , legend.text = element_text( size = 8))+ #, plot.title = element_text(size=15))+
   labs(title = "Renta de la tierra del gas y el petróleo sobre PBI", subtitle = "Argentina, Bolivia y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
   scale_color_discrete(name = "Fuente" )+
   facet_wrap(   ~ pais , scales = "free", ncol = 1)
-                # labeller = labeller( pais= paises_lab) )
+                 # labeller = labeller( pais= paises_lab) )
                 # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
   ggsave("../resultados/comparacion_paises/Renta de la tierra comparada con Banco Mundial (como porcentaje del PBI).png")
 ```
@@ -308,36 +305,254 @@ costo total, precio de produccion, renta vía costos,
  
 
 
+
+ 
+# Tasas de ganancia del sector petrolero
+tg petrolera total, tg empresas x segmento y país, renta apropiada por empresas
+
+## Argentina
+```{r}
+arg_tg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tg_total") %>% 
+  filter(stock_seleccionado == "Bolsar") %>% 
+  select(anio, tg = tg_hidrocarburos) %>% 
+  mutate(pais = "Argentina")
+
+
+```
+
+## Brasil
+
+```{r}
+bzl_tg <- bzl %>% 
+  mutate(pv = gcia_normal + renta_directo,
+         tg = pv / kta) %>% 
+  select(anio, pais, tg)
+```
+
+## Venezuela
+```{r}
+vzl_tg <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "Tasas de ganancia",
+                     skip = 1) %>% 
+  select(anio = "...1", tg = "TGPetrolera") %>% 
+  mutate(pais = "Venezuela")
+```
+## Bolivia
+```{r}
+bol_tg <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "TG") %>% 
+  select(anio = "...1" , tg = "TG después impuestos y regalías") %>% 
+  slice(-c(1:3)) %>% 
+  mutate_all(as.double) %>% 
+  mutate(pais = "Bolivia")
+```
+
+### Comparacion
+```{r}
+tg_paises <- rbind(arg_tg, bol_tg, vzl_tg, bzl_tg %>% filter(anio!=2015))
+
+tg_paises %>% 
+  filter(anio >1997) %>% 
+  ggplot( aes(anio, tg, color = pais))+
+  geom_line()+
+  labs(title = "Tasa de ganancia hidrocarburífera", subtitle = "Argentina, Brasil, Bolivia y Venezuela (1997-2018)",
+       y = "%", x="Año")+
+    scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
+  scale_color_manual(name = "País" , values=c(  "dodgerblue1", "green4","chartreuse2", "#CC6666"))
+
+```
+
+# Renta por mecanismos
+## Argentina
+```{r}
+mecanismos_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = 1) %>% 
+  select(-14) %>% 
+  mutate(renta_expo_sobrevaluada = renta_expo_sobrevaluada_crudo + renta_expo_sobrevaluada_crudo,
+         renta_diferencial_precios = renta_diferencial_precios_gas +renta_diferencial_precios_crudo,
+         impuestos = regalias_total+retenciones, 
+         pais = "Argentina") %>% 
+  select(anio, pais,ipc_18, TCC = tcc, TCP = tcp,
+         renta_expo_sobrevaluada,renta_diferencial_precios, impuestos, renta_empresas  ) %>% 
+  gather(key = tipo_renta, value = valor_renta, 6:ncol(.)) %>%
+  gather(key = tipo_tc , value = valor_tc , c(TCC,TCP) ) %>% 
+  mutate(valor_renta = valor_renta * ipc_18 / valor_tc, 
+         unidad = "Millones de USD") %>%  
+  select(anio, pais, unidad, tipo_tc, valor_tc, tipo_renta, valor_renta)
+  
+```
+
+## Brasil
+```{r}
+mecanismos_bzl <-read_excel("../data/brazil/Grinberg (2021) Renta petrolera Brasil_informePIOYPFConicet.xlsx", sheet = 1) %>%
+  select(anio = "...1", TCP = "TCP...7",TCC = "TCC...8", 
+         renta_expo_sobrevaluada = ATC, renta_diferencial_precios = PRECIO, 
+         impuestos = "ROY+IE", renta_empresas = AKM) %>%  
+  slice(-1) %>% 
+  mutate_all(as.double) %>% 
+  gather(key = tipo_renta, value = valor_renta, 4:ncol(.)) %>%
+  gather(key = tipo_tc , value = valor_tc , c(TCC,TCP) ) %>%
+    mutate(pais = "Brasil",
+           unidad = "Millones de USD",
+           valor_renta = valor_renta /valor_tc) 
+```
+## Venezuela
+```{r}
+mecanismos_vzl <-read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet = "Renta" ) %>% 
+  slice(-1) %>% 
+  select(anio = "...1", renta_empresas = "Renta petrolera (TgP-Tgnop)" ,
+         renta_expo_sobrevaluada = "Renta apropiada por tipo de cambio" , impuestos = Impuestos,
+         renta_diferencial_precios = "Venta de petróleo por debajo del precio internacional") %>% 
+    gather(key = tipo_renta, value = valor_renta, 2:ncol(.)) %>%
+    left_join(tc_vzl %>% rename(TCP =tcp, TCC = tcc)) %>% 
+  gather(key = tipo_tc , value = valor_tc , c(TCC,TCP) ) %>% 
+  mutate(pais = "Venezuela",
+           unidad = "Millones de USD",
+           valor_renta = valor_renta /valor_tc) 
+mecanismos[is.na(mecanismos$tipo_renta), ]
+```
+
+## Bolivia
+```{r}
+bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Comparación precio") %>% 
+  select(anio = "Gas Natural", tcc= "...35", tcp= "...36", renta_indirecto_tcp="...45", 
+         renta_pbi = "...50", renta_pv = "...51") %>% 
+  slice(-c(1:19)) %>% 
+  mutate_all(as.double) %>% 
+  mutate( pais = "Bolivia") %>% 
+  select(anio, pais, everything(.))
+
+```
+
+
+### Comparacion
+```{r}
+mecanismos <- rbind(mecanismos_arg, mecanismos_bzl, mecanismos_vzl)
+
+# metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
+# names(metodo_lab) <- c("indirecto" ,"directo")
+
+renta_lab <- c("Sobrevaluacion", "Dif. de precios", "Impuestos", "Empresas")
+names(renta_lab) <- unique(mecanismos_arg$tipo_renta)
+
+# paises_lab <- unique(sobrepv_paises$pais)
+# names(paises_lab  ) <- c( "Argentina", "Brasil"  ,  "Venezuela", "Bolivia")
+
+
+
+mecanismos %>% 
+  filter(anio > 1997) %>%
+  # filter(tipo_tc == "TCC") %>% 
+  ggplot(aes(anio, valor_renta, fill = tipo_renta)) +
+  # geom_line()+
+  geom_col(position = "identity")+
+  # theme_bw()+
+  theme_light()+
+   theme(strip.text.x = element_text(size = 8), strip.text.y = element_text(size = 7))+
+  labs(title = "Renta de la tierra del gas y el petróleo, por mecanismos de apropiacion", 
+       subtitle = "Argentina, Brasil y Venezuela (1997-2018)",
+       y = "Millones de USD", x="Año")+
+    scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  # scale_fill_manual("Paises", values=c(  "dodgerblue1",   "green4","#CC6666" )) +#, "chartreuse2" ))+
+  facet_grid(pais ~tipo_tc , scales = "free",labeller = labeller(tipo_renta = renta_lab) )
+  # facet_wrap(pais ~tipo_tc ,ncol=2, scales = "free",labeller = labeller(tipo_renta = renta_lab) )
+  
+ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petróleo (por mecanismos de apropiacion).png")
+```
+
+# Renta por descuentos 
+## Argentina
+```{r}
+x <-  read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "descuentos_vbp") %>% 
+  mutate(gcia_normal_hidrocarburos = gcia_normal_hidrocarburos*ipc_18,
+         renta_total = renta_total *ipc_18) %>% 
+  select(anio,gcia_normal_hidrocarburos , renta_total )
+
+descuentos_arg <-  read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "criterio_propio") %>% 
+  select(anio, 18:31, -c(fuente, ci_extr, ebe_extr,va_extr, ms_extr))  %>% 
+  left_join(x, by = "anio") %>% 
+  mutate(pais = "Argentina") %>% 
+  select(anio, pais, unidad, "valor bruto de produccion" = "vbp_tot" ,  "consumo intermedio" = "ci_tot" ,
+        "valor agregado"= "va_tot", "masa salarial"= "ms_tot", "excedente bruto de explotacion" = "ebe_tot",
+        "consumo capital fijo"  = "consumo_k_fijo"  ,  "plusvalia" = "pv", 
+        "ganancia normal hidrocarburifera" =  "gcia_normal_hidrocarburos", 
+        "renta de la tierra hidrocarburifera" = "renta_total") %>% 
+  gather(key = variable, value = valor, 4:ncol(.)) %>% 
+  left_join(mecanismos_arg %>% select(anio, tipo_tc, valor_tc)) %>% 
+  mutate(valor = valor/valor_tc,
+         unidad = "Millones de USD")
+  
+```
+## Venezuela
+```{r}
+tc_vzl
+
+pbi_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "PIB") %>% 
+  select(anio = "...1", "valor agregado" = "PIB Petrolero")
+
+pv_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "Plusvalía ") %>% 
+  select(anio = "...1", "plusvalia" = "Plusvalía petrolera")
+
+ci_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "CI") %>% 
+  select(anio = "...1", "consumo intermedio" = "CI Petro")
+
+w_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "Remuneraciones") %>% 
+  select(anio = "...1", "masa salarial" = "Rem Petro")
+
+consK_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", sheet  = "Consumo capital fijo") %>% 
+  select(anio = "...1", "consumo capital fijo" = "Consumo capital fijo Petrolero")
+
+descuentos_vzl <- pbi_vzl %>% 
+  full_join(ci_vzl) %>% 
+  full_join(w_vzl) %>% 
+  full_join(consK_vzl) %>% 
+  full_join(pv_vzl) %>% 
+  gather(key = variable, value = valor, 2:ncol(.)) %>% 
+  left_join(mecanismos_vzl %>% select(anio, pais, tipo_tc, valor_tc)) %>% 
+  mutate(valor = valor/valor_tc,
+         unidad = "Millones de USD")
+
+```
+### Comparacion
+```{r}
+descuentos <- rbind(descuentos_arg, descuentos_vzl)
+```
+
+
 # Costos
 ## Argentina
 ```{r}
-read_excel("../resultados/argentina/costos.xlsx") %>% 
-  filter(str_detect(autor, "Propia"))
-```
-
- 
-# Tasas de ganancia
-## Argentina
-```{r}
-read_excel("../resultados/argentina/stock, tg y renta empresas argentina.xlsx")
-
-
+# read_excel("../resultados/argentina/costos.xlsx") %>% 
+#   filter(str_detect(autor, "Propia"))
 ```
 
 
-tg petrolera total, tg empresas x segmento y país, renta apropiada por empresas
+# Exportacion de resultados
 
 
 ```{r}
+
+renta_paises <- renta_paises %>% rename(RTPG_PextQ = renta_directo, RTPG_Mecanismos= renta_indirecto)
+sobrepv_paises <- sobrepv_paises %>% mutate(
+                         metodo= case_when(metodo == "directo" ~ "Renta de la tierra del petróleo y el gas calculada desde el producto de valor a precio internacional y valuda en moneda local por tipo de cambio de paridad",
+                                    metodo == "indirecto" ~ "Renta de la tierra del petróleo y el gas calculada como la suma de los mecanismos de apropiación por diferentes sujetos sociales"))
+
+
 writexl::write_xlsx(list(renta_total = renta_paises,
                          sobre_pbi_pv = sobrepv_paises,
-                         comparacion_wb = sobrepib_paises), 
+                         comparacion_wb = sobrepib_paises,
+                         # tg = tg_paises, 
+                         mecanismos= mecanismos,
+                         descuentos= descuentos), 
                     path = "../resultados/comparacion_paises/renta_por_pais.xlsx" )
 
+datos <-  list( renta_paises, sobrepv_paises, sobrepib_paises, mecanismos, descuentos)
+
+## variables de todos los dataframes
+columnas <- c()
+for(i in 1:length(datos)){
+  columnas <- c(columnas, colnames(datos[[i]]))
+}
+
+list_col <-  as.data.frame(unique(columnas))
+writexl::write_xlsx(list_col, path = "../resultados/comparacion_paises/columnas.xlsx")
 ```
 
 
- tg, los mecanismos de apropiacion, y componentes del descuento p*q y los tcp, el
-Pv
-Total y el pbi total
- 
