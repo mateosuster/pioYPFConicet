@@ -149,7 +149,7 @@ renta_paises %>%
    theme(strip.text.x = element_text(size = 8,  hjust=0.5, vjust=0.5, 
                                      margin(.0, 0, .0, 0, "cm" ))) +
   labs(title = "Renta de la tierra del gas y el petróleo", subtitle = "Argentina, Brasil, Bolivia y Venezuela (1997-2018)",
-       y = "Millones de dólares", x="Año")+
+       y = "Millones de USD", x="Año")+
   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
   scale_color_manual("Paises", values=c( "dodgerblue1", "chartreuse2" ,  "green4", "#CC6666"))+
   facet_wrap(   unidad ~ variable, scales = "free", 
