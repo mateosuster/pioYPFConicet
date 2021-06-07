@@ -661,6 +661,13 @@ prod_sesco_gas_b <- read_csv("C:/Archivos/Datos/Hidrocarburos/SESCO/produccin-de
 prod_sesco_gas <- prod_sesco_gas_a %>%
   bind_rows(prod_sesco_gas_b)
 
+#sesco historic
+prod_sec_energia_gas <- read.csv( "../data/secretaria_energia/sesco/producciongasnaturaldesde-1950.csv") %>% 
+  mutate(produccion_gas_natural = produccion_gas_natural*1000,
+         unidad = "Miles de m3") %>% 
+  rename(sec_energia_prod = produccion_gas_natural) 
+
+
 
 #EIA
 prod_eia_dry_natural_gas <- read_csv("C:/Archivos/Datos/EIA/data/Dry_natural_gas_production_Argentina_Annual.csv", 
@@ -681,6 +688,7 @@ prod_merge_gas <-  prod_regalias_gas %>%
               select(anio, gas_anuario = gas_anuario_MMm3 ) %>% 
               mutate(gas_anuario = gas_anuario * 1000,
                      unidad = "Miles de m3")) %>% 
+      left_join(prod_sec_energia_gas %>% select(anio, sec_energia_prod)) %>% 
   left_join(prod_eia_dry_natural_gas %>% rename(gas_eia = prod_eia)) %>% 
   mutate(prod_gas = case_when(anio < 1993 ~ gas_anuario,
                                   anio > 1992 ~ gas_sesco),
@@ -5220,20 +5228,19 @@ list_col <-  as.data.frame(unique(columnas))
 
 ```{r include=FALSE}
 ## Exportación de resultados
+prod_merge_crudo_ex <- prod_merge_crudo %>% 
+  rename(regalias_prod = regalias, mecon_prod= mecon, sesco_prod = sesco,
+         anuario_prod = anuario_combustibles , sec_energia_prod = crudo_sec_energia , eia_prod  =eia)
+prod_merge_gas_MMBTU_ex <- prod_merge_gas_MMBTU %>% 
+  rename(regalias_prod = regalias, mecon_prod= mecon, sesco_prod = sesco,
+         anuario_prod = anuario_combustibles , eia_prod  =eia)
+precio_mi_crudo_ex <- precio_mi_crudo %>% 
+  rename(idee_precio = idee, regalias_precio = regalias, mecon_precio = mecon, 
+         ypf_precio = ypf, mecon_ccnn_precio = mecon_ccnn )
+precio_interno_gas_mmbtu_usd_ex <- precio_interno_gas_mmbtu_usd %>% 
+  rename(idee_precio = idee, regalias_precio = regalias, mecon_precio = mecon, 
+         ypf_precio = ypf, mecon_ccnn_precio = mecon_ccnn , anuario_precio = anuario)
 
-writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo, 
-                         precio_interno_crudo = precio_mi_crudo, 
-                         exportacion_crudo = expo_q_crudo, 
-                         precios_externo_crudo = precios_referencia_y_expo_crudo,
-                         produccion_gas = prod_merge_gas_MMBTU, 
-                         precio_interno_gas =precio_interno_gas_mmbtu_usd, 
-                         exportacion_gas = expo_q_gas, 
-                         precio_externo_gas = precio_mdomundial_gas_MMBTU,
-                         subsidios =subsidios_hidrocarburos,
-                         ganancia_y_pbi = ganancia_y_pbi,
-                         tipo_cambio = tcp_anual_b,
-                         ipc = ipc_promedio),
-                    path =  "../resultados/argentina/variables.xlsx")
 
 coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_s_extraccion,
                      "Tasa de depreciación de YPF" = consumo_k_fijo_ypf,
@@ -5246,33 +5253,46 @@ coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_
 capture.output(coeficientes, file = "../resultados/argentina/coeficientes.txt")
 
 costos_comparacion <- readxl::read_excel("../resultados/argentina/costos.xlsx")
-writexl::write_xlsx(list(sum_mecanismos = renta_indirecto[,c(1:13, 17)] %>% filter(anio >1961),
-                         descuentos_vbp = renta_directo, 
-                           sobre_pib_descuentos = renta_directo_pbi[,c(1,14:15)],
-                         sobre_pib_mecanismos =renta_indirecto[,c(1,19:20)], 
+indice <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "indice")
+variables <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "variables")
+writexl::write_xlsx(list(indice = indice,
+                         variables= variables ,
+                         tipo_cambio = tcp_anual_b,
+                         ipc = ipc_promedio %>% select(-fecha),
+                         pv_y_pbi = ganancia_y_pbi ,
+                         produccion_crudo = prod_merge_crudo_ex, 
+                         produccion_gas = prod_merge_gas_MMBTU_ex,
+                         exportacion_crudo = expo_q_crudo,
+                         exportacion_gas = expo_q_gas,
+                         precio_interno_crudo = precio_mi_crudo_ex, 
+                         precio_interno_gas =precio_interno_gas_mmbtu_usd_ex, 
+                          precios_externo_crudo = precios_referencia_y_expo_crudo, 
+                         precio_externo_gas = precio_mdomundial_gas_MMBTU,
+                         RTPG_mecanismos = renta_indirecto[,c(1:13, 17)] %>% filter(anio >1961),
+                         RTPG_PextQ = renta_directo,
+                         RTPG_mecanismos_vs_pib =renta_indirecto[,c(1,19:20)]  %>% filter(anio >1961),
+                         RTPG_PextQ_vs_pib = renta_directo_pbi[,c(1,14:15)],
                          crudo_dif_precios = renta_dif_precios_crudo[,-14], 
                          gas_dif_precios = renta_diferencial_precios_gas[,-13],
-                           crudo_sobrevaluacion = renta_tcp_crudo[,-c(12:13)],
-                           gas_sobrevaluacion = renta_tcp_gas,
-                         regalias = regalias_usd,
-                         retenciones = retenciones_crudo,
-                         subsidios = subsidios_hidrocarburos,
-                         tg_total =renta_tg,
-                         tg_empresas = renta_empresas_balances,
-                         stock_balances = stock_balances_empresas,
+                        crudo_sobrevaluacion = renta_tcp_crudo[,-c(12:13)],
+                        gas_sobrevaluacion = renta_tcp_gas,
+                         regalias_pg = regalias_usd,
+                         retenciones_pg = retenciones_crudo,
+                         subsidios_pg = subsidios_hidrocarburos,
+                         tg_pg_total =renta_tg,
+                         tg_pg_empresas = renta_empresas_balances,
+                         stock_pg_balances = stock_balances_empresas,
                          segmento_YPF_PetBR =union_segmentos,
-                         ccnn_oficial = ccnn_oficial,
-                         criterio_ccnn=criterio_ccnn %>% select(-c(ci_tot , ci_extr)) ,
-                         empalme_ccnn=empalme_ccnn,
-                         criterio_propio =criterio_propio ,
-                         comparacion_autores = renta_autores , 
-                         costos_comparacion = costos_comparacion ,
-                          costos_ccnn=costos),
+                         ccnn_pg = ccnn_oficial,
+                         criterio_ccnn_pg=criterio_ccnn %>% select(-c(ci_tot , ci_extr)) ,
+                         empalme_ccnn_pg=empalme_ccnn,
+                         VBPextTcp  =criterio_propio ,
+                         RTPG_comparacion = renta_autores , 
+                         costos_pg_comparacion = costos_comparacion ,
+                          costos_pg_ccnn=costos),
                     path = "../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx")
-```
 
 
-```{r include=FALSE}
 x <- renta_autores %>% 
   filter(anio >1997,tipo_de_renta =="renta_total") %>% 
   group_by(anio, unidad, autor) %>% 
@@ -5285,6 +5305,21 @@ writexl::write_xlsx(x, path = "../resultados/argentina/tabla_comparacion_autores
 
 
 # Exportacion vieja
+
+# writexl::write_xlsx(list(produccion_crudo = prod_merge_crudo_ex, 
+#                          precio_interno_crudo = precio_mi_crudo_ex, 
+#                          exportacion_crudo = expo_q_crudo, 
+#                          precios_externo_crudo = precios_referencia_y_expo_crudo,
+#                          produccion_gas = prod_merge_gas_MMBTU_ex, 
+#                          precio_interno_gas =precio_interno_gas_mmbtu_usd_ex, 
+#                          exportacion_gas = expo_q_gas, 
+#                          precio_externo_gas = precio_mdomundial_gas_MMBTU,
+#                          pv_y_pbi = ganancia_y_pbi ,
+#                          tipo_cambio = tcp_anual_b,
+#                          ipc = ipc_promedio %>% select(-fecha)),
+#                     path =  "../resultados/argentina/variables.xlsx")
+
+
 # writexl::write_xlsx(list(metodo_indirecto = renta_indirecto[,c(1:13, 17)],
 #                          crudo_dif_precios_ms = renta_dif_precios_crudo[,-14],
 #                          gas_dif_precios_ms = renta_diferencial_precios_gas[,-13],

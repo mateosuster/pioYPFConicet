@@ -19,12 +19,12 @@ library(plotly)
 
 ## Argentina
 ```{r}
-renta_directo_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "descuentos_vbp") %>%
+renta_directo_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ") %>%
   mutate(pais = "Argentina") %>% 
   select(anio, unidad,pais, renta_directo = renta_total) 
 
 renta_indirecto_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx",
-                                  sheet = "sum_mecanismos")%>%
+                                  sheet = "RTPG_mecanismos")%>%
     mutate(pais = "Argentina", unidad = "Millones de pesos de 2018") %>% 
   select(anio, unidad, pais, ipc_18,tcc, tcp, renta_indirecto = renta_total) %>% 
   filter(anio >1961)  
@@ -162,11 +162,11 @@ ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petról
 ## Argentina
 ```{r}
 sobrepv_ind_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
-                              sheet = "sobre_pib_mecanismos") %>% 
+                              sheet = "RTPG_mecanismos_vs_pib") %>% 
   mutate(metodo = "indirecto")
 
 sobrepv_dir_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
-                              sheet = "sobre_pib_descuentos") %>% 
+                              sheet = "RTPG_PextQ_vs_pib") %>% 
   mutate(metodo = "directo")
 
 sobrepv_arg <- rbind(sobrepv_dir_arg, sobrepv_ind_arg) %>% 
@@ -365,7 +365,7 @@ tg petrolera total, tg empresas x segmento y país, renta apropiada por empresas
 
 ## Argentina
 ```{r}
-arg_tg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tg_total") %>% 
+arg_tg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tg_pg_total") %>% 
   filter(stock_seleccionado == "Bolsar") %>% 
   select(anio, tg = tg_hidrocarburos) %>% 
   mutate(pais = "Argentina")
@@ -416,7 +416,7 @@ tg_paises %>%
 # Renta por mecanismos
 ## Argentina
 ```{r}
-mecanismos_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = 1) %>% 
+mecanismos_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos") %>% 
   select(-14) %>% 
   mutate(renta_expo_sobrevaluada = renta_expo_sobrevaluada_crudo + renta_expo_sobrevaluada_crudo,
          renta_diferencial_precios = renta_diferencial_precios_gas +renta_diferencial_precios_crudo,
@@ -463,8 +463,8 @@ mecanismos_vzl <-read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", 
 
 ## Bolivia
 ```{r}
-bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Comparación precio") %>% 
-  select(anio = "Gas Natural", tcc= "...35", tcp= "...36", renta_indirecto_tcp="...45", 
+bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Renta") %>% 
+  select(anio = "...1", TCC= "...14", TCP= "...15", renta_indirecto_tcp="...45", 
          renta_pbi = "...50", renta_pv = "...51") %>% 
   slice(-c(1:19)) %>% 
   mutate_all(as.double) %>% 
@@ -512,12 +512,12 @@ ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petról
 # Renta por descuentos 
 ## Argentina
 ```{r}
-x <-  read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "descuentos_vbp") %>% 
+x <-  read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ") %>% 
   mutate(gcia_normal_hidrocarburos = gcia_normal_hidrocarburos*ipc_18,
          renta_total = renta_total *ipc_18) %>% 
   select(anio,gcia_normal_hidrocarburos , renta_total )
 
-descuentos_arg <-  read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "criterio_propio") %>% 
+descuentos_arg <-  read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "VBPextTcp") %>% 
   select(anio, 18:31, -c(fuente, ci_extr, ebe_extr,va_extr, ms_extr))  %>% 
   left_join(x, by = "anio") %>% 
   mutate(pais = "Argentina") %>% 
@@ -581,18 +581,30 @@ descuentos <- rbind(descuentos_arg, descuentos_vzl)
 
 ```{r}
 
-renta_paises <- renta_paises %>% rename(RTPG_PextQ = renta_directo, RTPG_Mecanismos= renta_indirecto)
-sobrepv_paises <- sobrepv_paises %>% mutate(
-                         metodo= case_when(metodo == "directo" ~ "Renta de la tierra del petróleo y el gas calculada desde el producto de valor a precio internacional y valuda en moneda local por tipo de cambio de paridad",
-                                    metodo == "indirecto" ~ "Renta de la tierra del petróleo y el gas calculada como la suma de los mecanismos de apropiación por diferentes sujetos sociales"))
+renta_paises_ex <- renta_paises %>% rename(RTPG_PextQ = renta_directo, RTPG_Mecanismos= renta_indirecto)
 
+sobrepv_paises_ex <- sobrepv_paises %>% mutate( metodo= case_when(metodo == "directo" ~ "Renta de la tierra del petróleo y el gas calculada desde el producto de valor a precio internacional y valuda en moneda local por tipo de cambio de paridad",
+                                    metodo == "indirecto" ~ "Renta de la tierra del petróleo y el gas calculada como la suma de los mecanismos de apropiación por diferentes sujetos sociales")) %>% 
+  rename(RTPG_vs_pv = renta_pv , RTPG_vs_pbi = renta_pbi)
 
-writexl::write_xlsx(list(renta_total = renta_paises,
-                         sobre_pbi_pv = sobrepv_paises,
-                         comparacion_wb = sobrepib_paises,
+sobrepib_paises_ex <- sobrepib_paises %>% 
+  mutate(anio = year(anio)) %>% 
+  rename(RTPG_vs_pbi = renta_pbi )
+
+mecanismos_ex <- mecanismos %>% 
+  rename(tipo_RTPG = tipo_renta , valor_RTPG = valor_renta )
+
+indice <- read_excel("../resultados/comparacion_paises/metadata_paises.xlsx", sheet = "indice")
+variables <- read_excel("../resultados/comparacion_paises/metadata_paises.xlsx", sheet = "indice")
+
+writexl::write_xlsx(list(indice = indice,
+                         variables = variables, 
+                         RTPG_total = renta_paises_ex,
+                         RTPG_vs_pbi_pv = sobrepv_paises_ex,
+                         RTPG_vs_banco_mundial = sobrepib_paises_ex,
                          # tg = tg_paises, 
-                         mecanismos= mecanismos,
-                         descuentos= descuentos), 
+                         RTPG_mecanismos= mecanismos_ex,
+                         RTPG_PextQ= descuentos), 
                     path = "../resultados/comparacion_paises/renta_por_pais.xlsx" )
 
 datos <-  list( renta_paises, sobrepv_paises, sobrepib_paises, mecanismos, descuentos)
