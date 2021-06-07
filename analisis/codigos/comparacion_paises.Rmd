@@ -19,11 +19,12 @@ library(plotly)
 
 ## Argentina
 ```{r}
-renta_directo_arg <- read_excel("../resultados/argentina/renta_metodo_directo.xlsx", sheet = 2) %>%
+renta_directo_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "descuentos_vbp") %>%
   mutate(pais = "Argentina") %>% 
   select(anio, unidad,pais, renta_directo = renta_total) 
 
-renta_indirecto_arg <- read_excel("../resultados/argentina/renta_metodo_indirecto.xlsx")%>%
+renta_indirecto_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx",
+                                  sheet = "sum_mecanismos")%>%
     mutate(pais = "Argentina", unidad = "Millones de pesos de 2018") %>% 
   select(anio, unidad, pais, ipc_18,tcc, tcp, renta_indirecto = renta_total) %>% 
   filter(anio >1961)  
@@ -160,10 +161,12 @@ ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petról
 
 ## Argentina
 ```{r}
-sobrepv_ind_arg <- read_excel("../resultados/argentina/renta_sobre_pbi.xlsx", sheet = 2) %>% 
+sobrepv_ind_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
+                              sheet = "sobre_pib_mecanismos") %>% 
   mutate(metodo = "indirecto")
 
-sobrepv_dir_arg <- read_excel("../resultados/argentina/renta_sobre_pbi.xlsx", sheet = 1) %>% 
+sobrepv_dir_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
+                              sheet = "sobre_pib_descuentos") %>% 
   mutate(metodo = "directo")
 
 sobrepv_arg <- rbind(sobrepv_dir_arg, sobrepv_ind_arg) %>% 
@@ -341,7 +344,7 @@ ggplot() +
   theme_light()+
    theme(strip.text.x = element_text(size = 7), 
          axis.text.x = element_text(angle = 90, size=7) ,
-         plot.title = element_text(size=14))+# , vjust = 0.5, hjust=0.5))+
+         plot.title = element_text(size=14, family = "Arial"))+# , vjust = 0.5, hjust=0.5))+
   labs(title = "Renta de la tierra del gas y el petróleo sobre PBI y plusvalía total", subtitle = "Cálculo propio y del Banco Mundial de Argentina, Brasil, Bolivia y Venezuela (1997-2018)",
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
