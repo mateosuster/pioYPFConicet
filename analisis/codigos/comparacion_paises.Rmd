@@ -219,7 +219,7 @@ sobrepv_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol)
 metodo_lab <- c("Suma de mecanismos", "Descuentos sobre valor total de producción")
 names(metodo_lab) <- c("indirecto" ,"directo")
 
-renta_lab <- c("Renta de la tierra sobre plusvalía", "Renta de la tierra sobre PBI")
+renta_lab <- c("RTPG_PextQ sobre plusvalía", "RTPG_PextQ sobre PBI")
 names(renta_lab) <- c("renta_pv" ,"renta_pbi")
 
 paises_lab <- unique(sobrepv_paises$pais)
@@ -228,7 +228,8 @@ names(paises_lab  ) <- c( "Argentina", "Brasil"  ,  "Venezuela", "Bolivia")
 
 
 sobrepv_paises %>% 
-  filter(anio > 1997, metodo =="indirecto" ) %>%
+  mutate(metodo = case_when(pais == "Bolivia" & metodo == "indirecto" ~ "directo" ,T ~metodo)) %>% 
+  filter(anio > 1997, metodo =="directo" ) %>%
   gather(., key = variable, value = valor, 2:3) %>% 
   ggplot(aes(anio, valor, fill = pais)) +
   # geom_line()+
@@ -240,7 +241,8 @@ sobrepv_paises %>%
        y = "%", x="Año")+
   scale_y_continuous(labels=function(x) scales::percent(x, accuracy = 2) )+
   scale_fill_manual("Paises", values=c(  "dodgerblue1",  "chartreuse2", "green4", "#CC6666"))+
-  facet_grid(pais ~ variable, scales = "free", labeller = labeller(variable = renta_lab, pais= paises_lab) )
+  facet_grid(pais ~ variable, scales = "free", labeller = labeller(variable = renta_lab, pais= paises_lab))
+             # ncol= 2)
   # facet_wrap(   pais ~ variable, scales = "free", ncol = 2,
   #               labeller = labeller(variable = renta_lab, pais= paises_lab) )
   #               # labeller = labeller(metodo = metodo_lab, variable = renta_lab) )
@@ -264,8 +266,9 @@ renta_wb
 
 
 sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol) %>% 
-    mutate(fuente = "Estimación propia (mecanismos)") %>% 
-  filter( metodo == "indirecto", anio >1962) %>% 
+    mutate(fuente = "Estimación propia (RTPG_PextQ)") %>% 
+    mutate(metodo = case_when(pais == "Bolivia" & metodo == "indirecto" ~ "directo" ,T ~metodo)) %>% 
+  filter( metodo == "directo", anio >1962) %>% 
   select(-c(renta_pv, metodo)) %>% 
   rbind(renta_wb) %>% 
   mutate(anio = as.Date((anio), format = "%Y" ) )
@@ -283,7 +286,8 @@ sobrepib_paises <-  rbind(sobrepv_arg, sobrepv_bzl, sobrepv_vzl, sobrepv_bol) %>
 
 
 sobrepib_paises %>% 
-  filter(pais %in% c("Argentina", "Venezuela", "Bolivia"), anio > "1996-06-06") %>% 
+  filter(pais %in% c("Argentina", "Venezuela", "Bolivia") ) %>%
+  filter( anio > "1996-06-06") %>%
   # gather(., key = variable, value = valor, 2:3) %>% 
   ggplot(aes(anio, renta_pbi, color = fuente)) +
   geom_line(position = "dodge")+
