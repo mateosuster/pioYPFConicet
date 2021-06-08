@@ -618,10 +618,20 @@ costos_blz <- read_excel("../data/brazil/Grinberg (2021) Renta petrolera Brasil_
   
 ```
 
+## Bolivia
+```{r}
+costos_bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Costos II sin ponderación") %>% 
+  select(anio = "...1", "Precio de costo (Balances)" ="...10") %>% 
+  slice(2:9) %>% 
+  mutate_all(as.double) %>% 
+   gather(key = variable, value = valor, 2:ncol(.)) %>% 
+  mutate(unidad = "USD/BOE", pais = "Bolivia") 
+```
+
 
 ### Comparacion
 ```{r}
-costos <-  rbind(costos_arg, costos_vzl, costos_blz) %>% 
+costos <-  rbind(costos_arg, costos_vzl, costos_blz, costos_bol) %>% 
   rename(valor_costo = valor, tipo_costo = variable)
 ```
 
