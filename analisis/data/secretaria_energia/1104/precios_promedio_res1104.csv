@@ -1,0 +1,211 @@
+anio,producto,tipo_precio,valor
+2004,Gas Oil Grado 2,precio_c_imp,1.8363097432987936
+2004,Gas Oil Grado 2,precio_s_imp,1.6578510638297677
+2004,Gas Oil Grado 2,precio_surtidor,0.9490283286118999
+2004,Nafta (común) hasta 92 Ron,precio_c_imp,1.7160105217010082
+2004,Nafta (común) hasta 92 Ron,precio_s_imp,0.9493588054457478
+2004,Nafta (común) hasta 92 Ron,precio_surtidor,1.730943531093646
+2004,Nafta (premium) de más de 95 Ron,precio_c_imp,1.9536753675366498
+2004,Nafta (premium) de más de 95 Ron,precio_s_imp,1.144719134875325
+2004,Nafta (premium) de más de 95 Ron,precio_surtidor,1.9693461538460477
+2004,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,1.8697557529269238
+2004,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,1.9533555420957054
+2004,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,1.8873040961709768
+2005,Gas Oil Grado 2,precio_c_imp,1.5718936000561308
+2005,Gas Oil Grado 2,precio_s_imp,1.140185923753547
+2005,Gas Oil Grado 2,precio_surtidor,0.9705393977018067
+2005,Nafta (común) hasta 92 Ron,precio_c_imp,1.719428230200723
+2005,Nafta (común) hasta 92 Ron,precio_s_imp,0.9624925289504689
+2005,Nafta (común) hasta 92 Ron,precio_surtidor,1.7324300842791558
+2005,Nafta (premium) de más de 95 Ron,precio_c_imp,1.9590769119912155
+2005,Nafta (premium) de más de 95 Ron,precio_s_imp,1.150222013984379
+2005,Nafta (premium) de más de 95 Ron,precio_surtidor,1.971712971200865
+2005,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,1.8825705223941909
+2005,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,1.0860003693877731
+2005,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,1.8889559202940909
+2006,Gas Oil Grado 2,precio_c_imp,1.4952218891648488
+2006,Gas Oil Grado 2,precio_s_imp,1.0175417469100616
+2006,Gas Oil Grado 2,precio_surtidor,0.999349700423621
+2006,Nafta (común) hasta 92 Ron,precio_c_imp,1.716445008933821
+2006,Nafta (común) hasta 92 Ron,precio_s_imp,0.9609957129624733
+2006,Nafta (común) hasta 92 Ron,precio_surtidor,1.733776430169123
+2006,Nafta (premium) de más de 95 Ron,precio_c_imp,1.9567488574044962
+2006,Nafta (premium) de más de 95 Ron,precio_s_imp,1.1549087253539139
+2006,Nafta (premium) de más de 95 Ron,precio_surtidor,1.973076960439449
+2006,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,1.8796559700331823
+2006,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,1.1261433529604246
+2006,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,1.8933624511570635
+2007,Gas Oil Grado 2,precio_c_imp,1.8472349440071532
+2007,Gas Oil Grado 2,precio_s_imp,1.242356751200234
+2007,Gas Oil Grado 2,precio_surtidor,1.2152625872366973
+2007,Nafta (común) hasta 92 Ron,precio_c_imp,1.813156738944328
+2007,Nafta (común) hasta 92 Ron,precio_s_imp,1.0381988235294317
+2007,Nafta (común) hasta 92 Ron,precio_surtidor,1.7778289178279192
+2007,Nafta (premium) de más de 95 Ron,precio_c_imp,2.2299445085678764
+2007,Nafta (premium) de más de 95 Ron,precio_s_imp,1.3512896279193796
+2007,Nafta (premium) de más de 95 Ron,precio_surtidor,2.195046728971926
+2007,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,2.029240229905198
+2007,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,1.2017537646395993
+2007,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,1.9461234648883339
+2008,Gas Oil Grado 2,precio_c_imp,2.2608870449790794
+2008,Gas Oil Grado 2,precio_s_imp,1.5380004691976492
+2008,Gas Oil Grado 2,precio_surtidor,1.6444552114011282
+2008,Nafta (común) hasta 92 Ron,precio_c_imp,2.1946947814707753
+2008,Nafta (común) hasta 92 Ron,precio_s_imp,1.2738401035115978
+2008,Nafta (común) hasta 92 Ron,precio_surtidor,2.170279455262202
+2008,Nafta (premium) de más de 95 Ron,precio_c_imp,3.057382526221822
+2008,Nafta (premium) de más de 95 Ron,precio_s_imp,1.8691638250390135
+2008,Nafta (premium) de más de 95 Ron,precio_surtidor,3.0667476705528007
+2008,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,2.6119248217141653
+2008,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,1.5609248807576286
+2008,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,2.5473229264514794
+2009,Gas Oil Grado 2,precio_c_imp,2.8013959914556703
+2009,Gas Oil Grado 2,precio_s_imp,1.828834217461099
+2009,Gas Oil Grado 2,precio_surtidor,1.786927359668931
+2009,Nafta (común) hasta 92 Ron,precio_c_imp,2.6620373117838567
+2009,Nafta (común) hasta 92 Ron,precio_s_imp,1.5535012797299268
+2009,Nafta (común) hasta 92 Ron,precio_surtidor,2.680574117076169
+2009,Nafta (premium) de más de 95 Ron,precio_c_imp,3.5807825754338327
+2009,Nafta (premium) de más de 95 Ron,precio_s_imp,2.1765724508855038
+2009,Nafta (premium) de más de 95 Ron,precio_surtidor,3.610331601322819
+2009,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,3.249292114429236
+2009,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,1.986956114374357
+2009,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,3.1143325090305116
+2010,Gas Oil Grado 2,precio_c_imp,3.5715727341629115
+2010,Gas Oil Grado 2,precio_s_imp,2.4818522474532547
+2010,Gas Oil Grado 2,precio_surtidor,2.0047841949073573
+2010,Nafta (común) hasta 92 Ron,precio_c_imp,3.4174701674207695
+2010,Nafta (común) hasta 92 Ron,precio_s_imp,1.9916372932217354
+2010,Nafta (común) hasta 92 Ron,precio_surtidor,3.4788148627863436
+2010,Nafta (premium) de más de 95 Ron,precio_c_imp,4.412159446019808
+2010,Nafta (premium) de más de 95 Ron,precio_s_imp,2.6853238242045783
+2010,Nafta (premium) de más de 95 Ron,precio_surtidor,4.379008195389476
+2010,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,3.9194193710901657
+2010,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,2.3504344951820175
+2010,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,3.7893530201899788
+2011,Gas Oil Grado 2,precio_c_imp,4.347369854820225
+2011,Gas Oil Grado 2,precio_s_imp,2.9987540279464135
+2011,Gas Oil Grado 2,precio_surtidor,2.9562898051654862
+2011,Nafta (común) hasta 92 Ron,precio_c_imp,4.577521176995085
+2011,Nafta (común) hasta 92 Ron,precio_s_imp,3.0470934869295485
+2011,Nafta (común) hasta 92 Ron,precio_surtidor,4.2184624624624965
+2011,Nafta (premium) de más de 95 Ron,precio_c_imp,5.581013336938292
+2011,Nafta (premium) de más de 95 Ron,precio_s_imp,3.445867856096934
+2011,Nafta (premium) de más de 95 Ron,precio_surtidor,5.5510681028496816
+2011,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,4.870306616873113
+2011,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,2.962041863760805
+2011,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,4.794863522588066
+2012,Gas Oil Grado 2,precio_c_imp,5.78655932958586
+2012,Gas Oil Grado 2,precio_s_imp,3.9184361430966885
+2012,Gas Oil Grado 2,precio_surtidor,4.179857562642779
+2012,Nafta (común) hasta 92 Ron,precio_c_imp,5.971596705632309
+2012,Nafta (común) hasta 92 Ron,precio_s_imp,3.4992380451918024
+2012,Nafta (común) hasta 92 Ron,precio_surtidor,5.104076299973888
+2012,Nafta (premium) de más de 95 Ron,precio_c_imp,6.791296712415366
+2012,Nafta (premium) de más de 95 Ron,precio_s_imp,4.181119053493399
+2012,Nafta (premium) de más de 95 Ron,precio_surtidor,6.768766227745254
+2012,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,6.267207889516564
+2012,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,3.8051281349925095
+2012,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,6.277893406706046
+2013,Gas Oil Grado 2,precio_c_imp,7.460749792364955
+2013,Gas Oil Grado 2,precio_s_imp,4.7577948883458765
+2013,Gas Oil Grado 2,precio_surtidor,5.1480220928269285
+2013,Nafta (común) hasta 92 Ron,precio_c_imp,7.1410828463388984
+2013,Nafta (común) hasta 92 Ron,precio_s_imp,4.211862947658387
+2013,Nafta (común) hasta 92 Ron,precio_surtidor,6.070017129153827
+2013,Nafta (premium) de más de 95 Ron,precio_c_imp,8.429276903998998
+2013,Nafta (premium) de más de 95 Ron,precio_s_imp,5.225714410043286
+2013,Nafta (premium) de más de 95 Ron,precio_surtidor,8.53763886983678
+2013,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,7.74461987189082
+2013,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,5.040997102112286
+2013,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,7.662957825190465
+2014,Gas Oil Grado 2,precio_c_imp,10.627609825877068
+2014,Gas Oil Grado 2,precio_s_imp,7.336960150088102
+2014,Gas Oil Grado 2,precio_surtidor,7.811510222835617
+2014,Nafta (común) hasta 92 Ron,precio_c_imp,11.133556818181784
+2014,Nafta (común) hasta 92 Ron,precio_s_imp,6.96517593643588
+2014,Nafta (común) hasta 92 Ron,precio_surtidor,8.265801354401793
+2014,Nafta (premium) de más de 95 Ron,precio_c_imp,13.186148301610778
+2014,Nafta (premium) de más de 95 Ron,precio_s_imp,8.490193310304852
+2014,Nafta (premium) de más de 95 Ron,precio_surtidor,17.505639713639187
+2014,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,12.02900305422572
+2014,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,7.462019850452374
+2014,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,11.994829042391359
+2015,Gas Oil Grado 2,precio_c_imp,11.893165591262232
+2015,Gas Oil Grado 2,precio_s_imp,8.136723341860682
+2015,Gas Oil Grado 2,precio_surtidor,8.765077443808678
+2015,Nafta (común) hasta 92 Ron,precio_c_imp,12.222639257294427
+2015,Nafta (común) hasta 92 Ron,precio_s_imp,7.593639999999998
+2015,Nafta (común) hasta 92 Ron,precio_surtidor,9.174894179894169
+2015,Nafta (premium) de más de 95 Ron,precio_c_imp,14.62347337834002
+2015,Nafta (premium) de más de 95 Ron,precio_s_imp,9.232853848998282
+2015,Nafta (premium) de más de 95 Ron,precio_surtidor,14.630434395137673
+2015,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,13.255969052888053
+2015,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,8.679018910957229
+2015,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,13.27987203112112
+2016,Gas Oil Grado 2,precio_c_imp,15.47109888206507
+2016,Gas Oil Grado 2,precio_s_imp,10.42532184793364
+2016,Gas Oil Grado 2,precio_surtidor,11.488896010052468
+2016,Nafta (común) hasta 92 Ron,precio_c_imp,15.452535433070867
+2016,Nafta (común) hasta 92 Ron,precio_s_imp,9.868122065727682
+2016,Nafta (común) hasta 92 Ron,precio_surtidor,11.823529411764683
+2016,Nafta (premium) de más de 95 Ron,precio_c_imp,19.189308508341252
+2016,Nafta (premium) de más de 95 Ron,precio_s_imp,12.495683753332827
+2016,Nafta (premium) de más de 95 Ron,precio_surtidor,19.293749376158484
+2016,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,17.24398752590706
+2016,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,11.038535959392433
+2016,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,17.054957749317776
+2017,Gas Oil Grado 2,precio_c_imp,18.030163982839227
+2017,Gas Oil Grado 2,precio_s_imp,12.14648686671898
+2017,Gas Oil Grado 2,precio_surtidor,13.303253232757081
+2017,Nafta (común) hasta 92 Ron,precio_c_imp,18.881125319693073
+2017,Nafta (común) hasta 92 Ron,precio_s_imp,12.007571059431525
+2017,Nafta (común) hasta 92 Ron,precio_surtidor,14.299693877551007
+2017,Nafta (premium) de más de 95 Ron,precio_c_imp,23.053039138817436
+2017,Nafta (premium) de más de 95 Ron,precio_s_imp,15.068626419098
+2017,Nafta (premium) de más de 95 Ron,precio_surtidor,23.40830602566505
+2017,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,20.622704345182377
+2017,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,13.24259395641947
+2017,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,20.57682569884206
+2018,Gas Oil Grado 2,precio_c_imp,27.816951683291183
+2018,Gas Oil Grado 2,precio_s_imp,19.4254038413412
+2018,Gas Oil Grado 2,precio_surtidor,20.523724183569417
+2018,Nafta (común) hasta 92 Ron,precio_c_imp,29.516788321167876
+2018,Nafta (común) hasta 92 Ron,precio_s_imp,19.91970802919708
+2018,Nafta (común) hasta 92 Ron,precio_surtidor,24.99766423357664
+2018,Nafta (premium) de más de 95 Ron,precio_c_imp,36.091441289038166
+2018,Nafta (premium) de más de 95 Ron,precio_s_imp,24.69254503592212
+2018,Nafta (premium) de más de 95 Ron,precio_surtidor,36.74345272915125
+2018,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,31.467649394783745
+2018,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,20.933853988508336
+2018,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,32.08999418193755
+2019,Gas Oil Grado 2,precio_c_imp,43.72503517163756
+2019,Gas Oil Grado 2,precio_s_imp,31.156772702982465
+2019,Gas Oil Grado 2,precio_surtidor,32.16061302385824
+2019,Nafta (común) hasta 92 Ron,precio_c_imp,44.90755813953489
+2019,Nafta (común) hasta 92 Ron,precio_s_imp,32.32593023255813
+2019,Nafta (común) hasta 92 Ron,precio_surtidor,44.817790697674404
+2019,Nafta (premium) de más de 95 Ron,precio_c_imp,52.08298433425995
+2019,Nafta (premium) de más de 95 Ron,precio_s_imp,35.878552541502806
+2019,Nafta (premium) de más de 95 Ron,precio_surtidor,52.76797060079718
+2019,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,46.107923244521075
+2019,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,30.984908150113473
+2019,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,46.77615852008573
+2020,Gas Oil Grado 2,precio_c_imp,56.02928283210499
+2020,Gas Oil Grado 2,precio_s_imp,38.8606226671734
+2020,Gas Oil Grado 2,precio_surtidor,41.8539283761203
+2020,Nafta (premium) de más de 95 Ron,precio_c_imp,67.76993194827135
+2020,Nafta (premium) de más de 95 Ron,precio_s_imp,45.6961631632911
+2020,Nafta (premium) de más de 95 Ron,precio_surtidor,68.49730955219377
+2020,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,59.59283075691588
+2020,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,39.06461058292515
+2020,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,60.32450978758794
+2021,Gas Oil Grado 2,precio_c_imp,76.65031739172107
+2021,Gas Oil Grado 2,precio_s_imp,53.384791105121714
+2021,Gas Oil Grado 2,precio_surtidor,57.30111486647091
+2021,Nafta (premium) de más de 95 Ron,precio_c_imp,93.44907884414162
+2021,Nafta (premium) de más de 95 Ron,precio_s_imp,63.79923503399115
+2021,Nafta (premium) de más de 95 Ron,precio_surtidor,95.71516816143442
+2021,Nafta (súper) entre 92 y 95 Ron,precio_c_imp,81.3147293180216
+2021,Nafta (súper) entre 92 y 95 Ron,precio_s_imp,53.79407521286614
+2021,Nafta (súper) entre 92 y 95 Ron,precio_surtidor,83.25992276004156
