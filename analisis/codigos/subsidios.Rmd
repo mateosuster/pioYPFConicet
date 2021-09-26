@@ -1,0 +1,78 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+https://www.argentina.gob.ar/economia/transparencia/subsidios
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(readr)
+```
+
+# PBI
+```{r}
+library(lubridate)
+# Producto Interno Bruto en millones de pesos corrientes [Base 2004]
+pbi_corr <- read_csv("C:/Archivos/Datos/INDEC/PBI/producto-interno-bruto-precios-corrientes-valores-anuales-base-2004.csv") %>% 
+  mutate(anio = year(indice_tiempo)) %>% 
+  select(anio, pbi = producto_interno_bruto_precios_mercado )
+
+
+# TC
+tc_bcra_anual <- read_csv("../data/tcp/tc_bcra_anual.csv") %>% select(-X1)
+```
+
+## Subsidios
+```{r}
+# CEFIP cont et al. Subsidios como % del PBI
+subsidios_cefip <- read_excel("/Archivos/Datos/Hidrocarburos/subsidios/subsidios.xlsx") %>% 
+  gather(key = anio,
+         value = subsidios_porcentaje_pbi,
+         2:ncol(.)) %>% 
+  filter(sector %in% c("Plan Gas"
+                       # ,"CAMMESA", "ENARSA"
+                       # ,"Subsidios FF GN y GLP"
+                       )) %>% 
+  mutate(anio = as.double(anio)) %>% 
+  mutate(subsidios_porcentaje_pbi = as.double(subsidios_porcentaje_pbi) ) %>% 
+  group_by(anio) %>% 
+  summarise(subsidios_cefip=sum(subsidios_porcentaje_pbi, na.rm = T))  %>% 
+  left_join(pbi_corr %>% 
+              select(anio, pbi)) %>%
+  left_join(tc_bcra_anual, by = "anio") %>% 
+  mutate( unidad = "Millones de USD",
+          pbi_usd = pbi /tcc_bcra ,
+          subsidios_cefip = subsidios_cefip/100 * pbi_usd,
+          porcentaje = subsidios_cefip/pbi_usd) %>% 
+  select(anio, unidad, subsidios_cefip)
+
+
+#ejes 
+subsidios_ejes <- read_excel("/Archivos/Datos/Hidrocarburos/Estimacion propia/subsidios.xlsx" ) %>% 
+  rename(subsidios_ejes = subsidios_hidrocarburos)
+
+
+```
+
+```{r}
+#presupuesto
+
+```
+
+
+```{r}
+# comparacion
+subsidios_hidrocarburos <- subsidios_ejes%>% 
+  select(anio, unidad, subsidios_ejes) %>% 
+  full_join(subsidios_cefip, by =c("anio", "unidad")) %>% 
+  arrange(-anio) 
+subsidios_hidrocarburos
+
+library(ggplot2)
+reshape2::melt(subsidios_hidrocarburos, id.vars =c("anio", "unidad")) %>% 
+  ggplot(aes(anio, value, color = variable))+
+  geom_line()+
+  labs (title = "Subsidios al sector hidrocarburífero", x = "Año",
+        y = "Millones de USD")
+```

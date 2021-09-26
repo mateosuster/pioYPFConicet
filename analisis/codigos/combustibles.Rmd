@@ -1,0 +1,811 @@
+---
+title: "World Bank Energy Data"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(readxl)
+library(stringr)
+library(reshape2)
+library(zoo)
+library(lubridate)
+
+#funciones
+liter_to_gallon_p <- function(x) {x /0.264172}
+gallon_to_liter_p <- function(x) {x /3.78541}
+
+#tipos de cambio
+tc_bcra <- read.csv("../data/tcp/tc_bcra_anual.csv") %>% select(-X) %>% 
+  mutate(tcp = NA)
+
+tcc_tcp_historico <- read_excel("C:/Archivos/Datos/TCP/tcc_tcp_historico.xlsx") %>% 
+  select(anio, tcc = "TCC exportaciones", tcp = TCP) %>% 
+  # filter(anio < 2002) %>% 
+  mutate(anio = as.double(anio))
+tcc_tcp_historico[tcc_tcp_historico$anio == 43313, ]$anio <- 2018
+
+tc <-  rbind(tc_bcra %>% 
+               rename(tcc =tcc_bcra) %>% 
+               filter(anio > 2001), 
+             tcc_tcp_historico %>% 
+               filter( anio <= 2001  )  
+             # ,
+             # tcc_tcp_historico %>% 
+             #   filter( anio > 2001  ) %>% 
+             #   mutate(tcc = NA)
+               
+             ) %>% 
+  arrange(anio)
+tc[is.na(tc$tcp),"tcp"] <- c(tcc_tcp_historico[tcc_tcp_historico$anio %in% c(2002:2018),]$tcp, NA, NA , NA) 
+
+# Tabla para convertir los cambios de moneda
+conversor_pesos <- read_excel("C:/Archivos/Datos/Hidrocarburos/pase de moneda.xlsx") %>% 
+  # mutate("m$n" = as.double(conversor_pesos$`m$n`)) %>% 
+  mutate_all(., as.double) %>% 
+  mutate(moneda = c("moneda nacional", "pesos ley", "peso argentino", "austral", "pesos")) %>% 
+  filter(moneda == "pesos")
+
+
+```
+
+
+# Comparación mundial
+[World Bank - Energy & Mining data](https://data.worldbank.org/topic/energy-and-mining?view=chart) 
+```{r}
+
+#country codes
+# iso_codes <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/world bank/iso_3digit_alpha_country_codes.xls", 
+#     skip = 2)
+iso_codes <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/world bank/country-and-continent-codes-list-csv.csv")
+
+# all indicators
+wb_data <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/world bank/API_5_DS2_en_csv_v2_2454210.csv", 
+    skip = 3) %>% 
+  select(-c(`Indicator Code`) ) %>% 
+  rename(indicator = `Indicator Name`, country = "Country Name", country_code = "Country Code") %>% 
+  gather(key = year, value = value, 4:ncol(.)) %>% 
+  mutate(year = as.double(year) ) %>%
+  left_join(iso_codes %>% select(Three_Letter_Country_Code, Continent_Name),
+                             by = c("country_code" = "Three_Letter_Country_Code") )
+
+
+# filtro_pais <- c("Argentina", "Venezuela, RB", "Bolivia", "Brazil", "Chile", "United States" )
+filtro_pais <- c("Argentina", "Venezuela, RB", "United States" )
+
+filtro_fuel <- c("Pump price for gasoline (US$ per liter)", "Pump price for diesel fuel (US$ per liter)")
+
+# unique(wb_data$year)
+# length(unique(wb_data$country))
+```
+
+```{r}
+#filtro de ISO codes
+wb_countries <- wb_data %>% 
+  filter( country_code %in% iso_codes$Three_Letter_Country_Code) 
+
+# Oil rent  
+# plotly::ggplotly(wb_countries %>% 
+#   arrange(country, year) %>% 
+#   filter(indicator == "Oil rents (% of GDP)") %>%
+#   ggplot(aes(year,value, colour = country))+
+#   geom_line()+
+#   theme(legend.position = "none")+
+#     facet_wrap(~Continent_Name))
+
+# Renta petrolera sobre PBI todos los paises
+wb_no_countries <- wb_data %>% 
+  filter( ! country_code %in% iso_codes$`Code Value`)
+
+# plotly::ggplotly(wb_no_countries %>%
+#   arrange(country, year) %>% 
+#   filter(indicator == "Oil rents (% of GDP)") %>%
+#   ggplot(aes(year,value, colour = country))+
+#   geom_line()+
+#   theme(legend.position = "none"))
+
+# unique(wb_no_countries$country)
+```
+
+
+
+```{r}
+#gasoline y diesel
+wb_data %>% 
+  filter(indicator %in% filtro_fuel, country %in% filtro_pais, !is.na(value))  %>%
+  ggplot(aes(year, value, color = country))+
+  geom_line()+
+  # theme(legend.position = "none")+
+  labs(title = "Precios de combustibles. Países seleccionados", 
+       caption =  "Fuente: elaboración propia en base a Banco Mundial",
+       y = "USD/litro")+
+  # facet_wrap(~indicator, ncol = 1, scales = "free")
+  facet_grid(~indicator, scales = "free")
+
+wb_arg_fuel <-  wb_data %>% 
+  filter(indicator %in% filtro_fuel, country == "Argentina", !is.na(value)) %>% 
+  mutate(variable = case_when(str_detect(indicator, "gasoline") ~ "gasoline",
+                         str_detect(indicator, "diesel") ~  "diesel"
+                         ),
+         fuente = "Banco Mundial", unidad = "USD/litro"
+         ) %>% 
+  select(anio = year, unidad, fuente, variable, value)
+
+# wb_no_countries %>% 
+#   filter(indicator %in% filtro_fuel[1], !is.na(value), !is.na(Continent_Name)) %>% #, country %in% filtro_pais, !is.na(value))  %>% 
+#   ggplot(aes(year, value, color = country))+
+#   geom_line()+
+#   theme(legend.position = "none")+
+#   facet_wrap(~Continent_Name)# ,scales = "free")
+  
+```
+
+# Argentina
+
+## Anuario de combustibles
+```{r}
+# u$s litro
+anuario_comun <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/Fernando - precionafta.xls") %>% 
+  select(anio = "...5", valor = "...9" ) %>% 
+  filter(!is.na(anio) & (anio > 1948) ) %>% 
+  mutate_all(as.double) %>% 
+  mutate(anio = as.integer(anio),
+         fuente = "Anuario de Combustibles",
+         cod = 1, 
+         producto = "Nafta Comun", unidad = "USD/litro")
+
+```
+
+
+## FR y B
+
+```{r}
+anuario2 <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/NAFTAS con y sin imp 1963-2011.xlsx") %>% 
+  select(fecha = "...1", comun_precio_c_imp = "Común...2", 
+         comun_precio_s_imp = "...3", comun_gravamen ="...4",
+         super_precio_c_imp = "Super", super_precio_s_imp = "...6", super_gravamen ="...7", 
+         gasoil_precio_c_imp = "PRECIO", gasoil_precio_s_imp = "Retención", gasoil_gravamen ="Gravamen (impuesto)") %>% 
+  filter(!is.na(fecha)) %>% 
+  mutate(anio = substr(fecha, 1,4)) %>% 
+  select(anio, everything(.), -fecha) %>% 
+  mutate_all(as.double) %>% 
+  melt(., id.vars= "anio") %>% 
+  mutate(value = case_when(anio <1983 ~ value /conversor_pesos$`$Ley`,
+                           anio %in% c(1983:1984)~ value /conversor_pesos$`$a`, 
+                           anio %in% c(1985:1990)~ value /conversor_pesos$A, 
+                           T ~ value
+                           )
+         ) %>% 
+  group_by(anio, variable) %>% 
+  summarise(value = mean(value, na.rm= T)) %>% 
+  inner_join(tc, by = "anio") %>% 
+  mutate(value = value/tcc,
+         producto = case_when(str_detect(variable, "comun") ~ "Nafta Común",
+                              str_detect(variable, "super") ~ "Nafta Super",
+                              str_detect(variable, "gasoil") ~ "Gasoil"
+                              ),
+         cod = case_when(str_detect(variable, "comun") ~ 1,
+                              str_detect(variable, "super") ~ 2,
+                              str_detect(variable, "gasoil") ~ 4
+                              ),
+         tipo_precio = case_when(str_detect(variable, "c_imp") ~ "Precio con impuestos",
+                              str_detect(variable, "s_im") ~ "Precio sin impuestos",
+                              str_detect(variable, "gravamen") ~ "Impuestos"
+                              ),
+         fuente = "Farfaro Ruiz y Bil", unidad = "USD/litro"
+         )
+
+# anuario2[(anuario2$anio %in% c(1970:1985)) & (anuario2$cod==4), "value"] <- NA
+
+ipc_08 <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/NAFTAS con y sin imp 1963-2011.xlsx", skip = 1) %>% 
+  select(anio = "...1", ipc08 = "IPC2008") %>% 
+  mutate(anio = as.double(substr(anio, 1,4)))  %>% 
+  group_by(anio) %>% 
+  summarise(ipc08 =mean(ipc08))
+  
+gasoil_frb <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/NAFTAS con y sin imp 1963-2011.xlsx",  sheet = 2, skip = 2) %>% 
+  select(anio = "...1", gasoil_precio_c_imp = "Gasoil $2008", gasoil_precio_s_imp = "...9") %>% 
+  slice(-1) %>% 
+  mutate_all(as.double) %>% 
+  melt(., id.vars="anio") %>% 
+  left_join(ipc_08) %>% 
+  inner_join(tc %>% select(-tcp), by = "anio") %>% 
+  mutate(producto = "Gasoil", cod=4, value = (value*ipc08)/tcc,
+         fuente = "Farfaro Ruiz y Bil", unidad = "USD/litro",tipo_precio =
+           case_when(str_detect(variable, "c_imp") ~ "Precio con impuestos",
+                              str_detect(variable, "s_im") ~ "Precio sin impuestos")) %>% 
+  select(-c(ipc08, tcc))
+
+
+anuario2 <- anuario2 %>% 
+  select(-c(tcc, tcp)) %>% 
+  filter(cod != 4) %>% 
+  rbind(gasoil_frb)
+
+
+anuario2 %>% 
+  filter(tipo_precio != "Impuestos") %>% 
+  # filter (cod %in% c(1,2))) %>%
+  # filter ( value > 10) %>%
+  ggplot(aes(anio, value, color = tipo_precio))+
+  geom_line()+
+  geom_point()+
+  facet_wrap(~producto, ncol = 2)+
+  labs(title = "Precio combustibles", subtitle = "Serie FR y B", 
+       caption=  "Fuente: elaboración propia en base a Bil y Farfaro Ruiz (2012), Ferreres y BCRA",
+       x = "Año", y = "USD/litro")
+
+anuario2 %>% 
+  filter(cod == 4) %>% 
+  ggplot(aes(anio, value, color = tipo_precio))+
+  geom_line()+
+  geom_point()+
+  facet_wrap(~tipo_precio, ncol = 2)+
+  labs(title = "Precio gasoil", subtitle = "Serie FR y B", 
+       caption=  "Fuente: elaboración propia en base a Bil y Farfaro Ruiz (2012), Ferreres y BCRA",
+       x = "Año", y = "USD/litro")
+
+
+```
+
+## SESCO
+```{r}
+
+precios_localidad <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/secretaria_energia/sesco/PreciosDeVentaPorLocalidad.xls", 
+    sheet = "Precio de venta por localidad", 
+    skip = 9) %>% 
+  rename(anio = "Año")
+names(precios_localidad) <- tolower(names(precios_localidad))
+
+precios_sesco <- precios_localidad %>% 
+  mutate_at(., .vars = c("localidad", "producto", "anio"), .funs = zoo::na.locf ) %>%
+  left_join(tc, by = "anio") %>%
+  group_by(anio, producto) %>% 
+  summarise(valor =mean(total/tcc, na.rm = T)) %>% 
+  mutate(cod = case_when(str_detect(producto, "COMUN >83 RON")~ 1,
+                         str_detect(producto, "SUPER >93 RON")~ 2,
+                         str_detect(producto, "ULTRA >97 RON")~ 3,
+                         str_detect(producto, "GAS OIL")~ 4,
+                         ),
+         fuente = "SESCO Downstream", unidad = "USD/litro"
+         )    
+precios_sesco$valor[precios_sesco$anio==2005] <- NA
+precios_sesco$valor[(precios_sesco$anio==2009) & (precios_sesco$producto=="FUEL OIL")] <- NA
+
+precios_sesco %>% 
+  # filter(!(anio %in% c(2005, 2009))) %>% 
+  # filter( valor <5) %>%
+  ggplot(aes(anio, valor, color = producto))+
+  geom_line()+
+  geom_point()+
+  labs(title = "Precios de combustibles en Argentina (SESCO Downstream)", 
+       subtitle = "Conversión con Tipo de Cambio del BCRA y Ferreres", y ="USD/litro",
+       caption = "Fuente: elaboración propia en base a SESCO Downstream")
+  
+
+```
+
+
+## Res.1104
+
+[Res 1104](http://res1104.se.gob.ar/consultaprecios.eess.php) 
+```{r}
+
+res_1104 <- read_csv("../data/secretaria_energia/1104/precios_promedio_res1104.csv") %>% 
+  mutate(cod = case_when(str_detect(producto, "común") ~ 1,
+                         str_detect(producto, "súper") ~ 2,
+                         str_detect(producto, "premium") ~ 3,
+                         str_detect(producto, "Gas Oil Grado 2") ~ 4
+                         ),
+          fuente = "Res. 1104", unidad = "USD/litro"
+         )  %>% 
+  left_join(tc, by ="anio") %>%
+  mutate(valor = valor /tcc) 
+
+
+res_1104 %>% 
+  filter(tipo_precio == "precio_surtidor") %>% 
+  ggplot(aes( x=anio, y = valor, color = producto))+
+  # geom_line()+
+  geom_boxplot()+
+  facet_wrap(~producto, scales = "free", ncol= 2)
+
+res_1104 %>% 
+  filter(tipo_precio %in% c("precio_c_imp", "precio_s_imp")) %>% 
+  ggplot(aes( x=anio, y = valor, color = tipo_precio))+
+  geom_line()+
+  labs(title = "Precios de combustibles con y sin impuestos en Argentina", 
+       subtitle = "Conversión con Tipo de Cambio del BCRA", y ="USD/litro" )+
+  facet_wrap(~producto, scales = "free", ncol= 2)
+
+```
+
+```{r}
+# ypf F20
+# Average prive per unit /m3
+
+ypf_f20  <- read_excel("C:/Archivos/Datos/Hidrocarburos/pio ypf dropbox/PIO YPF/Artículo Measuring oil ground rent Argentina/Fuente de los gráficos/diferencia de precios 20F YPF.xlsx", 
+    skip = 2) %>% select(anio = "...1", diesel = "...5", gasoline = "...7") %>% 
+  filter(!is.na(anio)) %>% 
+  mutate_all(as.double) %>% 
+  group_by(anio) %>% 
+  mutate_all(function(x) x/1000) %>% 
+  melt(., id.vars = "anio") %>%
+  left_join(tc, by = "anio") %>%
+  mutate(value = value/tcc,
+         fuente="YPF", unidad = "USD/litro")  %>% 
+    select(-c(tcc, tcp)) 
+
+
+res_1104_avg_s_imp <-  res_1104 %>% 
+  filter(tipo_precio == "precio_surtidor") %>%
+  # filter(tipo_precio == "precio_s_imp") %>% 
+  mutate(variable = case_when(str_detect(producto, "común") ~ "gasoline",
+                         str_detect(producto, "súper") ~ "gasoline",
+                         str_detect(producto, "premium") ~ "gasoline",
+                         str_detect(producto, "Gas Oil Grado 2") ~ "diesel")
+  ) %>% 
+  group_by(variable, anio, fuente, unidad) %>% 
+  summarise(value = mean(valor))
+
+rbind(ypf_f20, res_1104_avg_s_imp) %>%
+# res_1104_avg_s_imp %>% 
+  # filter(anio<2016) %>% 
+  rbind( wb_arg_fuel) %>% 
+  ggplot(aes(anio, value, color= fuente))+
+  geom_line()+
+  facet_wrap(~variable)+
+  labs(title = "Precios promedio de gasolina y diesel", 
+       subtitle = "YPF vs Resolución 1104. Tipo de cambio BCRA", x = "", y= "USD/litro")
+
+
+```
+
+
+
+
+## Res.314
+
+[Precios en Surtidor - Resolución 314/2016](https://datos.gob.ar/dataset/energia-precios-surtidor---resolucion-3142016)
+
+```{r}
+# precios_314_hist <- read_csv("../data/secretaria_energia/314/precios-historicos.csv") %>% 
+#     mutate(fecha = as.Date(fecha_vigencia,  "%d/%m/%Y"))
+# 
+# precios_314_hist %>% 
+#   arrange(fecha) %>% 
+#   mutate(dia = substr(fecha_vigencia, 1,2),
+#          mes = substr(fecha_vigencia,  4,5) ,
+#          anio = substr(fecha_vigencia, 7,10) ) %>% 
+#   relocate(fecha_vigencia, fecha,dia, mes, anio, .before = "idempresa" )
+# 
+# precios_314 <- read_csv("../data/secretaria_energia/314/precios-en-surtidor-resolucin-3142016.csv",
+#                                         col_types = cols(indice_tiempo = col_date(format = "%Y-%m")))
+# str(precios_en_surtidor_res_314)
+# unique(precios_en_surtidor_res_314$producto)
+# 
+# summary(precios_314$indice_tiempo)
+
+```
+
+
+
+
+# Estados Unidos
+
+## EIA
+
+[U.S. Regular Gasoline Prices](https://www.eia.gov/petroleum/gasdiesel/)
+Este es el unico excel donde esta midgrade y diesel
+```{r}
+#info por estado de gasolina (distintos tipos)
+# pswrgvwall <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/EIA/pswrgvwall.xls", 
+#     sheet = "Data 1")
+
+```
+
+
+
+
+[RETAIL MOTOR GASOLINE AND ON-HIGHWAY DIESEL FUEL PRICES](https://www.eia.gov/totalenergy/data/browser/?tbl=T09.04)
+
+Para mas detalles metodológicos, revisar: https://www.eia.gov/totalenergy/data/monthly/pdf/sec9.pdf
+```{r}
+usa_price <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/EIA/MER_T09_04.csv")
+
+usa_price <- add_column(usa_price, fecha = "", year="", month="", .after = 2)
+usa_price <- usa_price %>%
+  mutate(fecha = as.character(YYYYMM),
+         year = as.double(substr(fecha, 1,4)),
+         month = case_when(year <1973 ~ 1, T ~as.double(substr(fecha, 5,6))
+                           ),
+         Value = as.double(Value)
+  ) %>%
+  filter(month !=13) %>%
+  mutate(fecha = as.Date(paste(year, month,01 ,sep="-")))
+# mutate(fecha = zoo::as.yearmon(paste(year, month, sep="-"))  )
+
+```
+
+```{r}
+eia_1 <- usa_price %>%
+  group_by(year, description = Description) %>%
+  summarise(value = mean(Value , na.rm=T)) %>%
+  arrange(description, year) %>%
+  ungroup() %>%
+  mutate(cod = case_when(str_detect(description, "Unleaded Regular Gasoline") ~ 1,
+                         str_detect(description, "Unleaded Premium Gasoline") ~ 3,
+                         str_detect(description, "Diesel") ~ 4
+                         ),
+         pais = "EEUU",
+         value = gallon_to_liter_p(value), unidad = "USD/litro"
+           ) %>% 
+  filter(!is.na(cod))
+eia_1[eia_1=="NaN"] <- NA
+
+
+unique(usa_price$Description)
+unique(usa_price$Unit)
+
+```
+
+```{r}
+#dollars per liter
+
+us_fuel_price <- read_excel("../data/EIA/PET_PRI_GND_DCUS_NUS_M.xls", sheet=2, skip=2)
+us_fuel_price <- us_fuel_price %>%
+  select(1,5,8,11,14) %>% 
+  mutate(anio = year(Date),
+         mes = month(Date)) %>% 
+  rename(regular = names(us_fuel_price)[5], 
+         midgrade = names(us_fuel_price)[8],
+         premium = names(us_fuel_price)[11],
+         diesel2 = names(us_fuel_price)[14])
+
+eia_2 <- us_fuel_price %>% 
+  select(-c(Date, mes)) %>% 
+  group_by(anio) %>% 
+  summarise_all(function(x ) mean(x, na.rm=T)) %>% 
+  gather(key = producto, value = value, 2:ncol(.)) %>% 
+  mutate(cod = case_when(str_detect(producto, "regular") ~ 1,
+                         str_detect(producto, "midgrade") ~ 2,
+                         str_detect(producto, "premium") ~ 3,
+                         str_detect(producto, "diesel") ~ 4 ),
+         tax_code = case_when(str_detect(producto, "regular") ~ 1,
+                         str_detect(producto, "midgrade") ~ 1,
+                         str_detect(producto, "premium") ~ 1,
+                         str_detect(producto, "diesel") ~ 2 ),
+         pais = "EEUU",
+         value = gallon_to_liter_p(value),
+         unidad ="USD/litro"
+         )
+
+names(us_fuel_price)
+```
+
+
+## Fuel Tax
+[State Motor-Fuel Tax Rates, 2000 - 2015](https://www.fhwa.dot.gov/policyinformation/statistics/2019/mf205.cfm)
+
+```{r}
+
+# cents/liter
+gasoline_tax <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/fhwa/mf205.xls", 
+    sheet = "GASOLINE", skip = 6) %>% 
+  gather(key = "anio", value = "tax", 2:ncol(.)) %>% 
+  mutate(anio = gsub( "\\.*", "",anio), 
+         anio = substr(anio, 1,4)) %>% 
+  filter(!is.na(STATE)) %>% 
+  group_by(STATE) %>% 
+  mutate_all(as.double) %>% 
+  mutate(item = "gasoline_tax", tax_code = 1, tax = gallon_to_liter_p(tax/100))
+
+
+diesel_tax <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/fhwa/mf205.xls", 
+    sheet = "DIESEL", skip = 6)%>% 
+  gather(key = "anio", value = "tax", 2:ncol(.)) %>% 
+  mutate(anio = gsub( "\\.*", "",anio), 
+         anio = substr(anio, 1,4)) %>% 
+  filter(!is.na(STATE)) %>% 
+  group_by(STATE) %>% 
+  mutate_all(as.double) %>% 
+  mutate(item = "diesel_tax", tax_code = 2 , tax = gallon_to_liter_p(tax/100))
+
+unique(diesel_tax$anio)
+
+anual_tax = rbind(diesel_tax, gasoline_tax) %>% 
+  filter(STATE != "State Average (3)") %>% 
+  group_by(anio, item) %>% 
+  summarise(tax_avg = mean(tax, na.rm= T))
+
+weight_anual_tax <- rbind(diesel_tax, gasoline_tax) %>% 
+  filter(str_detect(STATE,  "Average" ) )
+```
+
+
+## U.S. Gulf Coast Conventional Gasoline Regular Spot Price FOB (Dollars per Gallon)
+```{r}
+gc_gasoline_spot <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/EIA/EER_EPMRU_PF4_RGC_DPGm.xls", 
+    sheet = "Data 1", skip = 2) 
+names(gc_gasoline_spot) <- c("date", "gulfcoast_gasoline_fob")
+
+gc_gasoline_spot <-  gc_gasoline_spot %>%   
+  mutate(date = as.Date(date))
+
+gulf_coast_annual <- gc_gasoline_spot %>% 
+  mutate(anio = year(date)) %>% 
+  group_by(anio) %>% 
+  summarise(value = mean(gulfcoast_gasoline_fob, na.rm =T),
+            cod = 1, producto = "regular", pais = "Gulf Coast Spot FOB")
+  
+```
+
+
+# UK
+https://www.gov.uk/government/statistical-data-sets/oil-and-petroleum-products-weekly-statistics
+```{r}
+
+week_price_raw <- read_csv( "../data/govuk/CSV_280621.csv")
+
+for (i in 1:5){
+  print(rep(as.character(week_price_raw[1,] )[i], 2))
+   }
+
+week_price <- week_price_raw %>% 
+  rename(fecha = "Weekly Prices time series") %>% 
+  slice(3:nrow(week_price_raw)) %>% 
+  mutate(fecha = dmy(fecha))
+
+summary(week_price$fecha)
+```
+
+
+
+# Uruguay
+[ANCAP](https://www.ancap.com.uy/6088/1/historico-precio-combustibles.html)
+
+```{r}
+# $ /litro
+p_comb_uy<- read_excel( "../data/ancap/precio historico de combustibles.xlsx", 
+    skip = 4)
+p_comb_uy <- p_comb_uy %>% 
+  rename(fecha = names(p_comb_uy)[1]) %>%
+  filter(fecha != "Fecha") 
+
+library(lubridate)
+correcion_1 <-  p_comb_uy %>%
+  mutate(fecha_correct = dmy(fecha)) %>% 
+  filter(!is.na(fecha_correct))
+
+correcion_2 <- p_comb_uy %>% 
+  filter(!is.na(as.numeric(fecha))) %>% 
+  mutate(fecha_correct = as.Date(as.numeric(fecha), origin = "1899-12-30"))
+
+precios_ancap <- rbind(correcion_1,correcion_2)
+```
+
+
+
+### Comparacion Argentina vs EEUU
+```{r}
+# Precios con impuestos
+anuario2_c_imp <-  anuario2 %>% 
+  filter(tipo_precio == "Precio con impuestos") %>% 
+  select(anio, producto, valor = value, cod, fuente, unidad)
+
+res1104_c_imp <- res_1104 %>% 
+  filter(!is.na(cod), tipo_precio == "precio_c_imp") %>%
+  select(anio, producto, valor,cod, fuente, unidad) 
+
+serie_larga <- precios_sesco %>%
+  filter(!is.na(cod)) %>% 
+  rbind(res1104_c_imp , anuario2_c_imp, anuario_comun)
+
+serie_larga_filtrada <- precios_sesco %>%
+  filter(!is.na(cod), anio %in% c(1994:2004)) %>% 
+  rbind(res1104_c_imp %>% 
+          filter(anio > 2004) ) %>% 
+  rbind(anuario2_c_imp %>% 
+          filter(anio <1994 )  ) %>% 
+  arrange(anio) %>% 
+  mutate(pais = "Argentina")
+
+# Precios ARG
+etiquetas <- c("1" = "Nafta Normal", "2"= "Nafta Super", "3"="Nafta Premium", "4"="Diesel grado 2")  
+png("../resultados/comparacion_paises/precios_con_impuestos_ARG.png")
+serie_larga %>%
+# serie_larga_filtrada %>% 
+  # filter(cod ==1) %>% 
+  ggplot(aes(anio, valor, color = fuente)) + 
+  geom_line() +
+  facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
+  labs(y = "USD/litro", title = "Precios de combustibles con impuestos de Argentina", 
+       subtitle = "Distintas estimaciones con TCC")
+dev.off()
+
+#Comparacion con EEUU
+precios_eeuu <- eia_1 %>% 
+  filter(!is.na(cod) & !( (cod ==1) & (year >1990) ) ) %>%
+  select(anio = year, producto = description, everything(.)) %>% 
+  rbind(eia_2 %>% 
+          select(-tax_code) %>% 
+          filter( cod %in% c(2, 1))) %>% 
+  rename(valor = value) %>% 
+  arrange(anio)
+
+
+library(jpeg)
+png("../resultados/comparacion_paises/precios_con_impuestos_tcc.png")
+serie_larga_filtrada %>%
+  left_join(tcc_tcp_historico, by = "anio") %>%
+  mutate(valor = valor*(tcc/tcp)) %>%
+  select(-c(tcc, tcp, fuente)) %>%
+  rbind(precios_eeuu) %>%
+  filter(anio >1975) %>% 
+  ggplot(aes(anio, valor, color = pais)) + 
+  geom_line() +
+  facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
+  labs(y = "USD/litro", title = "Precios de combustibles con impuestos de Argentina y EEUU",
+       subtitle =  "Tipo de cambio de paridad", x = "Año")
+dev.off()
+
+png("../resultados/comparacion_paises/precios_con_impuestos_tcp.png")
+serie_larga_filtrada %>%
+  rbind(precios_eeuu) %>%
+  filter(anio >1975) %>% 
+  ggplot(aes(anio, valor, color = pais)) + 
+  geom_line() +
+  facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
+  labs(y = "USD/litro", title = "Precios de combustibles con impuestos de Argentina y EEUU",
+       subtitle =  "Tipo de cambio comercial", x = "Año")
+dev.off()
+
+```
+
+
+
+```{r}
+#Precio sin impuestos
+anuario2_s_imp <-  anuario2 %>% 
+  filter(tipo_precio == "Precio sin impuestos") %>% 
+  select(anio, producto, valor = value, cod, fuente, unidad)
+
+res1104_s_imp <- res_1104 %>% 
+  filter(!is.na(cod), tipo_precio == "precio_s_imp") %>%
+  select(anio, producto, valor,cod, fuente, unidad) 
+
+serie_larga_s_imp <- rbind(res1104_s_imp , anuario2_s_imp)
+
+serie_larga_filtrada_s_imp <- res1104_s_imp %>% 
+          filter(anio > 2004)  %>% 
+  rbind(anuario2_s_imp %>% 
+          filter(anio <=2004 )  ) %>% 
+  arrange(anio) %>% 
+  mutate(pais = "Argentina")
+
+
+
+# Precios ARG
+etiquetas <- c("1" = "Nafta Normal", "2"= "Nafta Super", "3"="Nafta Premium", "4"="Diesel grado 2")  
+png("../resultados/comparacion_paises/precios_sin_impuestos_ARG.png")
+serie_larga_s_imp %>%
+  # filter(cod ==1) %>% 
+  ggplot(aes(anio, valor, color = fuente)) + 
+  geom_line() +
+  facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
+  labs(y = "USD/litro", title = "Precios de combustibles sin impuestos de Argentina",
+       subtitle = "Distintas estimaciones con TCC")
+dev.off()
+
+#Comparacion con EEUU
+naftas_usa_s_imp <- eia_2  %>%
+  right_join(weight_anual_tax, by = c("anio", "tax_code")) %>% 
+  filter(!is.na(cod)) %>% 
+  mutate(pais = "EEUU",
+         valor = value - tax,
+         fuente = "EIA") %>% 
+  select(-c(STATE, tax, tax_code , item, value) )
+
+png("../resultados/comparacion_paises/precios_sin_impuestos_tcc.png")
+serie_larga_filtrada_s_imp %>%
+  left_join(tcc_tcp_historico, by = "anio") %>%
+  mutate(valor = valor*(tcc/tcp)) %>%
+  select(-c(tcc, tcp)) %>%
+  rbind(naftas_usa_s_imp) %>%
+  filter(anio >1975) %>% 
+  ggplot(aes(anio, valor, color = pais)) + 
+  geom_line() +
+  facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
+  labs(y = "USD/litro", title = "Precios de combustibles sin impuestos de Argentina y EEUU",
+       caption = "Fuente: elaboración propia en base a Secretaria de Energía (Res. 1104), EIA y BCRA", 
+       subtitle =  "Tipo de cambio de paridad", x = "Año")
+dev.off()
+
+png("../resultados/comparacion_paises/precios_sin_impuestos_tcp.png")
+serie_larga_filtrada_s_imp %>%
+  rbind(naftas_usa_s_imp) %>%
+  filter(anio >1975) %>% 
+  ggplot(aes(anio, valor, color = pais)) + 
+  geom_line() +
+  facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
+  labs(y = "USD/litro", title = "Precios de combustibles sin impuestos de Argentina y EEUU",
+       caption = "Fuente: elaboración propia en base a Secretaria de Energía (Res. 1104), EIA y BCRA", 
+       subtitle =  "Tipo de cambio comercial", x="Año")
+dev.off()
+```
+
+```{r}
+
+#precios sin impuestos
+graf_brecha_s_imp = serie_larga_filtrada_s_imp %>%
+  filter(anio > 1999) %>%
+  left_join(tcc_tcp_historico, by = "anio") %>%
+  mutate(valor = valor*(tcc/tcp)) %>%
+  # select(-c(tcc, tcp)) %>%
+  select(anio, unidad, cod, precios_arg = valor) %>% 
+  left_join(naftas_usa_s_imp %>% 
+              select(anio, cod, precios_eeuu = valor)) %>% 
+  mutate( cod =as.factor(cod),
+          brecha = (precios_arg/precios_eeuu-1)*100 )
+
+png("../resultados/comparacion_paises/brecha_precios_sin_impuestos.png")
+ggplot(graf_brecha_s_imp, aes(anio, brecha, color = cod))+
+  geom_line(alpha = 0.5)+
+  geom_point()+
+  geom_hline(yintercept = 0)+
+  labs(title = "Brecha de precios de combustibles sin impuestos",
+       subtitle = "Conversión con tipo de cambio de paridad", 
+       x="Año", y = "(Precio Arg / Precio EEUU) - 1  (%)", col = "Producto")+
+   scale_color_manual( labels = etiquetas, values = c("dodgerblue2", "red2", "green4", "black"))+
+  theme(legend.position = "bottom")
+dev.off()
+
+
+```
+
+```{r}
+#precios con impuestos
+
+graf_brecha_c_imp <- serie_larga_filtrada %>%
+  left_join(tcc_tcp_historico, by = "anio") %>%
+  mutate(valor = valor*(tcc/tcp)) %>%
+  select(anio, unidad, cod, precios_arg = valor) %>% 
+  left_join(precios_eeuu %>% 
+              select(anio, cod, precios_eeuu = valor)) %>% 
+  mutate( cod =as.factor(cod),
+          brecha = (precios_arg/precios_eeuu-1)*100 )
+
+png("../resultados/comparacion_paises/brecha_precios_con_impuestos.png")
+ggplot(graf_brecha_c_imp, aes(anio, brecha, color = cod))+
+  geom_line(alpha = 0.5)+
+  geom_point()+
+  geom_hline(yintercept = 0)+
+  labs(title = "Brecha de precios de combustibles con impuestos",
+       subtitle = "Conversión con tipo de cambio de paridad", 
+       x="Año", y = "(Precio Arg / Precio EEUU) - 1  (%)", col = "Producto")+
+   scale_color_manual( labels = etiquetas, values = c("dodgerblue2", "red2", "green4", "black"))+
+  theme(legend.position = "bottom")
+dev.off()
+
+```
+
+
+```{r}
+#exportacion de resultados
+writexl::write_xlsx(list(TCP = tcc_tcp_historico, 
+                         arg_s_imp = serie_larga_filtrada_s_imp %>% 
+                           mutate(tipo_de_cambio = "TCC"),
+                         arg_c_imp = serie_larga_filtrada %>% 
+                           mutate(tipo_de_cambio = "TCC") ,
+                         eeuu_s_imp =naftas_usa_s_imp,
+                         eeuu_c_imp = precios_eeuu, 
+                         brecha_s_imp = graf_brecha_s_imp,
+                         brecha_c_imp = graf_brecha_c_imp,
+                         todos_arg_c_imp = serie_larga,
+                         todos_arg_s_imp =serie_larga_s_imp), 
+                    path = "../resultados/comparacion_paises/combustibles.xlsx")
+
+```
+

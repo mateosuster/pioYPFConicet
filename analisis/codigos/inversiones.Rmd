@@ -1,0 +1,248 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+
+## Inversiones
+
+Fuentes: 
+
+* Balances de Bolsar. Inversión calculada a partir de variaciones del activo + consumo de capital fijo (esto último está pendiente)
+* Secretaria de Energía. Resolución 2057 
+  + [Inversiones realizadas año anterior](http://datos.minem.gob.ar/dataset/inversiones-en-mercado-de-hidrocarburos-upstream/archivo/285d45e5-1b88-4dae-8e5c-c01843c7c8c0)
+  + [Inversiones anuales previstas a realizar en el año de la presentación de la DDJJ](http://datos.minem.gob.ar/dataset/inversiones-en-mercado-de-hidrocarburos-upstream)
+
+
+4) construir serie de inversión para atras (buscar Stock de YPF pero solo para extracción). armar ejercicio de FD y ver si las proporciones se mantienen. 
+
+* Reconstruccion de serie de inversion por empresa
+ver un flujo de pozos y un flujo de inversion y luego ver si lo que mueve la inversion son los pozos (que su evolucion sea similar). 
+
+- inversion por empresa (balance: variacion del activo + consumo de K fijo)
+- inversion por empresa (secretaria de energia)
+- inversion agregada (tipo de inversion) (cuentas nacionales?)
+- pozos nuevos por empresa por año
+- pozos nuevos totales
+- aplicar MIP para YPF 
+
+Inversión a partir de Balances
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# inversiones_empresa <- stock_balances_empresas %>%
+#   ungroup() %>% 
+#   select(-c(fuente, sector)) %>% 
+#   filter(variable == "ppye") %>%
+#   arrange(empresa, anio) %>% 
+#   group_by(unidad, variable, empresa) %>%
+#   mutate(valor = variacion_interanual(valor))
+#    
+# # inversiones_empresa
+# 
+# graf_inversiones_empresa <- inversiones_empresa %>% 
+#   filter(empresa != "Camuzzi Gas Pampeana") %>% 
+#   ggplot(aes(anio, valor, color = empresa))+ 
+#   geom_line()+
+#   geom_point()+
+#   labs(title = "Inversiones por empresa",
+#        subtitle = "A partir de balances",
+#         y = "Millones de pesos de 2018",
+#        caption = "Balances de empresas extraídos de Bolsar")+
+#   facet_wrap(~variable)
+# # ggplotly(graf_inversiones_empresa, width = 800, height = 600)
+
+```
+
+
+Inversión a partir de Secretaria de Energía
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+inversiones_anio_anterior <- read_csv("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/resolucin-2057-inversiones-realizadas-ao-anterior.csv", 
+    col_types = cols(`Fecha Fin Tareas` = col_date(format = "%d/%m/%Y"), 
+        `Fecha Inicio Tareas` = col_date(format = "%d/%m/%Y"))) %>% 
+  rename(anio = "Año de presentación de la DDJJ",
+         empresa = "Empresa informante",
+         concepto = "Descripción del plan de acción (Conceptos)",
+         cantidad_exploracion = "Cant. Exploracion",
+         cantidad_explotacion = "Cant. Explotacion",
+         cantidad_exploracion_complementaria = "Cant. Exploracion Complementaria",
+         exploracion_millones_usd = "Millones u$s Exploracion",
+         explotacion_millones_usd = "Millones u$s Explotacion",
+         exploracion_compl_millones_usd = "Millones u$s Exp. Complementaria") %>% 
+  mutate(anio = anio - 1,
+         empresa =case_when(empresa == "YPF S.A." ~ "YPF",
+                            empresa == "PAN AMERICAN ENERGY (SUCURSAL ARGENTINA) LLC" ~ "PAE",
+                            empresa == "PAN AMERICAN ENERGY SL" ~ "PAE",
+                            empresa == "PETROBRAS ARGENTINA S.A." ~ "Petrobras",
+                            empresa == "PESA (PETROBRAS E.S.A.)" ~ "Petrobras",
+                            empresa == "ENAP SIPETROL ARGENTINA S.A." ~ "ENAP SIPETROL",
+                            empresa == "VISTA OIL & GAS ARGENTINA SAU" ~ "Vista Oil and Gas",
+                            empresa == "VISTA OIL & GAS ARGENTINA SA" ~ "Vista Oil and Gas",
+                            empresa == "SINOPEC ARGENTINA EXPLORATION AND PRODUCTION, INC." ~ "Sinopec",
+                            empresa == "TECPETROL S.A." ~ "Tecpetrol", 
+                            empresa == "PLUSPETROL S.A." ~ "Pluspetrol",
+                            empresa == "PLUSPETROL ENERGY S.A." ~ "Pluspetrol",
+                            empresa == "COMPAÑÍA GENERAL DE COMBUSTIBLES S.A." ~ "CGC",
+                            empresa == "WINTERSHALL ENERGIA S.A." ~ "Wintershall",
+                            empresa == "YSUR ENERGÍA ARGENTINA S.R.L." ~ "YSUR",
+                            empresa == "YSUR PETROLERA ARGENTINA S.A." ~ "YSUR",
+                            empresa == "TOTAL AUSTRAL S.A." ~ "Total Austral",
+                            T ~ empresa)) %>% 
+  select(anio, empresa, idempresa,  concepto,
+         cantidad_exploracion, cantidad_explotacion,cantidad_exploracion_complementaria,
+         exploracion_millones_usd,explotacion_millones_usd, exploracion_compl_millones_usd ) 
+
+unique(inversiones_anio_anterior$concepto)
+
+inversiones_anio_anterior <- inversiones_anio_anterior %>% 
+  # filter(str_detect(concepto, 'pozo')) %>%
+  group_by(empresa, anio) %>% 
+  summarise(inversion_explotacion = sum(explotacion_millones_usd, na.rm = T),
+            inversion_exploracion = sum(exploracion_millones_usd, na.rm = T)) %>% 
+  arrange(-inversion_explotacion) %>% 
+  mutate(unidad = "Millones de USD")
+inversiones_anio_anterior
+
+
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+resolucin_2057_inversiones_realizadas_mensual <- read_csv("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/resolucin-2057-inversiones-realizadas-mensual.csv")
+
+resolucin_2057_inversiones_fin_concesion<- read_csv("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/resolucin-2057-inversiones-realizadas-fin-de-concesin.csv")
+
+resolucin_2057_inversiones_fin_concesion %>%
+  rename(anio = "Año de presentación de la DDJJ",
+           empresa = "Empresa informante",
+           concepto = "Descripción del plan de acción (Conceptos)",
+           cantidad_exploracion = "Cant. Exploracion",
+           cantidad_explotacion = "Cant. Explotacion",
+           cantidad_exploracion_complementaria = "Cant. Exploracion Complementaria",
+           exploracion_millones_usd = "Millones u$s Exploracion",
+           explotacion_millones_usd = "Millones u$s Explotacion",
+           exploracion_compl_millones_usd = "Millones u$s Exp. Complementaria") %>% 
+  group_by(anio) %>% 
+  summarise(inversion_anual = sum(explotacion_millones_usd, exploracion_millones_usd))
+  
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+inversiones_2005_2012 <- readxl::read_excel("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/tablas dinamicas/inversiones_2005_2012.xlsx", 
+    col_types = c("numeric", "text", "text", 
+        "numeric", "numeric", "numeric"), 
+    skip = 8) %>% 
+  rename(plan_1ra_semana = "Plan 1ª Sem.",
+         plan_anual = "Plan Anual",
+         realizado_anual = "Realizado Anual",
+         concepto = Concepto) %>% 
+  mutate(anio =  zoo::na.locf(anio),
+         empresa =  zoo::na.locf(empresa),
+         unidad = "Millones de USD",
+         empresa =case_when(empresa == "YPF S.A." ~ "YPF",
+                            empresa == "PAN AMERICAN ENERGY (SUCURSAL ARGENTINA) LLC" ~ "PAE",
+                            empresa == "PAN AMERICAN ENERGY SL" ~ "PAE",
+                            empresa == "PETROBRAS ARGENTINA S.A." ~ "Petrobras",
+                            empresa == "PESA (PETROBRAS E.S.A.)" ~ "Petrobras",
+                            empresa == "ENAP SIPETROL ARGENTINA S.A." ~ "ENAP SIPETROL",
+                            empresa == "VISTA OIL & GAS ARGENTINA SAU" ~ "Vista Oil and Gas",
+                            empresa == "VISTA OIL & GAS ARGENTINA SA" ~ "Vista Oil and Gas",
+                            empresa == "SINOPEC ARGENTINA EXPLORATION AND PRODUCTION, INC." ~ "Sinopec",
+                            empresa == "TECPETROL S.A." ~ "Tecpetrol", 
+                            empresa == "PLUSPETROL S.A." ~ "Pluspetrol",
+                            empresa == "PLUSPETROL ENERGY S.A." ~ "Pluspetrol",
+                            empresa == "COMPAÑÍA GENERAL DE COMBUSTIBLES S.A." ~ "CGC",
+                            empresa == "WINTERSHALL ENERGIA S.A." ~ "Wintershall",
+                            empresa == "YSUR ENERGÍA ARGENTINA S.R.L." ~ "YSUR",
+                            empresa == "YSUR PETROLERA ARGENTINA S.A." ~ "YSUR",
+                            empresa == "TOTAL AUSTRAL S.A." ~ "Total Austral",
+                            T ~ empresa)) %>% 
+  filter(!(empresa %in% c("O&G DEVELOPMENTS LTD S.A." ,"PETROMINERA CHUBUT S.E."))) %>%
+  # filter(str_detect(concepto, 'pozo')) %>%
+  group_by(empresa, anio, unidad) %>% 
+  summarise(inversion_anual = sum(realizado_anual, na.rm = T)) %>% 
+  arrange(-inversion_anual)
+inversiones_2005_2012
+
+inversiones_anual = inversiones_2005_2012 %>% 
+  filter(anio != 2012) %>% 
+  group_by(anio) %>% 
+  summarise(inversion_anual = sum(inversion_anual)) %>% 
+  rbind(inversiones_anio_anterior %>% 
+          group_by(anio) %>% 
+          summarise(inversion_anual = sum(inversion_explotacion, inversion_exploracion)) )
+
+inversiones_anual %>% 
+  ggplot(aes(anio, inversion_anual))+
+  geom_col()+
+  labs(title = "Inversión anual total en el sector hidrocarburífero", 
+       y = "Millones de USD", x = "Año", caption = "Elaboración propia en base a Secretaría de Energía")+
+  scale_y_continuous(breaks = round(seq(0, 
+                                        max(inversiones_anual$inversion_anual)+1000, by = 1000)))+
+  scale_x_continuous(breaks = round(seq(min(inversiones_anual$anio), 
+                                        max(inversiones_anual$anio), by = 1)))+
+theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+
+
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+graf_inversiones_2005_2012 <-  inversiones_2005_2012 %>%
+  ggplot(aes(anio, inversion_anual, color = empresa))+ 
+  geom_line()+
+  geom_point()+
+  labs(title = "Inversiones por empresa (tablas dinamicas)",
+       subtitle = "Extraído de tablas dinámicas",
+        y = "Millones de USD",
+       caption = "Secretaria de Energía")+
+  theme(legend.position = "none")
+plotly::ggplotly(graf_inversiones_2005_2012)
+
+graf_inversiones_anio_anterior <-  inversiones_anio_anterior %>%
+  ggplot(aes(anio, inversion_explotacion, color = empresa))+ 
+  geom_line()+
+  geom_point()+
+  labs(title = "Inversiones por empresa (año anterior)",
+       subtitle = "Inversiones año anterior",
+        y = "Millones de USD",
+       caption = "Secretaria de Energía")+
+  theme(legend.position = "none")
+plotly::ggplotly(graf_inversiones_anio_anterior)
+
+```
+```{r}
+inv_anual_emp = inversiones_anio_anterior %>% 
+  group_by(empresa, anio, unidad) %>% 
+  summarise(inversion_anual = sum(inversion_exploracion, inversion_explotacion)) %>% 
+  rbind(inversiones_2005_2012)
+
+plot_inv_anual = inv_anual_emp %>% 
+  ggplot(aes(anio, inversion_anual, color = empresa))+ 
+  geom_line()+
+  geom_point()+
+  labs(title = "Inversiones por empresa (tablas dinamicas)",
+       subtitle = "Extraído de tablas dinámicas",
+        y = "Millones de USD",
+       caption = "Secretaria de Energía")+
+  theme(legend.position = "none")
+
+# plotly::ggplotly(plot_inv_anual)
+plot_inv_anual
+```
+```{r }
+inv_anual_emp %>% 
+  ungroup() %>% 
+  filter(empresa == "YPF", anio %in% 2008:2015) %>% 
+  summarise(sum(inversion_anual))
+```
+
+

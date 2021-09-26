@@ -1,0 +1,610 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+## Pozos
+
+
+### Metros perforados
+
+Fuente:
+
+* [Secretaría de Energía](https://datos.gob.ar/dataset/energia-perforacion-pozos-petroleo-gas)
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+metros_perforados_posterior_al_2009 <- read_csv("../data/secretaria_energia/sesco/metros-perforados.csv", 
+    col_types = cols(indice_tiempo = col_date(format = "%Y-%m")))
+
+metros_perforados_anterior_al_2009 <- read_csv("../data/secretaria_energia/sesco/metros-perforados-anterior-al-2009.csv") %>% 
+  rename(cantidad = Cantidad)
+
+metros_perforados_empresa <- metros_perforados_posterior_al_2009 %>%
+  bind_rows(metros_perforados_anterior_al_2009) %>% 
+  select(anio, mes, idempresa, empresa, idconcepto, concepto, cantidad, observaciones ) %>% 
+  group_by(anio, idempresa, empresa) %>%
+  summarise(metros_perforados = sum(cantidad, na.rm = T)) %>% 
+  ungroup()
+  
+
+metros_perforados <- metros_perforados_empresa %>%
+  group_by(anio) %>% 
+  summarise(metros_perforados = sum(metros_perforados, na.rm = T)) %>%
+  mutate(indice_metros = generar_indice(serie= metros_perforados, 
+                                        fecha = anio, 
+                                        fecha_base = 2001)) 
+
+# graf_metros_perforados <- metros_perforados_empresa%>% 
+#   ggplot(aes(anio, metros_perforados, fill = empresa)) +
+#   geom_col()+
+#   theme(legend.position = "none",
+#         axis.text.x = element_text(angle = 90))+
+#   labs(title = "Metros perforados por empresa")+
+#   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
+# ggplotly(graf_metros_perforados, width = 800, height = 600)
+
+
+#listado de empresas con sus id's
+listado_empresa <- distinct(metros_perforados_empresa %>% 
+              select(idempresa, empresa),idempresa, .keep_all = T) 
+  
+
+
+```
+
+
+### Pozos en operación
+
+Fuentes:
+
+* Secretaría de Energía - [Datos MINEM](https://github.com/datosminem/produccion-de-petroleo-y-gas-por-pozo):
+  + [Listado de pozos cargados por empresas operadoras](http://datos.minem.gob.ar/dataset/produccion-de-petroleo-y-gas-por-pozo/archivo/cbfa4d79-ffb3-4096-bab5-eb0dde9a8385): se toma la variable "Fecha del Fin de terminación de perforación del pozo" (adjiv_fecha_fin_term) como año de puesta en producción del pozo. Se podría elaborar un stock de pozos a partir de acumular los pozos terminados y restando los pozos abandonados, agrupando con la variable "Fecha de abandono del pozo"(adjiv_fecha_abandono)
+  + [Pozos terminados](http://datos.minem.gob.ar/dataset/perforacion-de-pozos-de-petroleo-y-gas/archivo/a2ce14af-5c56-45c2-9b9c-c7a1e5156dff)
+  + [Capítulo IV](http://datos.minem.gob.ar/dataset/produccion-de-petroleo-y-gas-por-pozo/archivo/cb5c0f04-7835-45cd-b982-3e25ca7d7751)
+  + [Estado de pozos](http://datos.minem.gob.ar/dataset/estado-de-pozos-de-petroleo-y-gas) (AUN NO SE PROCESÓ ESTA BASE NI LA ANTERIOR) 
+  + [SESCO](http://www.energia.gob.ar/contenidos/verpagina.php?idpagina=1624)
+* [IAPG](https://www.iapg.org.ar/web_iapg/sectores/estadisticas/productos/listados/listado_todos_los_productos.htm). Se presentan dos series: una elaborada a partir de los pozos perforados por año (resultante de descargar una base por cada año del sitio web oficial) y otra que corresponde al stock de pozos de petróleo de extracción efectiva (procedente de los datos de Estadísticas del Centenario de IAPG).
+
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE, mecho=FALSE, paged.print=FALSE}
+# sec energia
+# pozos cargados por empresas
+listado_pozos <- read_csv("../data/secretaria_energia/cap_iv/listado-de-pozos-cargados-por-empresas-operadoras.csv") %>% 
+  mutate(anio_terminacion_pozo =year(adjiv_fecha_fin_term)) %>%
+  left_join(listado_empresa) %>% 
+  group_by(anio_terminacion_pozo, idempresa, empresa) %>% 
+  summarise(pozos = n()) %>% 
+  filter(!is.na(anio_terminacion_pozo))
+
+
+  # mutate(empresa = case_when(idempresa == "YPF" ~ "YPF",
+  #                           idempresa == "PAE" ~ "PAE",
+  #                           idempresa == "YSUR" ~ "YSUR",
+  #                           idempresa == "PLU" ~ "Pluspetrol",
+  #                           idempresa == "PLUE" ~ "Pluspetrol",
+  #                           idempresa == "VIS" ~ "Vista Oil and Gas",
+  #                           idempresa == "TPT" ~ "Tecpetrol", 
+  #                           idempresa == "CGC" ~ "CGC",
+  #                           idempresa == "WIN" ~ "Wintershall",
+  #                           idempresa == "TAU" ~ "Total Austral",
+  #                           idempresa == "YSUR" ~ "YSUR",
+  #                           idempresa == "SHE" ~ "Shell",
+  #                           idempresa == "CAP" ~ "Capex",
+  #                           idempresa == "PPAM" ~ "Pampa",
+  #                           T ~ "Otra")) 
+                            # idempresa == "PETROBRAS ARGENTINA S.A." ~ "Petrobras",
+                            # idempresa == "PESA (PETROBRAS E.S.A.)" ~ "Petrobras",
+                            # idempresa == "ENAP SIPETROL ARGENTINA S.A." ~ "ENAP SIPETROL",
+                            # idempresa == "VISTA OIL & GAS ARGENTINA SA" ~ "Vista Oil and Gas",
+                            # idempresa == "SINOPEC ARGENTINA EXPLORATION AND PRODUCTION, INC." ~ "Sinopec",
+                            # idempresa == "PLUSPETROL ENERGY S.A." ~ "Pluspetrol",
+                            # idempresa == "YSUR PETROLERA ARGENTINA S.A." ~ "YSUR"))
+
+# graf_pozos_sec_energia <- listado_pozos %>% 
+#   ggplot(aes(anio_terminacion_pozo, pozos, fill = empresa))+
+#   geom_col()+
+#   theme(axis.text.x = element_text(angle = 90),
+#         legend.position = "none")+
+#   labs(title = "Pozos cargados por empresas operadoras (por año de terminación)",
+#        caption = "Secretaría de Energía")
+# ggplotly(graf_pozos_sec_energia, width = 600, height = 400)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+  
+pozos_terminados_anterior_al_2009 <- read_csv("../data/secretaria_energia/sesco/pozos-terminados-anterior-al-2009.csv") %>% 
+  rename(cantidad = Cantidad)
+
+pozos_terminados <- read_csv("../data/secretaria_energia/sesco/pozos-terminados.csv") %>% 
+  bind_rows(pozos_terminados_anterior_al_2009) %>% 
+  group_by(anio, idempresa, empresa ) %>% 
+  summarise(pozos  = sum(cantidad, na.rm = T))
+
+
+# graf_pozos_terminados <- pozos_terminados %>%
+#   ggplot(aes(anio, pozos , fill = empresa))+
+#   geom_col()+
+#   theme(axis.text.x = element_text(angle = 90),
+#         legend.position = "none")+
+#   labs(title = "Cantidad de pozos terminados",
+#        caption = "Secretaría de Energía")
+# ggplotly(graf_pozos_terminados, width = 600, height = 400)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#pozos iapg (bases anuales)
+pozo_iapg_05 <- read_excel( "../data/iapg/POZOSPERFORADOS_2005.xls", 
+    skip = 1) %>% 
+  mutate(anio = 2005) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_06 <- read_excel("../data/iapg/POZOSPERFORADOS_2006.xls", 
+    skip = 1) %>% 
+  mutate(anio = 2006) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_07 <- read_excel("../data/iapg/POZOSPERFORADOS_2007.xls", 
+    skip = 1) %>% 
+  mutate(anio = 2007) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_08 <- read_excel("../data/iapg/POZOSPERFORADOS_2008.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2008) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_09 <- read_excel("../data/iapg/POZOSPERFORADOS_2009.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2009) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_10 <- read_excel("../data/iapg/POZOSPERFORADOS_2010.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2010) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_12 <- read_excel("../data/iapg/POZOSPERFORADOS_2012.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2012) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_13 <- read_excel("../data/iapg/POZOSPERFORADOS_2013.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2013) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_14 <- read_excel("../data/iapg/POZOSPERFORADOS_2014.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2014) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_15 <- read_excel("../data/iapg/POZOSPERFORADOS_2015.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2015) %>% 
+  group_by(Operador) %>% 
+  mutate_all(as.double)
+
+pozo_iapg_16 <- read_excel("../data/iapg/POZOSPERFORADOS_2016.xls", 
+    skip = 2) %>% 
+  mutate(anio = 2016)
+
+pozo_iapg_17 <- read_excel("../data/iapg/POZOSPERFORADOS_2017.xls", 
+    skip = 2)  %>% 
+  mutate(anio = 2017)
+
+pozo_iapg_18 <- read_excel("../data/iapg/POZOSPERFORADOS_2018.xls", 
+    skip = 2)  %>% 
+  mutate(anio = 2018)
+
+pozo_iapg_19 <- read_excel("../data/iapg/POZOSPERFORADOS_2019.xls", 
+    skip = 2)  %>% 
+  mutate(anio = 2019) %>% 
+  rename("Total Pozos" = "Total Pozos Terminados")
+
+#se me colaron algunas filas de totales que hay que borrar
+pozos_iapg <- pozo_iapg_05 %>% 
+  bind_rows(pozo_iapg_06, pozo_iapg_07, pozo_iapg_08, pozo_iapg_09, 
+            pozo_iapg_10, pozo_iapg_12, pozo_iapg_13, pozo_iapg_14, pozo_iapg_15,
+            pozo_iapg_16, pozo_iapg_17, pozo_iapg_18, pozo_iapg_19) %>%
+  rename(total_pozos =  "Total Pozos") %>% 
+  filter(!(Operador %in% c("Totales", "TOTAL")) & !(is.na(Operador)) ) %>% 
+  mutate(empresa =case_when(Operador == "YPF S.A." ~ "YPF",
+                            Operador == "PAN AMERICAN ENERGY (SUCURSAL ARGENTINA) LLC" ~ "PAE",
+                            Operador == "PAN AMERICAN ENERGY SL" ~ "PAE",
+                            Operador == "PAN AMERICAN" ~ "PAE",
+                            Operador == "PETROBRAS ARGENTINA S.A." ~ "Petrobras",
+                            Operador == "PESA (PETROBRAS E.S.A.)" ~ "Petrobras",
+                            Operador == "TECPETROL S.A." ~ "Tecpetrol",
+                            Operador == "PLUSPETROL S.A." ~ "Pluspetrol",
+                            Operador == "SINOPEC ARGENTINA EXPLORATION INC" ~ "Sinopec",
+                            Operador == "COMPAÑÍA GENERAL DE COMBUSTIBLES S.A." ~ "CGC",
+                            Operador == "VISTA OIL & GAS ARGENTINA SA" ~ "Vista Oil and Gas",
+                            Operador == "VISTA OIL & GAS ARGENTINA SAU" ~ "Vista Oil and Gas",
+                            Operador == "WINTERSHALL ENERGIA S.A." ~ "Wintershall",
+                            Operador == "ENAP SIPETROL ARGENTINA S.A." ~ "ENAP SIPETROL",
+                            Operador == "YSUR ENERGÍA ARGENTINA S.R.L." ~ "YSUR",
+                            Operador == "YSUR PETROLERA ARGENTINA S.A" ~ "YSUR",
+                            Operador == "TOTAL AUSTRAL S.A." ~ "Total Austral",
+                            T ~ Operador)) %>%
+  filter(!is.na(empresa)) %>% 
+  ungroup() %>% 
+  select(empresa, anio,total_pozos) %>% 
+  group_by(anio, empresa) %>% 
+  summarise(total_pozos = sum(total_pozos)) %>% 
+  arrange(anio)
+pozos_iapg
+
+# graf_pozos_iapg <- pozos_iapg %>% 
+#   ggplot(aes(anio, total_pozos, fill = empresa))+
+#   geom_col()+
+#   theme(axis.text.x = element_text(angle = 90),
+#         legend.position = "none")+
+#   labs(title = "Pozos perforados",
+#        caption = "IAPG")
+# ggplotly(graf_pozos_iapg, width = 600, height = 400)
+```
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#pozos iapg acumulados
+pozos_iapg_centenario <- read_delim("../data/iapg/pozos_iapg_centenario.csv", ";",
+                                    escape_double = FALSE, trim_ws = TRUE) %>% 
+  rename(totales = totale)
+
+# graf_pozos_iapg_centenario <- pozos_iapg_centenario %>% 
+#   ggplot(aes(anio, totales))+
+#   geom_col()+
+#   theme(axis.text.x = element_text(angle = 90),
+#         legend.position = "none")+
+#   labs(title = "Pozos en extracción definitiva",
+#        caption = "IAPG")
+# ggplotly(graf_pozos_iapg_centenario, width = 600, height = 400)
+
+
+# comparacion de fuentes
+comparacion_pozos <- pozos_iapg %>% 
+  group_by(anio) %>% 
+  summarise(pozos_perforados_iapg = sum(total_pozos, na.rm = T)) %>% 
+  right_join(pozos_terminados %>%
+               group_by(anio) %>% 
+               summarise(pozos_terminados_sec_energia = sum(pozos, na.rm = T))) %>% 
+  right_join(listado_pozos %>% 
+                rename(anio = anio_terminacion_pozo) %>% 
+                group_by(anio) %>% 
+                summarise(pozos_cargados_sec_energia = sum(pozos, na.rm = T))) %>% 
+  full_join(pozos_iapg_centenario %>% 
+              mutate(variacion_pozos = variacion_interanual(totales)) %>%
+              select(anio, pozos_variacion_iapg = variacion_pozos)) 
+
+
+# graf_pozos <- comparacion_pozos %>%
+#   gather(key = "fuente",
+#          value = "valor",
+#          2:ncol(.)) %>% 
+#   ggplot(aes(anio, valor, color = fuente))+
+#   geom_line()+
+#   # geom_point()+
+#   ylim(0, 1700 )+
+#   labs(title = "Pozos. Comparación de fuentes")+
+#   theme(legend.position = "bottom")
+# ggplotly(graf_pozos, width = 800, height = 400)
+```
+
+
+
+
+
+### Análisis de correlación entre Inversión y Pozos
+
+- buscar correlacion, para ver si la serie de inversión se mueve similar a los pozos
+- usar stock y ademas usar variacion de stock (bs de uso)
+
+Con pozos de IAPG
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# con inversiones realizadas año anterior
+inversion_pozos <- pozos_iapg %>% 
+  left_join(inversiones_anio_anterior %>%
+              ungroup(), by = c("empresa", "anio")) %>% 
+  mutate(inversion_por_pozo = inversion_explotacion /total_pozos)
+
+#con inversiones anunciadas
+inversion_pozos_2 <- pozos_iapg %>% 
+  left_join(inversiones_2005_2012 %>%
+              ungroup(), by = c("empresa", "anio")) %>% 
+  mutate(inversion_por_pozo = inversion_anual /total_pozos)
+
+#esta mal pq es flujo de pozos vs stock de capital
+# kta_pozos <- pozos_iapg %>% 
+#   left_join(stock_balances_empresas %>%
+#               ungroup() %>% 
+#               select(-sector), by = c("empresa", "anio")) %>% 
+#   mutate(ppye_por_pozo = prop_plant_equip /total_pozos)
+
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# graf_inversion_pozo <- inversion_pozos %>% 
+#   filter( anio >= 2012) %>%
+#   ggplot(aes(anio,inversion_por_pozo, color = empresa ))+
+#   geom_line()+
+#   geom_point()+
+#   labs(title = "Inversiones año anterior sobre pozos IAPG", 
+#        y = "Millones de USD")+
+#   theme_classic()
+# ggplotly(graf_inversion_pozo, width = 800, height = 600)
+
+# graf_inversion_pozo_2 <- inversion_pozos_2 %>% 
+#   filter( anio <= 2012) %>%
+#   ggplot(aes(anio,inversion_por_pozo, color = empresa ))+
+#   geom_line()+
+#   geom_point()+
+#   labs(title = "Inversiones realizadas sobre pozos IAPG", 
+#        y = "Millones de USD")+
+#   theme_classic()
+# ggplotly(graf_inversion_pozo_2, width = 800, height = 400)
+```
+
+Con pozos Cap IV
+```{r echo=FALSE}
+# con inversiones realizadas año anterior
+inversion_pozos_capiv <- listado_pozos %>%
+  rename(anio =anio_terminacion_pozo) %>% 
+  left_join(inversiones_anio_anterior %>%
+              ungroup(), by = c("empresa", "anio" )) %>%
+  mutate(inversion_por_pozo = inversion_explotacion /pozos)
+
+graf_inversion_pozo <- inversion_pozos_capiv %>% 
+  filter( anio >= 2012) %>%
+  ggplot(aes(anio,inversion_por_pozo, color = empresa ))+
+  geom_line()+
+  geom_point()+
+  labs(title = "Inversiones año anterior sobre pozos Capitulo IV", 
+       y = "Millones de USD")+
+  theme_classic()+
+  theme(legend.position = "none")
+# ggplotly(graf_inversion_pozo, width = 700, height = 400)
+
+
+```
+
+
+
+
+
+
+
+
+
+### Estimación de stock de capital a partir de la evolución de pozos perforados
+
+
+El ejercicio consiste en verificar si los pozos terminados sirven como indicador de la inversión y, por lo tanto, de aproximador al stock de capital adelantado. Para ello se parte de un año base de la serie de Propiedad, Planta y Equipo del sector extracción de Bolsar y AFIP, para luego indexar las variables por la evolución de los pozos. Los balances de Bolsar que corresponden únicamente a extracción son dos: PAE y Tecpetrol, por lo que el valor obtenido puede estar subrepresentado para dar cuenta del total de la rama. Con respecto al índice de pozos, se tomaron dos series alternativas: una construída a partir del stock de pozos en extracción efectiva (fuente: IAPG) y otra elaborada con los pozos terminados anuales cargados por empresa operadora (fuente: Secretaría de Energía).  
+
+El año base elegido es 2006, dado que es el último dato que poseemos del stock de pozos totales en actividad de IAPG.
+
+Se realizó la misma estimación para YPF, filtrando las variables de Propiedad, Planta y Equipo (para el total de la empresa, por lo que incluye no sólo extracción sino refinación y otros rubros) y activo total del upstream. Se utilizó únicamente el indice de pozos terminados anuales de YPF para estimar la PPyE y el  activo, dado que no se posee valores del stock de pozos en perforación para los años en donde existen valores contables que sirvan de año base. Luego, se estimó un stock de capital total de rama a partir de ponderar el stock de YPF por la relación entre los pozos de YPF y los pozos totales de la rama.
+
+
+En síntesis, el listado de variables estimadas- a partir de las dos series de pozos (stock y flujo),salvo para la estimación de YPF que solo se pudo hacer con flujo de pozos por ausencia de información- es las siguientes:
+
+* $ppye\_estimado\_bolsar$ = $PPyE\ año\ base\ de\ Bolsar$ * $indice\ de\ pozos$
+* $ppye\_estimado\_afip$ = $PPyE\ año\ base\ de\ AFIP$ * $indice\ de\ pozos$
+
+* $ppye\_estimado\_ypf$ = $PPyE\ año\ base\ de\ YPF$ * $indice\ de\ pozos\ YPF$
+* $activo\_estimado\_upstream\_ypf$ = $Activo\ año\ base\ de\ YPF$ * $indice\ de\ pozos\ YPF$
+
+* $ppye\_estimado\_total$ = $ppye\_estimado\_ypf$ * $$\frac{pozos\ totales}{pozos\ de\ YPF}$$
+
+* $activo\_estimado\_upstream$ = $activo\_estimado\_upstream\_ypf$  * $$\frac{pozos\ totales}{pozos\ de\ YPF}$$
+
+Para poder seleccionar la estimación más adecuada, se realizó un análisis de correlación entre todas las series estimadas y los valores contables que se poseen de PPyE de AFIP, Bolsar e YPF. Se presentan distintos cuadros de correlaciones, con sus nivles de significancia, diagramas de dispersión entre variables y su distribución. Las series construídas que poseen mejor correlación son la Propiedad, Planta y Equipo a partir de Bolsar estimadas con índice de stock de pozos (correlación fuerte de 0.89 y significativa al 0.001) y flujo de pozos (correlación moderada de 0.54 y significativa al 0.05) y luego el activo del upstream total de la rama a partir de YPF (correlación moderada de 0.42 y significativa al 0.1 con los valores contables de YPF y correlación fuerte de 0.88 y significativa al 0.001 con las estimaciones de PPyE de AFIP y Bolsar a partir de flujo de pozos).
+
+la estimación tiene que realizarse con PPyE porque hay que excluir salarios e inventarios (que están en KTA)
+
+#### Análisis de correlacion entre Propiedad, Planta y Equipo y Pozos en producción
+
+
+reemplazar ipc por un ibif o indice especifico
+
+##### Total rama
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+stock_y_pozos_tasas <- stock_rama %>% 
+  filter(variable == "ppye" & sector %in% c("extraccion_petroleo_gas", "produccion")) %>%
+  select(anio, valor,fuente) %>%
+  arrange(anio) %>% 
+  spread(key = fuente, value = valor) %>% 
+  mutate(AFIP = variacion_interanual(AFIP),
+         Bolsar = variacion_interanual(Bolsar)) %>% 
+  full_join(comparacion_pozos 
+            %>%
+            # select(- pozos_perforados_iapg)
+            select(- pozos_variacion_iapg)
+            , by = "anio") %>%
+  rename(ppye_afip = AFIP,
+         ppye_bolsar = Bolsar,
+         pozos_iapg = pozos_perforados_iapg,
+         # pozos_iapg_centenario = pozos_variacion_iapg,
+         pozos_terminados = pozos_terminados_sec_energia,
+         pozos_cargados = pozos_cargados_sec_energia ) %>% 
+  arrange(anio) %>%
+  filter(anio > 1998) %>%
+  select(-anio) %>%
+  mutate_all(tasa_crecimiento)  
+  
+
+
+GGally::ggpairs(stock_y_pozos_tasas, lower = list(continuous = "smooth"))
+plot(stock_y_pozos_tasas)
+
+# round(var(stock_y_pozos_tasas, na.rm = TRUE), 4)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#matriz de correlacion
+cor_pozos <- cor(stock_y_pozos_tasas, use = "complete.obs")
+cor_pozos
+
+#  distintos correlogramas
+#con ggcorrplot
+library(ggcorrplot)
+p.mat = cor_pmat(stock_y_pozos_tasas)
+ggcorrplot(cor_pozos, hc.order = TRUE,
+    type = "lower", p.mat = p.mat, lab = T)
+
+# # #con corrplot
+# col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+# corrplot::corrplot(cor_pozos, method="color", col=col(200),
+#          type="upper", order="hclust",
+#          addCoef.col = "black", # Add coefficient of correlation
+#          tl.col="black", tl.srt=45, #Text label color and rotation
+#          # Combine with significance
+#          # p.mat = p.mat,
+#          # insig = "blank",
+#          sig.level = 0.01)
+
+# # #con gggally
+# GGally::ggcorr(stock_y_pozos_tasas, method = c("complete.obs", "pearson") ,
+#                label = T, label_round = 2)
+```
+
+```{r}
+#años base 2006
+ppye_anio_base_bolsar <- (stock_rama %>% 
+  filter(variable == "ppye" & sector == "produccion") %>%
+  select(anio, unidad, ppye = valor))
+ppye_anio_base_bolsar <- ppye_anio_base_bolsar$ppye[ppye_anio_base_bolsar$anio ==2006]
+
+# valor_base <- serie[which(fecha==fecha_base)]
+
+ppye_anio_base_afip <- (stock_rama %>% 
+  filter(variable == "ppye" & sector == "extraccion_petroleo_gas") %>%
+  select(anio, unidad, ppye = valor))
+ppye_anio_base_afip <- ppye_anio_base_afip$ppye[ppye_anio_base_afip$anio == 2006]
+
+
+stock_y_pozos <-  comparacion_pozos %>% 
+  gather(key = fuente_pozo,
+         value = cantidad_pozos,
+         2:ncol(.)) %>%
+  arrange(fuente_pozo,anio) %>% 
+  group_by(fuente_pozo) %>% 
+  mutate(indice_pozos_06 = generar_indice(serie= cantidad_pozos ,
+                                        fecha = anio,
+                                        fecha_base = 2006)) %>% 
+  # left_join(stock_rama %>%  
+  #             filter(variable == "ppye" & sector %in% c("extraccion_petroleo_gas", "produccion")) %>%
+  #             select(anio, ppye = valor, fuente_stock = fuente), by = "anio") %>% 
+  mutate(ppye_afip = ppye_anio_base_afip * indice_pozos_06,
+         ppye_bolsar =ppye_anio_base_bolsar * indice_pozos_06,
+         unidad_ppye="Millones de pesos 2018") %>% 
+  gather(key = fuente_ppye,
+         value = ppye_estimado,
+         5:6)
+stock_y_pozos
+
+# ggplotly(stock_y_pozos %>% 
+#   filter(anio >1960) %>% 
+#   ggplot(aes(anio,ppye_estimado , color = fuente_pozo))+
+#   geom_line()+
+#   labs(y= "Millones de pesos de 2018")+
+#   facet_wrap(~fuente_ppye    ),
+#     width = 800, length =500)
+
+#stock estimado a partir de pozos
+stock_estimado <- stock_y_pozos %>% 
+  ungroup() %>% 
+  filter(fuente_pozo =="pozos_cargados_sec_energia", fuente_ppye =="ppye_bolsar") %>% 
+  rename(unidad = unidad_ppye, valor =ppye_estimado) %>% 
+  select(-c(cantidad_pozos, indice_pozos_06, fuente_pozo))
+
+
+#diferencia entre ppye estimada y valor contable de bolsar
+stock_estimado %>% 
+  left_join(stock_rama %>% 
+              filter(fuente=="Bolsar", variable =="ppye", sector == "produccion") %>% 
+              select(anio, unidad, ppye_bolsar = valor)) %>% 
+  na.omit() %>% 
+  mutate(diff = (valor/ppye_bolsar -1)*100)
+
+#cambio stock solo para los años que tenemos BOLSAR
+stock_estimado <- stock_rama %>% 
+              filter(fuente %in% c("Bolsar", "AFIP"), variable =="ppye", 
+                     sector %in% c("produccion", "extraccion_petroleo_gas")) %>% 
+              select(anio, unidad,fuente_ppye=fuente , valor)
+  
+# write.csv(stock_estimado, "../data/balances/stock_estimado(temporal).csv")  
+```
+
+
+###### Stock de pozos
+```{r}
+stock_y_pozos_tasas_v2 <- stock_rama %>% 
+  filter(variable == "ppye" & sector %in% c("extraccion_petroleo_gas", "produccion")) %>%
+  select(anio, valor,fuente) %>%
+  spread(key = fuente, value = valor) %>% 
+  full_join(pozos_iapg_centenario%>%
+            select(anio, pozos_iapg = totales ), by = "anio") %>%
+  rename(ppye_afip = AFIP,
+         ppye_bolsar = Bolsar ) %>% 
+  arrange(anio) %>%
+  filter(anio > 1998) %>%
+  select(-anio) %>%
+  mutate_all(tasa_crecimiento)  
+  
+
+
+GGally::ggpairs(stock_y_pozos_tasas_v2, lower = list(continuous = "smooth"))
+plot(stock_y_pozos_tasas_v2)
+
+# round(var(stock_y_pozos_tasas, na.rm = TRUE), 4)
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#matriz de correlacion
+cor_pozos <- cor(stock_y_pozos_tasas_v2, use = "complete.obs")
+cor_pozos
+
+#  distintos correlogramas
+#con ggcorrplot
+library(ggcorrplot)
+p.mat = cor_pmat(stock_y_pozos_tasas)
+ggcorrplot(cor_pozos, hc.order = TRUE,
+    type = "lower", p.mat = p.mat, lab = T)
+
+# # #con corrplot
+# col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+# corrplot::corrplot(cor_pozos, method="color", col=col(200),
+#          type="upper", order="hclust",
+#          addCoef.col = "black", # Add coefficient of correlation
+#          tl.col="black", tl.srt=45, #Text label color and rotation
+#          # Combine with significance
+#          # p.mat = p.mat,
+#          # insig = "blank",
+#          sig.level = 0.01)
+
+# # #con gggally
+# GGally::ggcorr(stock_y_pozos_tasas, method = c("complete.obs", "pearson") ,
+#                label = T, label_round = 2)
+```

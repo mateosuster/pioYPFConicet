@@ -1,0 +1,79 @@
+---
+title: "Tipos de cambio"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(tidyverse)
+library(lubridate)
+```
+
+
+# [Banco Nacion](https://www.bna.com.ar/Personas)
+```{r}
+procesamiento_bna <- function(actual, nuevo ){
+   nuevo <- nuevo %>% 
+    mutate(fecha = as.Date(Fecha.cotizacion, "%d/%m/%Y" ) ,
+         anio = year(fecha),
+         mes = month(fecha) ,
+         compra = as.double(str_replace(Compra, ",", ".")),
+         venta = as.double(str_replace(Venta, ",", "."))) %>% 
+    select(fecha, anio, mes, compra, venta) 
+   actual <- actual %>% 
+     select(-1) %>% 
+     mutate(fecha = as.Date(fecha))
+  rtn <-  rbind(actual, nuevo) %>% distinct()
+  return(rtn)
+}
+
+y <- read.csv("../data/tcp/tc_bna.csv", sep=",") 
+x <- read.csv("../data/tcp/MyCsvLol.csv", sep=";") 
+
+tc_bna <- procesamiento_bna(actual = y, nuevo = x)
+
+write.csv(tc_bna, file = "../data/tcp/tc_bna.csv", sep = ",")
+
+summary(tc_bna)
+
+
+
+```
+
+# BCRA
+```{r}
+
+procesamiento_bcra <- function(nuevo){
+  nuevo <- nuevo %>%
+    select(c(1,2)) %>%
+    mutate(anio = year(Fecha), mes = month(Fecha) ) %>% 
+    rename( tcc_bcra = "Tipo de Cambio de Referencia - en Pesos - por Dólar" ,
+            fecha = Fecha) 
+  return(nuevo)
+}
+
+month_avg <- function(x,group, valor){
+  rtn <- x %>% 
+    group_by(x$group) %>%
+    summarise(tcc_avg = mean(valor, na.rm=T))
+  return(rtn)
+}
+
+com3500 <- read_excel("../data/tcp/com3500.xls" , skip = 3, sheet = 1) 
+tc_bcra <- procesamiento_bcra(com3500)
+
+summary(tc_bcra)
+
+
+
+tc_bcra_anual <- tc_bcra %>% 
+  group_by(anio) %>% 
+  summarise(tcc_bcra = mean (tcc_bcra, na.rm=T))
+
+write.csv(tc_bcra, "../data/tcp/tc_bcra.csv")
+write.csv(tc_bcra_anual, "../data/tcp/tc_bcra_anual.csv")
+
+
+
+```
+

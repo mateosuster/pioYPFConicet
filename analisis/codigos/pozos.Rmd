@@ -1,0 +1,120 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+pozos <- read_csv("C:/Archivos/Datos/Hidrocarburos/Pozos/capitulo iv/listado-de-pozos-cargados-por-empresas-operadoras.csv") 
+
+glimpse(pozos)
+
+cat_cols <- pozos[ , !purrr::map_lgl(pozos, is.numeric)]
+
+ulst <- lapply(cat_cols, unique)
+
+uniqs <- list()
+
+uniqs[1] = unique(cat_cols$idempresa)
+
+for (i in names(cat_cols)){
+  cat(i, "\n")
+  uniqs <- append(uniqs, unique(cat_cols$i))
+}
+
+
+boxplot(scale(pozos$petroleo))
+
+barplot(table(pozos$gasplus))
+```
+
+```{r}
+summary(pozos[, c("fecha_data", "fecha_data")])
+```
+
+
+
+# [Capítulo IV](http://datos.minem.gob.ar/dataset/produccion-de-petroleo-y-gas-por-pozo)
+
+https://www.se.gob.ar/datosupstream/consulta_avanzada/referencias_civ.pdf 
+
+https://github.com/datosminem/produccion-de-petroleo-y-gas-por-pozo
+
+
+```{r}
+produccin_de_captulo_iv_agrupada_por_yacimiento_y_formacin_productiva <- read_csv("C:/Users/mateo/Downloads/produccin-de-captulo-iv-agrupada-por-yacimiento-y-formacin-productiva.csv")
+
+
+summray(produccin_de_captulo_iv_agrupada_por_yacimiento_y_formacin_productiva)
+```
+
+```{r}
+
+capiv17 <-  read_csv("C:/Users/mateo/Downloads/produccin-de-pozos-de-gas-y-petrleo-2017.csv")
+
+glimpse(capiv17)
+
+```
+```{r}
+capiv17 %>% filter(idpozo == 32171)
+```
+
+
+
+```{r}
+
+cols <- c("tipo_de_recurso" , "cuenca" ,"clasificacion" , 
+  "subclasificacion" , "tipoextraccion" , "tipopozo","tipoestado" )
+
+par(mfrow = c(1,1), mar=c(10,4,4,2))
+for(i in cols){
+  barplot(sort(table(capiv17[, i]
+                     ) , decreasing = T
+               ), las =3,  cex.names=0.8, main = i )#cex.axis=0.5
+}
+
+barplot(table(capiv17[, cols[1]]))
+
+hist(capiv17$prod_gas)
+
+table(capiv17[, "tipo_de_recurso"])
+```
+```{r}
+cat_cols <- capiv17[ , !purrr::map_lgl(capiv17, is.numeric) ] %>% select(-c("fechaingreso", "idempresa"))
+
+ulst <- lapply(cat_cols, unique)
+
+```
+```{r}
+num_cols <- capiv17[ , purrr::map_lgl(capiv17, is.numeric) ] 
+
+summary(num_cols)
+
+```
+```{r}
+library(reshape2)
+
+# ggplot(data = melt(num_cols), aes())
+
+avg_agg <- num_cols  %>% 
+  select(-c("anio","idusuario", "mes")) %>%
+  group_by( idpozo) %>%
+  summarise_all( mean) %>% 
+  mutate(idpozo = as.factor(idpozo)) %>%
+  melt(id =c( "idpozo")) 
+
+
+ggplot(data = avg_agg, aes(value) )+
+  geom_histogram()+
+  facet_wrap(~variable, scales = "free")
+  
+ 
+  # ungroup() %>% 
+    # group_by( "idpozo", "variable") %>%
+  # summarise(value = mean(value, na.rm = T))
+  # 
+
+  
+  
+
+```
+
