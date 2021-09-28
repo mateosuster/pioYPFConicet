@@ -3818,12 +3818,14 @@ library(data.table)
 ganancia_y_pbi = as.data.table(ganancia_y_pbi)
 setnames(ganancia_y_pbi, old = c("ganancia", "pbi"), new = c("G", "PIB_corr"))
 ganancia_y_pbi = na.omit(ganancia_y_pbi)
+ganancia_y_pbi[, `:=` (G = G*10^6, PIB_corr = PIB_corr *10^6)]
 # ganancia_y_pbi = melt(ganancia_y_pbi, id.vars = c("anio", "unidad"), 
 #      variable.name = "codigo_variable", value.name = "valor" )
 # ganancia_y_pbi[, variable := fcase(codigo_variable == "G", "Ganancia total de la economía",
 #                                    codigo_variable == "PIB_corr", "Producto Interno Bruto, precios corrientes",
 #                                    default =  NA)]
-ganancia_y_pbi[, fuente := "Ver anexo"]
+ganancia_y_pbi[, fuente := "Ver anexo metodológico"]
+ganancia_y_pbi[, unidad := "Pesos corrientes"]
 
 
 #TCP
@@ -3835,13 +3837,14 @@ setnames(tcp_anual_b, old = c("tcc", "tcp", "sobrevaluacion"), new = c("TCc", "T
 #                                    codigo_variable == "TCp", "Tipo de cambio de paridad",
 #                                    codigo_variable == "sv", "Sobrevaluación cambiaria",                                
 #                                    default =  NA)]
-tcp_anual_b[, fuente := "Ver anexo"]
+tcp_anual_b[, fuente := "Ver anexo metodológico"]
 
 
 #IPC
 ipc_promedio = as.data.table(ipc_promedio)
 setnames(ipc_promedio, old = c("ipc_03", "ipc_70", "ipc_18"), new = c("IPC_03", "IPC_70", "IPC_18"))
 ipc_promedio[, fecha := NULL]
+ipc_promedio[, fuente := "Ver anexo metodológico"]
 
 # produccion crudo
 prod_merge_crudo = as.data.table(prod_merge_crudo)
@@ -4103,7 +4106,12 @@ precios_exportacion_gas[,variable := "Precio de exportación de gas natural de A
 renta_indirecto_pbi = as.data.table(renta_indirecto)
 renta_indirecto_pbi = renta_indirecto_pbi[anio >1961,c(1,18:19)]  
 setnames(renta_indirecto_pbi, c("renta_pv", "renta_pbi"), c("RvsPV", "RvsPBI") )
+renta_indirecto_pbi[, unidad := "Ratio"]
+setcolorder(renta_indirecto_pbi, c("anio", "unidad", "RvsPV", "RvsPBI"))
+```
 
+
+```{r include=FALSE}
 #
 renta_indirecto = as.data.table(renta_indirecto)
 renta_indirecto = renta_indirecto[anio > 1961,c(1:2, 6:12, 16) ]
@@ -4119,20 +4127,33 @@ setnames(renta_indirecto,
 renta_indirecto[Rret == 0, Rret := NA]
 renta_indirecto[Rreg == 0, Rreg := NA]
 renta_indirecto[Subs == 0, Subs := NA]
+renta_indirecto = merge(renta_indirecto, ipc_promedio[, c("anio", "IPC_18")], by = "anio", all.x = T)
+renta_indirecto[,c("Rdifp_crudo","Rdifp_gas" , "Rret", "Rreg",
+                   "Rsvx_crudo", "Rsvx_gas", "Subs", "Rtt"  )  :=  lapply(.SD, 
+                                                                          function(x) (x*renta_indirecto$IPC_18)*10^6 ),
+        .SDcols = c("Rdifp_crudo","Rdifp_gas" , "Rret", "Rreg", 
+                    "Rsvx_crudo", "Rsvx_gas", "Subs", "Rtt"  ) ]
+renta_indirecto[, unidad := "Pesos corrientes"]
 
-
-#
 renta_directo= as.data.table(renta_directo)
 renta_directo[, ipc_18 := NULL]
 setnames(renta_directo, 
          c("ppye", "tg_hidrocarburos", "tg_normal" , "pv", "subsidios", "gcia_normal_hidrocarburos", "renta_total" ),
          c("Kcfa", "TG_pyg", "TGnorm", "PV", "Subs",  "Gnorm_pyg", "Rtt")
          )
+renta_directo = merge(renta_directo, ipc_promedio[, c("anio", "IPC_18")], by = "anio", all.x = T)
+renta_directo[,c("Kcfa", "TG_pyg", "TGnorm", "PV", "Subs",  "Gnorm_pyg", "Rtt")  :=  lapply(.SD, 
+                                                                          function(x) (x*renta_directo$IPC_18)*10^6 ),
+        .SDcols = c("Kcfa", "TG_pyg", "TGnorm", "PV", "Subs",  "Gnorm_pyg", "Rtt") ]
+renta_directo[, unidad := "Pesos corrientes"]
 
 #
 renta_directo_pbi = as.data.table(renta_directo_pbi)
 renta_directo_pbi = renta_directo_pbi[,c(1,14:15)]            
 setnames(renta_directo_pbi, c("renta_pv", "renta_pbi"), c("RvsPV", "RvsPBI") )
+renta_directo_pbi[, unidad := "Ratio"]
+setcolorder(renta_directo_pbi, c("anio", "unidad", "RvsPV", "RvsPBI"))
+
 
 #
 crudo_sobrevaluacion = as.data.table(renta_tcp_crudo[,-c(12:13)])
@@ -4230,6 +4251,8 @@ tg_pg_empresas = as.data.table(renta_empresas_balances)
 tg_pg_empresas[,c( "fecha", "empresa", "sector", "moneda" ,"KTA",  "gcia_ant"  , 
                    "tg_ant" , "tg_desp")]
 
+div_millon <- function(x){ x / 10^6}
+
 #
 ccnn_pg = as.data.table(ccnn_oficial)
 cols = c("anio", "unidad", "fuente",
@@ -4241,6 +4264,13 @@ setnames(ccnn_pg, c("vbp_tot", "va_tot"  ,  "ci_tot","ms_tot",  "ebe_tot" ,
          c("VBP_pyg", "VA_pyg", "CI_pyg", "Kvc_pyg", "G_pyg",
            "VBP_extr", "VA_extr", "CI_extr", "Kvc_extr", "G_extr")
          )
+ccnn_pg[, c("VBP_pyg", "VA_pyg", "CI_pyg", "Kvc_pyg", "G_pyg",
+            "VBP_extr", "VA_extr", "CI_extr", "Kvc_extr", "G_extr")  :=  lapply(.SD, div_millon),
+        .SDcols =  c("VBP_pyg", "VA_pyg", "CI_pyg", "Kvc_pyg", "G_pyg",
+                                                "VBP_extr", "VA_extr", "CI_extr", "Kvc_extr", "G_extr")]
+ccnn_pg[, unidad := "Pesos corrientes"]
+
+
 
 #
 criterio_ccnn_pg = as.data.table(criterio_ccnn)
@@ -4260,6 +4290,15 @@ setnames(criterio_ccnn_pg ,
          "coef_CI", "CI_gyp", "CI_extr",
          "VA_gyp" , "VA_extr", "Kvc_extr" , "Kvc_gyp" , 
          "G_gyp", "G_extr") )
+criterio_ccnn_pg[,c("VBP_gyp", "VBP_extr",
+         "coef_CI", "CI_gyp", "CI_extr",
+         "VA_gyp" , "VA_extr", "Kvc_extr" , "Kvc_gyp" , 
+         "G_gyp", "G_extr")   :=  lapply(.SD, div_millon),
+        .SDcols =  c("VBP_gyp", "VBP_extr",
+         "coef_CI", "CI_gyp", "CI_extr",
+         "VA_gyp" , "VA_extr", "Kvc_extr" , "Kvc_gyp" , 
+         "G_gyp", "G_extr") ]
+criterio_ccnn_pg[, unidad := "Pesos corrientes"]
 
 #
 empalme_ccnn_pg = as.data.table(empalme_ccnn)
@@ -4279,7 +4318,17 @@ setnames(empalme_ccnn_pg ,
          "coef_CI", "CI_gyp", "CI_extr",
          "VA_gyp" , "VA_extr", "Kvc_extr" , "Kvc_gyp" , 
          "G_gyp", "G_extr") )
+empalme_ccnn_pg[,c("VBP_gyp", "VBP_extr",
+         "coef_CI", "CI_gyp", "CI_extr",
+         "VA_gyp" , "VA_extr", "Kvc_extr" , "Kvc_gyp" , 
+         "G_gyp", "G_extr")   :=  lapply(.SD, div_millon),
+        .SDcols =  c("VBP_gyp", "VBP_extr",
+         "coef_CI", "CI_gyp", "CI_extr",
+         "VA_gyp" , "VA_extr", "Kvc_extr" , "Kvc_gyp" , 
+         "G_gyp", "G_extr") ]
+empalme_ccnn_pg[, unidad := "Pesos corrientes"]
 
+#
 VBPextTcp = as.data.table(criterio_propio)
 cols = c("anio", "unidad", "fuente",
          "vbp_tot",
@@ -4306,7 +4355,13 @@ setnames(VBPextTcp ,
          "Kvc_gyp" , 
          "G_gyp"   # "G_extr"
          ) )
+VBPextTcp[,c("VBP_gyp", "CI_gyp", "VA_gyp" ,"Kvc_gyp" ,  "G_gyp")   :=  lapply(.SD, div_millon),
+        .SDcols = c("VBP_gyp", "CI_gyp", "VA_gyp" ,"Kvc_gyp" ,  "G_gyp") ]
+VBPextTcp[, unidad := "Pesos corrientes"]
+```
 
+
+```{r include=FALSE}
 #
 RTPG_comparacion = as.data.table(renta_comparacion) 
 RTPG_comparacion[, "...1" :=NULL]
@@ -4352,6 +4407,7 @@ capture.output(coeficientes, file = "../resultados/argentina/coeficientes.txt")
 
 indice <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "indice")
 variables <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "variables")
+
 writexl::write_xlsx(list(indice = indice,
                          variables= variables ,
                          tipo_cambio = tcp_anual_b,
@@ -4375,7 +4431,7 @@ writexl::write_xlsx(list(indice = indice,
                          ccnn_pg = ccnn_pg,
                          criterio_ccnn_pg=criterio_ccnn_pg, 
                          empalme_ccnn_pg=empalme_ccnn_pg,
-                         VBPextTcp  =criterio_propio ,
+                         VBPextTcp  =VBPextTcp ,
                          
                          RTPG_comparacion = RTPG_comparacion , 
                          
