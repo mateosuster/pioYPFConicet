@@ -24,7 +24,6 @@ output:
   
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 # library(xtable) # ej xtable(tabla) para pasar a latex
-setwd("C:/Archivos/repos/hidrocarburos/analisis/codigos")
 t0  <- Sys.time()
 
 # knitr::opts_chunk$set(echo = FALSE)
@@ -42,6 +41,8 @@ library(Hmisc)
 library(zoo)
 
 options(scipen = 9999999)
+
+# setwd("C:/Archivos/repos/hidrocarburos/analisis/codigos")
 
 ```
 
@@ -406,7 +407,7 @@ prod_merge_crudo <-  prod_regalias_crudo %>%
   filter(anio < 2021)
 
 
-# write.csv(prod_merge_crudo, file = "../resultados/data_viz/produccion_crudo.csv", row.names = F)
+write.csv(prod_merge_crudo, file = "../resultados/data_viz/produccion_crudo.csv", row.names = F)
 
 #diferencia promedio del 6% entre las bases (es mayor la de mecon)
 # summary(prod_merge_crudo)
@@ -688,7 +689,7 @@ precio_mi_crudo <-  precio_mi_crudo %>%
 
   
   
-# write.csv(precio_mi_crudo, file = "../resultados/data_viz/precio_mi_crudo.csv", row.names = F)
+write.csv(precio_mi_crudo, file = "../resultados/data_viz/precio_mi_crudo.csv", row.names = F)
 
 # writexl::write_xlsx(precio_mi_vs_internacional_idee_crudo %>% 
 #                       select(anio,  precio_crudo_neuquina_tc_oficial ) %>% 
@@ -857,7 +858,7 @@ precio_interno_gas_mmbtu_usd <- precio_mi_gas_MMBTU %>%
          value = valor)
 
 
-# write.csv(precio_interno_gas_mmbtu_usd, file = "../resultados/data_viz/precio_mi_gas.csv", row.names = F)
+write.csv(precio_interno_gas_mmbtu_usd, file = "../resultados/data_viz/precio_mi_gas.csv", row.names = F)
 
 #precio revista transpuesto
 # writexl::write_xlsx(precio_mi_idee_gas %>% 
@@ -1070,8 +1071,8 @@ precios_referencia_y_expo_crudo <-  precio_expo_crudo  %>%
   filter(anio < 2021)
 
 
-# write.csv(precios_referencia_y_expo_crudo,
-#                     file = "../resultados/precio_expo_y_mdo_mundial_crudo.csv",row.names = F)
+write.csv(precios_referencia_y_expo_crudo,
+                    file = "../resultados/data_viz/precio_expo_y_mdo_mundial_crudo.csv",row.names = F)
 
 precios_referencia_y_expo_crudo %>% 
   select(-precio_me_crudo)
@@ -1383,8 +1384,8 @@ comparacion_bep <- precio_mdomundial_gas_bep %>%
 #   mutate(unidad = "USD/bep") %>% 
 #   select(anio, unidad, everything(.))
   
-# write.csv(precio_mdomundial_gas_MMBTU, file = "../resultados/data_viz/precio_mdomundial_gas_MMBTU.csv",
-#           row.names = F)
+write.csv(precio_mdomundial_gas_MMBTU, file = "../resultados/data_viz/precio_mdomundial_gas_MMBTU.csv",
+          row.names = F)
 
 # writexl::write_xlsx(list(MMBTU = precio_mdomundial_gas_MMBTU, 
 #                          BEP = precio_mdomundial_gas_bep), path = "resultados/precio_mdo_mundial_gas.xlsx")
@@ -1652,8 +1653,8 @@ expo_usd_crudo <- comex_crudo_sesco %>%
 
 
 
-# write.csv(expo_q_crudo, file = "../resultados/data_viz/expo_q_crudo.csv", row.names = F)
-# write.csv(expo_usd_crudo, file = "../resultados/data_viz/expo_usd_crudo.csv", row.names = F)
+write.csv(expo_q_crudo, file = "../resultados/data_viz/expo_q_crudo.csv", row.names = F)
+write.csv(expo_usd_crudo, file = "../resultados/data_viz/expo_usd_crudo.csv", row.names = F)
 ```
 
 
@@ -1757,8 +1758,8 @@ expo_usd_gas <- expo_sesco_usd_gas %>%
  
 
 
-# write.csv(expo_q_gas, file = "../resultados/data_viz/expo_q_gas.csv", row.names = F)
-# write.csv(expo_usd_gas, file = "../resultados/data_viz/expo_usd_gas.csv", row.names = F)
+write.csv(expo_q_gas, file = "../resultados/data_viz/expo_q_gas.csv", row.names = F)
+write.csv(expo_usd_gas, file = "../resultados/data_viz/expo_usd_gas.csv", row.names = F)
 ```
 
 
@@ -2805,7 +2806,7 @@ valor_total_produccion <-  valor_total_produccion_corr %>%
          unidad = "Millones de pesos de 2018")
 
 
-# write.csv( valor_total_produccion, file = "../resultados/data_viz/valor_total_produccion.csv", row.names = F)
+write.csv( valor_total_produccion, file = "../resultados/data_viz/valor_total_produccion.csv", row.names = F)
 
 
 
@@ -3300,6 +3301,7 @@ $$Impuestos\_netos\_específicos = Retenciones + Regalías - Subsidios$$
 ```{r echo=FALSE}
 # knitr::opts_chunk$set(echo= TRUE,fig.width = 120,fig.height = 400)
 renta_directo <- renta_tg %>% 
+  filter(stock_seleccionado == "Bolsar") %>% 
   select(anio, ppye , #es stock de bolsar
          tg_hidrocarburos, tg_normal = union_tg) %>% 
   left_join(criterio_propio %>% 
@@ -3645,23 +3647,24 @@ costos <- produccion_total %>%
          produccion_crudo =prod_crudo, produccion_gas=prod_gas,
          produccion_total=produccion_total_bep) %>% 
  left_join(stock_estimado %>%
-               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-              # filter(variable == "ppye_estimado_bolsar") %>% 
+               left_join(ipc_promedio %>% select(anio, ipc_18) , by = "anio") %>%
+              filter(fuente_ppye == "Bolsar") %>%
               mutate(consumo_k_fijo = valor * ipc_18 * consumo_k_fijo_ypf) %>% 
-               select(anio, consumo_k_fijo)) %>%
+               select(anio, consumo_k_fijo), by = "anio") %>%
   left_join(valor_total_produccion %>% 
-              left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
-              left_join(tcp_anual_b %>% select(-sobrevaluacion)) %>%
+              # left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
+              left_join(tcp_anual_b %>% select(-sobrevaluacion) , by = "anio") %>%
               filter(variable %in% c("ci_extr", "ms_extr"),
-                     fuente%in% c("CCNN oficial", "Empalme CCNN")) %>% #"Criterio CCNN"
+                     fuente%in% c( "Empalme CCNN")) %>% #"CCNN oficial", "Criterio CCNN"
               mutate(valor = (valor*10^6)*ipc_18/tcc,
                      unidad ="USD tcc") %>% 
-              spread(key=variable, value=valor)) %>% 
+              spread(key=variable, value=valor) , by = "anio") %>% 
   left_join(renta_directo %>% 
               select(anio, #stock_seleccionado,
-                     ppye, tg_normal, renta_total) ) %>% 
+                     ppye, tg_normal, renta_total) , by = "anio") %>% 
   left_join(precios_referencia_y_expo_crudo %>% 
-              select(anio, unidad, precio_referencia_externo = precio_me_crudo)) %>% 
+              select(anio, precio_referencia_externo = precio_me_crudo),by = c("anio")) %>% 
+  filter(!is.na(consumo_k_fijo)) %>% 
   mutate(ppye = (ppye*10^6)*ipc_18/tcc,
          renta_total = (renta_total*10^6)*ipc_18/tcc,
          unidad_costos= "USD/boe",
@@ -3671,11 +3674,15 @@ costos <- produccion_total %>%
          precio_costo_mmbtu = conversor_bepMMBTU_p(precio_costo),
          precio_produccion =costos_totales_sum_gcia_normal/produccion_total,
          precio_venta_potencial = (produccion_total *precio_referencia_externo -
-                                     costos_totales)/produccion_total )
+                                     costos_totales)/produccion_total ) %>% 
+  select(anio, unidad_produccion,produccion_total , 
+         unidad_ccnn = unidad, fuente, costos_totales,
+         unidad_costos, precio_referencia_externo, costos_totales_sum_gcia_normal, precio_costo,
+         precio_costo_mmbtu, precio_produccion, precio_venta_potencial)
          # precio_venta_potencial = ((ppye * tg_normal)+renta_total)/produccion_total)
 # (produccion x precio internacional - costos_totales) / barriles BOE = gcia + renta por barril 
 #expresar en usd tcc y tcp
-costos
+# costos
 
 # costos %>% 
 #            filter(anio > 1997) %>% 
@@ -3871,7 +3878,7 @@ prod_merge_gas_MMBTU[, prod_gas := NULL]
 setnames(prod_merge_gas_MMBTU, 
          old = c("regalias", "mecon" , "sesco", "anuario_combustibles", "sec_energia_prod", "eia" ),
          new = c("Q_gas_regalias", "Q_gas_mecon" , "Q_gas_sesco", "Q_gas_anuario", "Q_gas_sec_energia", "Q_gas_eia")  )
-prod_merge_gas_MMBTU[, variable := "Producción de gas"]
+prod_merge_gas_MMBTU[, variable := "Producción de gas natural"]
 prod_merge_gas_MMBTU = melt(prod_merge_gas_MMBTU, 
                         id.vars = c("anio", "variable", "unidad"), 
                         variable.name = "codigo_variable", value.name = "valor")
@@ -4049,7 +4056,7 @@ precios_referencia_gas[, variable := fcase(
   codigo_variable == "Pext_ttf_gas", "Precio TTF del gas natural en Holanda", 
   codigo_variable == "Pext_canada_gas", "Precio Alberta del gas natural en Canadá",
   codigo_variable == "Pext_oil_mix_mean_oecd", "Precio CIF mix OCDE",
-  codigo_variable == "Pext_asia_lng", "Precio del LNG en Asia", 
+  codigo_variable == "Pext_asia_lng", "Precio del GNL en Asia", 
   codigo_variable == "Pext_eu_gas", "Precio del gas natural en la UE",
   codigo_variable =="Px_gas_bol_arg_ypfb",  "Precio de exportación de gas natural de YPFB hacia Argentina",
   codigo_variable == "Px_gas_bol_bzl_ypfb", "Precio de exportación de gas natural de YPFB hacia Brazil",
@@ -4108,10 +4115,8 @@ renta_indirecto_pbi = renta_indirecto_pbi[anio >1961,c(1,18:19)]
 setnames(renta_indirecto_pbi, c("renta_pv", "renta_pbi"), c("RvsPV", "RvsPBI") )
 renta_indirecto_pbi[, unidad := "Ratio"]
 setcolorder(renta_indirecto_pbi, c("anio", "unidad", "RvsPV", "RvsPBI"))
-```
 
 
-```{r include=FALSE}
 #
 renta_indirecto = as.data.table(renta_indirecto)
 renta_indirecto = renta_indirecto[anio > 1961,c(1:2, 6:12, 16) ]
@@ -4358,10 +4363,8 @@ setnames(VBPextTcp ,
 VBPextTcp[,c("VBP_gyp", "CI_gyp", "VA_gyp" ,"Kvc_gyp" ,  "G_gyp")   :=  lapply(.SD, div_millon),
         .SDcols = c("VBP_gyp", "CI_gyp", "VA_gyp" ,"Kvc_gyp" ,  "G_gyp") ]
 VBPextTcp[, unidad := "Pesos corrientes"]
-```
 
 
-```{r include=FALSE}
 #
 RTPG_comparacion = as.data.table(renta_comparacion) 
 RTPG_comparacion[, "...1" :=NULL]
@@ -4373,12 +4376,13 @@ costos_pg_comparacion = as.data.table(costos_comparacion)
 setnames(costos_pg_comparacion, "costo", "Pcost")
 
 #
-# costos_pg_ccnn= as.data.table (costos %>% distinct())
-# costos_pg_ccnn[complete.cases(costos_totales)]
-```
+costos_pg_ccnn= as.data.table (costos)
+costos_pg_ccnn[, precio_costo_mmbtu := NULL]
+setnames(costos_pg_ccnn, c("produccion_total", "costos_totales", 
+                           "precio_referencia_externo", "costos_totales_sum_gcia_normal",
+                           "precio_costo", "precio_produccion", "precio_venta_potencial"),
+         c("Q_total", "KTc", "P_ext", "KTCGnorm", "Pcost", "Pp", "PvtaPot"))
 
-```{r}
- 
 #concatenacion de all data
 all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU, 
                expo_q_crudo , expo_q_gas_MMBTU,
@@ -4386,7 +4390,7 @@ all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU,
                precios_referencia_crudo, precios_exportacion_crudo, 
                precios_referencia_gas, precios_exportacion_gas,
                regalias_to_vars, retenciones_pg, subsidios_pg),  use.names=TRUE)
-
+write.csv(all_raw_data, "../resultados/argentina/variables.csv", row.names = F)
 
 
 ```
@@ -4395,15 +4399,15 @@ all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU,
 ```{r include=FALSE}
 
 
-coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_s_extraccion,
-                     "Tasa de depreciación de YPF" = consumo_k_fijo_ypf,
-                     "Impuestos promedios MIP 97" = imp_prom_97,
-                     "Coeficiente tecnico MIP 97" = coef_tecnico_97,
-                     "Proporción de la Masa Salarial total promedio 2004-2012"= mean_coef_ms$coef_ms_tot,
-                     "Proporción de la Masa Salarial extraccion promedio 2004-2012"= mean_coef_ms$coef_ms_extr,
-                     "Coeficiente consumo intermedio (Año)" =coef_consumo_intermedio$anio,
-                     "Coeficiente consumo intermedio (1- VA/VBP)" =coef_consumo_intermedio$coef_ci)
-capture.output(coeficientes, file = "../resultados/argentina/coeficientes.txt")
+# coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_s_extraccion,
+#                      "Tasa de depreciación de YPF" = consumo_k_fijo_ypf,
+#                      "Impuestos promedios MIP 97" = imp_prom_97,
+#                      "Coeficiente tecnico MIP 97" = coef_tecnico_97,
+#                      "Proporción de la Masa Salarial total promedio 2004-2012"= mean_coef_ms$coef_ms_tot,
+#                      "Proporción de la Masa Salarial extraccion promedio 2004-2012"= mean_coef_ms$coef_ms_extr,
+#                      "Coeficiente consumo intermedio (Año)" =coef_consumo_intermedio$anio,
+#                      "Coeficiente consumo intermedio (1- VA/VBP)" =coef_consumo_intermedio$coef_ci)
+# capture.output(coeficientes, file = "../resultados/argentina/coeficientes.txt")
 
 indice <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "indice")
 variables <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "variables")
@@ -4435,8 +4439,8 @@ writexl::write_xlsx(list(indice = indice,
                          
                          RTPG_comparacion = RTPG_comparacion , 
                          
-                         costos_pg_comparacion = costos_comparacion 
-                        # costos_pg_ccnn=costos %>% filter(anio >1993)
+                         costos_pg_comparacion = costos_comparacion, 
+                        costos_pg_ccnn= costos_pg_ccnn
                         ),
                     path = "../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx")
 
