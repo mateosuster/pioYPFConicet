@@ -1,0 +1,734 @@
+---
+title: "Análisis de National Oil Company Database"
+author:
+- affiliation: UNGS/CONICET
+  name: Mateo Suster
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+[Link National Oil Company Database](https://www.nationaloilcompanydata.org/)
+
+```{r message=FALSE, warning=FALSE}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(lubridate)
+options (scipen = 999)
+  
+#cargo la base
+nocs_full <- read_csv( "../data/nocs/NRGI-NOCdatabase-FullDataset.csv") %>% 
+   mutate(observation = as.double(observation),
+          anio = (as.Date(parse_date_time(year, orders  = "%Y"))))
+
+hidrocarburos_df <- read_csv("../data/balances/hidrocarburos_df.csv") %>% 
+  select(-"...1")  
+ 
+  
+  
+```
+
+Variables que contiene la base
+```{r message=FALSE, warning=FALSE}
+variables = unique(nocs_full$indicatorName)
+variables
+```
+
+Lista de todas las empresas
+```{r}
+#empresas disponibles
+unique(nocs_full$company)
+```
+
+Cantidad de empresas
+```{r}
+length(unique(nocs_full$company))
+```
+
+
+```{r}
+#filtro exploratorio de empresas 
+filtro_empresas <- c("YPF", "Petrobras", "YPFB", "PDVSA", "Saudi Aramco")
+```
+
+
+```{r}
+#filtro con empresas de América Latina
+empresas_AL <- nocs_full %>% 
+  filter(region ==  "Latin America/Caribbean") %>% 
+  select(company, country) 
+empresas_AL <- empresas_AL[!duplicated(empresas_AL), ]
+
+empresas_AL
+
+```
+
+# Producción
+
+```{r}
+production_graf <-  nocs_full %>% 
+  filter(indicatorName %in% c("Oil production", "Gas production")) %>% 
+  mutate(observation = observation / 1000000,
+         id = 1:nrow(.)) %>%
+  group_by(company, indicatorName, year, region ) %>% 
+  mutate(observation = sum(observation, na.rm = T)) %>% 
+  ggplot(aes(year, observation , color = company))+
+  geom_point(size = 0.8, alpha = 0.9, aes(shape = country))+
+  labs(title =  "Oil & gas production",
+       x = "Año", y = "Millons de barriles de petróleo equivalente/día")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, hjust = 1))+
+  facet_grid(indicatorName~region, labeller = label_wrap_gen(width=17))
+ggplotly(production_graf)
+```
+
+# Activo y Patrimonio Neto 
+
+```{r}
+assets_graf <-  nocs_full %>% 
+  filter(indicatorName %in% c( "Total assets"),
+         year == 2017, units == "USD million",
+         !is.na(observation)) %>%
+  ggplot(aes(x = reorder(company,-observation) , y= observation, fill = company))+
+  geom_col(position = "stack")+
+  labs(title =  "Total assets",
+       x = "Empresa", y = "MM USD")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, hjust = 1))
+  # facet_grid(indicatorName~region, labeller = label_wrap_gen(width=17))
+ggplotly(assets_graf)
+
+```
+
+```{r}
+assets_graf <-  nocs_full %>% 
+  filter(indicatorName %in% c( "Equity"),
+         year == 2017, units == "USD million",
+         !is.na(observation)) %>%
+  ggplot(aes(x = reorder(company,-observation) , y= observation, fill = company))+
+  geom_col(position = "stack")+
+  labs(title =  "Total Equity", subtitle= "Year 2017",
+       x = "Empresa", y = "MM USD")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, hjust = 1))
+  # facet_grid(indicatorName~region, labeller = label_wrap_gen(width=17))
+ggplotly(assets_graf)
+```
+
+# Inversión en capital
+
+
+```{r}
+capex_graf <-  nocs_full %>% 
+  filter(indicatorName %in% c("Capital expenditures"), units == "USD million") %>%
+  ggplot(aes(x = year, y= observation, color = company))+
+  geom_line(aes(linetype = country))+
+  labs(title =  "Capital expenditures (CAPEX)",
+       x = "Año", y = "MM USD")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, hjust = 1),
+        strip.text.y = element_text(size = 7))+
+  facet_grid(~region, labeller = label_wrap_gen(width=15))
+
+ggplotly(capex_graf)
+```
+
+
+# Rentabilidad
+
+## Data Frame con indicadores
+```{r message=FALSE, warning=FALSE}
+
+#para cálculo de rentabilidad
+nocs_df <- nocs_full %>%
+  select(year, company, region, country, productionGroup, indicatorName, units, observation) %>% 
+  filter(indicatorName %in% c("Longterm/fixed assets", "Cash and cash equivalents",
+                               "Net income after taxes", "Income tax",
+                              "Equity","Total assets", 
+                              "Total liabilities" , "Current liabilities" ),
+         units == "USD million") %>%
+  mutate(row_id = 1:nrow(.)
+         # , observation = as.double(observation)
+         ) %>%
+  spread(.,
+         key = indicatorName,
+         value = observation) %>% 
+  select(-c(row_id)) %>% 
+  rename( fixed_assets = "Longterm/fixed assets", cash_and_equi = "Cash and cash equivalents",
+         net_income_after_tax = "Net income after taxes" , income_tax = "Income tax",
+         equity = "Equity",  assets = "Total assets",
+         liabilities = "Total liabilities", current_liabilities = "Current liabilities") %>% 
+  mutate(net_income_after_tax = as.double(net_income_after_tax),
+         fixed_assets = as.double(fixed_assets),
+         cash_and_equi = as.double(cash_and_equi),
+         income_tax = as.double(income_tax),
+         equity = as.double(equity),
+         liabilities = as.double(liabilities),
+         year = parse_date_time(year, orders = "y")) %>% 
+  group_by(year, company, country, region, productionGroup, units) %>%
+  summarise(fixed_assets = sum(fixed_assets, na.rm = T),
+            cash_and_equi = sum(cash_and_equi, na.rm = T),
+            net_income_after_tax = sum(net_income_after_tax, na.rm = T),
+            income_tax = sum(income_tax, na.rm =  T),
+            assets = sum(assets, na.rm =  T),
+            liabilities = sum(liabilities, na.rm =  T),
+            current_liabilities = sum(current_liabilities, na.rm =  T),
+            equity = sum(equity, na.rm =  T),
+            KTA = cash_and_equi + fixed_assets,
+            tg_beforetax = (income_tax + net_income_after_tax) / KTA,
+            tg_aftertax = net_income_after_tax / KTA,
+            ratio_endeudamiento = liabilities / equity, 
+            ratio_endeudamiento_cp = current_liabilities/equity,
+            pasivo_activo = liabilities/assets,
+            ratio_solvencia =  equity /liabilities) 
+
+# nocs_df %>% arrange(-tg_aftertax) %>% 
+#   select(company, KTA, tg_aftertax)
+
+nocs_df
+
+nocs_df[sapply(nocs_df, is.infinite)] <- NA
+
+
+```
+
+## Rentabilidad media de la rama
+```{r message=FALSE, warning=FALSE}
+tg_media <- nocs_df %>%
+    group_by(year) %>% 
+    summarise(
+                  tg_media_before_tax = sum(income_tax, net_income_after_tax, na.rm =  T)/ 
+                                                        sum(fixed_assets, cash_and_equi, na.rm = T),
+                  tg_media_after_tax = sum(net_income_after_tax, na.rm =  T) / 
+                                                        sum(fixed_assets, cash_and_equi, na.rm = T)) %>% 
+                  # tg_media_before_tax_mean = sum(mean(income_tax, na.rm =  T), 
+                  #                                mean(net_income_after_tax, na.rm = T), na.rm = T)/ 
+                  #                             sum(mean(fixed_assets, na.rm = T), 
+                  #                                 mean(cash_and_equi, na.rm = T), na.rm = T),
+                  # tg_media_after_tax_mean = mean(net_income_after_tax, na.rm = T)/ 
+                  #                             sum(mean(fixed_assets, na.rm = T), 
+                  #                                 mean(cash_and_equi, na.rm = T), na.rm = T)) %>% 
+     gather(.,
+               key = variable,
+               value = valor, 
+               2:3) 
+    # mutate(metodo = case_when( str_sub(variable[-3])))
+                
+
+tg_media_graf <- tg_media %>% 
+  # filter(variable == "tg_media_before_tax_mean") %>% 
+  ggplot(aes(year, valor, color = variable))+
+  geom_line()+
+  labs(title =  "NOC's. Tasa de Ganancia media")+
+  theme(legend.position = "bottom")+
+  scale_y_continuous(labels = scales::percent)
+tg_media_graf
+     
+```
+
+```{r message=FALSE, warning=FALSE}
+nocs_df_con_media <- nocs_df %>% 
+  bind_rows(tg_media %>% 
+              spread(key = variable,
+                     value = valor) %>% 
+              mutate(company = "TG Media") %>% 
+              rename(tg_beforetax = tg_media_before_tax,
+                     tg_aftertax = tg_media_after_tax)) %>% 
+  mutate(is_media = case_when(company == "TG Media" ~ "media",
+                              TRUE ~ "empresas"))
+
+write.csv(nocs_df_con_media, file = "../resultados/comparacion_paises/nocs_df_con_media.csv")
+
+graf_media_line <- nocs_df_con_media %>% 
+  ggplot(aes(year, tg_aftertax, color = company, group = is_media))+
+  geom_line()+
+  geom_point()+
+  labs(title =  "NOC's. Rentabilidad media y del resto de las empresas después de impuestos")+
+  theme(legend.position = "none")+
+  scale_y_continuous(labels = scales::percent, limits = c(-0.30, 0.70),breaks = seq(-0.30, 0.70, .1))
+graf_media_line
+```
+
+
+```{r message=FALSE, warning=FALSE}
+graf_media_box <- nocs_df %>% 
+  # ggplot(aes(year, tg_aftertax, color = company, size = is_media))+
+  ggplot(aes(year, tg_aftertax, color = company, group = year))+
+  geom_boxplot()+
+  # ggplot(aes(data = nocs_df_con_media %>% filter(company == "TG Media"), year, tg_aftertax))+
+  # geom_line()+
+  labs(title =  "NOC's. Rentabilidad despues de impuestos")+
+  theme(legend.position = "none")+
+  scale_y_continuous(labels = scales::percent, limits = c(-0.3, .8), breaks = seq(-0.3, .8, 0.1))
+graf_media_box
+```
+
+
+```{r}
+summary(nocs_df %>% 
+  group_by(year, productionGroup) %>% 
+  summarise(tg_aftertax = mean(tg_aftertax, na.rm = T)) %>% 
+  spread(.,
+         key = productionGroup,
+         value =  tg_aftertax))
+
+```
+
+
+## Rentabilidad según tamaño
+```{r message=FALSE, warning=FALSE}
+tg_graf_prod_group <- nocs_df %>% 
+  # filter(tg_aftertax != 0 & fixed_assets > 0 & tg_aftertax < 5 & tg_aftertax > -20 ) %>%  
+  ggplot(aes(year, tg_aftertax, color = company))+
+  geom_line()+
+  labs(title =  "NOC's. Rentabilidad despues de impuestos. División por tamaño")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, hjust = 1))+
+  scale_y_continuous(labels = scales::percent, limits = c(-0.3, .8), breaks = seq(-0.3, .8, 0.20))+
+  facet_grid(~productionGroup,  labeller = label_wrap_gen(width=17))
+plotly::ggplotly(tg_graf_prod_group)
+```
+
+
+## Rentabilidad según región
+```{r message=FALSE, warning=FALSE}
+tg_graf_xregion <- nocs_df %>% 
+  filter(tg_aftertax != 0 & fixed_assets > 0 & tg_aftertax < 1 & tg_aftertax > -20 ) %>%
+  ggplot(aes(year, tg_aftertax, color = company))+
+  geom_line()+
+  labs(title =  "NOC's. Rentabilidad despues de impuestos. División por regións")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, hjust = 1))+
+  scale_y_continuous(labels = scales::percent)+
+  facet_grid(~region,  labeller = label_wrap_gen(width=17))
+
+plotly::ggplotly(tg_graf_xregion)
+
+```
+
+## YPF, Petrobras y empresas seleccionadas
+
+```{r}
+filtro_emp_df <-  nocs_df  %>%
+  ungroup() %>% 
+  mutate(company = case_when(!(company %in% filtro_empresas) ~ "Media (resto de empresas)",
+                             T ~ company)) %>% 
+  group_by(year, company) %>%
+  summarise(fixed_assets = sum(fixed_assets, na.rm = T),
+            cash_and_equi = sum(cash_and_equi, na.rm = T),
+            net_income_after_tax = sum(net_income_after_tax, na.rm = T),
+            income_tax = sum(income_tax, na.rm =  T),
+            liabilities = sum(liabilities, na.rm =  T),
+            equity = sum(equity, na.rm =  T),
+            KTA = cash_and_equi + fixed_assets,
+            tg_beforetax = (income_tax + net_income_after_tax) / KTA,
+            tg_aftertax = net_income_after_tax / KTA,
+            ratio_endeudamiento = liabilities / equity, 
+            ratio_solvencia =  equity /liabilities)
+filtro_emp_df
+
+
+tg_filtro_graf <- filtro_emp_df %>% 
+  filter(tg_aftertax != 0 & fixed_assets > 0 & tg_aftertax < 5 & tg_aftertax > -20 ) %>%  
+  ggplot(aes(year, tg_aftertax, color = company))+
+  geom_line()+
+  labs(title =  "Rentabilidad",
+       subtitle =  "Empresas seleccionadas")+
+  # theme(legend.position = "none")+
+  # facet_wrap(~productionGroup)+
+  scale_y_continuous(labels = scales::percent)
+
+  
+ggplotly(tg_filtro_graf)
+```
+
+```{r}
+tg_graf_ypf <- nocs_df %>%  
+  mutate(is_ypf = case_when(company == "YPF" ~ "YPF" ,
+                            TRUE ~ "Other")) %>% 
+  filter(tg_aftertax != 0 & fixed_assets > 0 & tg_aftertax < 1 & tg_aftertax > -20 ) %>%
+  ggplot(aes(year, tg_aftertax, color = is_ypf))+
+  # ggplot(aes(year, tg_aftertax, color = company, size = is_ypf))+
+  geom_point(alpha = 0.6)+
+  stat_smooth(level = 0.30)+
+  labs(title =  "NOC's. Rentabilidad de YPF vs resto de las empresas")+
+  theme(legend.position = "none")+
+  scale_y_continuous(labels = scales::percent, limits = c(-0.35, 0.75))
+
+ggplotly(tg_graf_ypf)
+
+```
+
+
+
+```{r}
+# ruta_graf_tg <- "tg_filtro_graf.png"
+# png(ruta_graf_tg)
+# print(tg_filtro_graf)
+# dev.off()
+
+```
+
+```{r eval=FALSE, include=FALSE}
+filtro_emp_df <-  nocs_df  %>%
+  ungroup() %>% 
+  mutate(company = case_when(!(company %in% filtro_empresas) ~ "Resto",
+                             T ~ company)) %>% 
+  group_by(year, company) %>%
+  summarise(fixed_assets = sum(fixed_assets, na.rm = T),
+            cash_and_equi = sum(cash_and_equi, na.rm = T),
+            net_income_after_tax = sum(net_income_after_tax, na.rm = T),
+            income_tax = sum(income_tax, na.rm =  T),
+            liabilities = sum(liabilities, na.rm =  T),
+            equity = sum(equity, na.rm =  T),
+            KTA = cash_and_equi + fixed_assets,
+            tg_beforetax = (income_tax + net_income_after_tax) / KTA,
+            tg_aftertax = net_income_after_tax / KTA,
+            ratio_endeudamiento = liabilities / equity, 
+            ratio_solvencia =  equity /liabilities) 
+filtro_emp_df
+
+
+tg_ypf_petrobras <- filtro_emp_df %>% 
+  filter(company %in% c("YPF"   ,   "Petrobras")) %>% 
+  ggplot(aes(year, tg_aftertax, color = company))+
+  geom_line()+
+  labs(title =  "Tasa de Ganancia después de impuestos",
+       subtitle =  "NOC's. Empresas seleccionadas")+
+  # theme(legend.position = "none")+
+  # facet_wrap(~productionGroup)+
+  scale_y_continuous(labels = scales::percent)
+
+ggplotly(tg_ypf_petrobras)
+```
+
+# Analisis de correlación 
+```{r}
+#Correlación entre KTA y ganancias después de impuestos
+cor(x = nocs_df$KTA, 
+    y = nocs_df$net_income_after_tax, use = "complete.obs",
+    method = "spearman")
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+graf_corr_kta_gcia <- nocs_df %>%
+  #  filter(productionGroup == "Large domestic producers",
+  #   tg_aftertax != 0 & fixed_assets > 0 & tg_aftertax < 2.5 & tg_aftertax > -20 ) %>%
+  ggplot(aes(KTA, net_income_after_tax))+
+  geom_point()+
+  geom_smooth()+
+  theme(legend.position = "none")+
+  labs(title = "Análisis de correlación entre ingreso neto y stock de capital",
+       x = "Stock de Capital", y = "Ingreso Neto")
+plotly::ggplotly(graf_corr_kta_gcia)
+```
+
+```{r}
+#Correlación entre CAPEX y ganancias después de impuestos
+nocs_spread <- nocs_full %>% 
+  select(year, company, region, country, productionGroup, indicatorName, units, observation) %>% 
+  filter(units == "USD million") %>% 
+  mutate(row_id = 1:nrow(.)) %>%
+  spread(.,
+         key = indicatorName,
+         value =  observation)
+ 
+nocs_spread_2 <- nocs_full %>%
+  select(year, company, region, country, productionGroup, indicatorName, units, observation) %>% 
+  filter(indicatorName %in% c("Operational expenditures", "Total revenue", 
+                              "Capital expenditures", "Net income after taxes"),
+         units == "USD million") %>%
+  mutate(row_id = 1:nrow(.)) %>%
+  spread(.,
+         key = indicatorName,
+         value = observation) %>%
+  rename(capex = 'Capital expenditures',
+         net_income = "Net income after taxes") %>% 
+  group_by(company, year) %>% 
+  summarise(capex = sum(capex, na.rm = T),
+            net_income = sum(net_income, na.rm = T))
+
+
+
+cor(x = nocs_spread_2$capex, 
+    y = nocs_spread_2$net_income, use = "complete.obs",
+    method = "spearman")
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+graf_corr_kta_gcia <- nocs_spread_2 %>%
+ ggplot(aes(capex, net_income))+
+  geom_point()+
+  geom_smooth()+
+  theme(legend.position = "none")+
+  labs(title = "Análisis de correlación entre ingreso neto y CAPEX",
+       x = "CAPEX", y = "Ingreso Neto")
+plotly::ggplotly(graf_corr_kta_gcia)
+```
+
+
+# Endeudamiento
+
+## Solvencia
+
+$$ Solvencia = \frac{Patrimonio Neto}{Pasivo}$$
+
+```{r}
+nocs_df %>% 
+  ggplot(aes(year, ratio_solvencia ,group = year))+
+  geom_boxplot() +
+  # geom_point(aes(color = company))+
+  # geom_line(aes(group = company))+
+  geom_line(data = nocs_df %>% filter(company == "YPF"), 
+            aes(year, ratio_solvencia,color = "red", group = company), size = 1)+
+  theme(legend.position = "none")+
+  labs(title = "Distribución de ratio de solvencia para todas las empresas e YPF")
+
+ggplot(nocs_df %>% filter(company == "YPF"))+
+  geom_line( aes(year, ratio_solvencia, group = company))+
+  labs(title = "Ratio de solvencia de YPF")
+
+```
+
+
+```{r message=FALSE, warning=FALSE}
+solvencia_graf <- nocs_df %>% 
+  filter(ratio_solvencia >=0 & ratio_solvencia < 4) %>% 
+  ggplot(aes(year, ratio_solvencia, color = company))+
+  geom_point(alpha = 0.5)+
+  labs(title =  "Ratio de solvencia todas las empresas")+
+  theme(legend.position = "none")+
+  # scale_y_continuous(labels = scales::percent)+
+  facet_wrap(~productionGroup)
+ggplotly(solvencia_graf)
+```
+```{r}
+solvencia_graf_2 <- nocs_df %>% 
+  # filter(ratio_solvencia >=0 & ratio_solvencia < 4) %>% 
+  filter(company %in% empresas_AL$company) %>% 
+  ggplot(aes(year, ratio_solvencia, color = company))+
+  geom_point(alpha = 0.5)+
+  labs(title =  "Ratio de solvencia de empresas de AL")+
+  theme(legend.position = "none")+
+  # scale_y_continuous(labels = scales::percent)+
+  facet_wrap(~productionGroup)
+
+ggplotly(solvencia_graf_2)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+solvencia_filtro_graf <- filtro_emp_df %>% 
+  # filter(ratio_solvencia >=0 & ratio_solvencia < 4) %>% 
+  ggplot(aes(year, ratio_solvencia, color = company))+
+  geom_line()+
+  geom_point(alpha = 1, size = 3)+
+  labs(title =  "Ratio de solvencia empresas seleccionadas")+
+  theme(legend.position="bottom")
+  # scale_y_continuous(labels = scales::percent)+
+
+solvencia_filtro_graf
+```
+## Endeudamiento
+
+### Ratio de endeudamiento
+$$ Endeudamiento = \frac{Pasivo}{Patrimonio Neto} $$
+
+```{r}
+nocs_df %>% 
+  ggplot(aes(year, ratio_endeudamiento ,group = year))+
+  geom_boxplot() +
+  # geom_point(aes(color = company))+
+  # geom_line(aes(group = company))+
+  geom_line(data = nocs_df %>% filter(company == "YPF"), 
+            aes(year, ratio_endeudamiento,color = "red", group = company), size = 1)+
+  theme(legend.position = "none")+
+  labs(title = "Distribución de ratio de endeudamiento de NOC's e YPF")+
+  ylim(NA, 15 )
+
+ggplot(nocs_df %>% filter(company == "YPF"))+
+  geom_line( aes(year, ratio_endeudamiento, group = company))+
+  labs(title = "Ratio de endeudamiento de YPF")
+
+nocs_df %>% 
+  ggplot(aes( ratio_endeudamiento ))+#,group = year))+
+  geom_density() +
+  labs(title = "Distribución de ratio de endeudamiento de NOC's")+
+  facet_wrap(~year(year), scales = "free")
+
+# tapply(nocs_df$ratio_endeudamiento, nocs_df$year, summary)
+
+library(data.table)
+nocs_dt = as.data.table(nocs_df)
+nocs_dt[, as.list(summary(ratio_endeudamiento)), by =year]
+```
+
+```{r}
+
+nocs_df %>% 
+  ggplot(aes(year, pasivo_activo ,group = year))+
+  geom_boxplot() +
+  # geom_point(aes(color = company))+
+  # geom_line(aes(group = company))+
+  geom_line(data = nocs_df %>% filter(company == "YPF"), 
+            aes(year, pasivo_activo,color = "red", group = company), size = 1)+
+  theme(legend.position = "none")+
+  labs(title = "Distribución de Pasivo/Activo de NOC's e YPF")
+  # ylim(NA, 15 )
+
+ggplot(nocs_df %>% filter(company == "YPF"))+
+  geom_line( aes(year, pasivo_activo, group = company))+
+  labs(title = "Pasivo/Activo de YPF")
+
+```
+
+
+
+```{r}
+nocs_df %>% 
+  ggplot(aes(year, ratio_endeudamiento_cp ,group = year))+
+  geom_boxplot() +
+  # geom_point(aes(color = company))+
+  # geom_line(aes(group = company))+
+  geom_line(data = nocs_df %>% filter(company == "YPF"), 
+            aes(year, ratio_endeudamiento_cp,color = "red", group = company), size = 1)+
+  theme(legend.position = "none")+
+  labs(title = "Distribución de ratio de endeudamiento CP de NOC's e YPF")+
+  ylim(NA, 12.5 )
+
+ggplot(nocs_df %>% filter(company == "YPF"))+
+  geom_line( aes(year, ratio_endeudamiento_cp, group = company))+
+  labs(title = "Ratio de endeudamiento CP de YPF")
+
+
+```
+
+
+```{r}
+endeudamiento_graf <- nocs_df %>% 
+  filter(ratio_endeudamiento <10 & ratio_endeudamiento > -3 ) %>% 
+  ggplot(aes(year, ratio_endeudamiento, color = company))+
+  geom_point(alpha = 0.5)+
+  labs(title =  "Ratio de endeudamiento todas las empresas")+
+  theme(legend.position = "none")+
+  # scale_y_continuous(labels = scales::percent)+
+  facet_wrap(~productionGroup)
+ggplotly(endeudamiento_graf)
+```
+```{r}
+endeudamiento_graf_al <- nocs_df %>% 
+  filter(ratio_endeudamiento <30 ) %>%
+  filter(company %in% empresas_AL$company ) %>% 
+  ggplot(aes(year, ratio_endeudamiento, color = company))+
+  geom_point(alpha = 0.5)+
+  labs(title =  "Ratio de endeudamiento empresas AL")+
+  theme(legend.position = "none")+
+  # scale_y_continuous(labels = scales::percent)+
+  facet_wrap(~productionGroup)
+ggplotly(endeudamiento_graf_al)
+```
+
+
+
+```{r message=FALSE, warning=FALSE}
+
+endeudamiento_filtro_graf <- filtro_emp_df %>% 
+  # filter(ratio_solvencia >=0 & ratio_solvencia < 4) %>% 
+  ggplot(aes(year, ratio_endeudamiento, color = company))+
+  geom_point(alpha = 1, size = 3)+
+  geom_line()+
+  labs(title =  "Ratio de endeudamiento empresas seleccionadas")+
+  theme(legend.position="bottom")
+  # scale_y_continuous(labels = scales::percent)+
+
+endeudamiento_filtro_graf
+
+
+```
+### Valores absolutos
+
+```{r}
+endeudamiento_all <- nocs_df %>% 
+  # filter(company %in% empresas_AL$company ) %>%
+  ggplot(aes(year, liabilities, color = company))+
+  geom_point(alpha = 0.5)+
+  geom_line()+
+  labs(title =  "Liabilities", y = "USD million")+
+  theme(legend.position="none")+
+  facet_wrap(~productionGroup)
+  # scale_y_continuous(labels = scales::percent)+
+
+ggplotly(endeudamiento_all)
+```
+
+
+```{r}
+endeudamiento_al <- nocs_df %>% 
+  filter(company %in% empresas_AL$company ) %>%
+  ggplot(aes(year, liabilities, color = company))+
+  geom_point(alpha = 0.5)+
+  geom_line()+
+  labs(title =  "Liabilities", y = "USD million")+
+  theme(legend.position="none")+
+  facet_wrap(~productionGroup)
+  # scale_y_continuous(labels = scales::percent)+
+
+ggplotly(endeudamiento_al)
+```
+
+```{r}
+endeudamiento <- filtro_emp_df %>% 
+  filter(company != "Resto") %>%
+  ggplot(aes(year, liabilities, color = company))+
+  geom_point(alpha = 1, size = 3)+
+  geom_line()+
+  labs(title =  "Liabilities", y = "USD million")+
+  theme(legend.position="bottom")
+  # scale_y_continuous(labels = scales::percent)+
+
+endeudamiento
+
+```
+
+
+
+
+
+```{r}
+# writexl::write_xlsx(list(nocs_data = nocs_df ,
+#                          tg_nocs= tg_media), path =  "/Archivos/repos/hidrocarburos/analisis/resultados/argentina/NOC's.xlsx")
+
+```
+
+#cluster
+```{r}
+data_cluster <- nocs_full %>% 
+  filter(year == 2011, units == "USD million" ) %>% 
+  select(company, productionGroup, indicatorName, observation) %>% 
+  mutate(id = 1:nrow(.)) %>% 
+  spread(key = indicatorName, value=observation) %>%
+  replace(is.na(.), 0 )
+  # na.omit()
+
+# data_cluster_z <- scale(data_cluster[4:ncol(data_cluster)])
+
+library(cluster)
+datos_para_cluster = data_cluster[4:ncol(data_cluster)]
+
+cantidad_clusters=2
+
+CL  = kmeans(scale(datos_para_cluster),cantidad_clusters)
+datos$kmeans = CL$cluster
+```
+
