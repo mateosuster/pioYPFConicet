@@ -491,6 +491,8 @@ nocs_df %>%
   # geom_point(aes(color = company))+
   # geom_line(aes(group = company))+
   geom_line(data = nocs_df %>% filter(company == "YPF"), 
+            aes(year, ratio_solvencia,color = "blue", group = company), size = 1)+
+  geom_line(data = nocs_df %>% filter(company == "PDVSA"), 
             aes(year, ratio_solvencia,color = "red", group = company), size = 1)+
   theme(legend.position = "none")+
   labs(title = "Distribución de ratio de solvencia para todas las empresas e YPF")
@@ -546,16 +548,26 @@ solvencia_filtro_graf
 $$ Endeudamiento = \frac{Pasivo}{Patrimonio Neto} $$
 
 ```{r}
-nocs_df %>% 
+plt_endeu <- nocs_df %>% 
   ggplot(aes(year, ratio_endeudamiento ,group = year))+
   geom_boxplot() +
   # geom_point(aes(color = company))+
   # geom_line(aes(group = company))+
+  geom_line(data = nocs_df %>% filter(company == "PDVSA"), 
+            aes(year, ratio_endeudamiento,color = "PDVSA", group = company), size = 1)+
   geom_line(data = nocs_df %>% filter(company == "YPF"), 
-            aes(year, ratio_endeudamiento,color = "red", group = company), size = 1)+
-  theme(legend.position = "none")+
-  labs(title = "Distribución de ratio de endeudamiento de NOC's e YPF")+
-  ylim(NA, 15 )
+            aes(year, ratio_endeudamiento,color = "YPF", group = company), size = 1)+
+  scale_color_manual(name = "Empresa", 
+                     labels = c("PDVSA", "YPF"),
+                     values = c(  "brown4", "blue1"))+
+                     # values = c("PDVSA" =  "red", "YPF" = "blue"))+
+  theme(legend.position = "bottom")+
+  labs(title = "Ratio de endeudamiento de NOC's", x = "", y="",
+       subtitle = "YPF y PDVSA frente al resto de la distribución")+
+  ylim(-3, 5 )
+plt_endeu = plot_theme(plt_endeu)
+ggsave(plot = plt_endeu, file = "../resultados/comparacion_paises/endeudamiento_ypf_pdvsa.png", 
+       width = 10, height = 5)
 
 ggplot(nocs_df %>% filter(company == "YPF"))+
   geom_line( aes(year, ratio_endeudamiento, group = company))+

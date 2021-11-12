@@ -61,7 +61,7 @@ Inversión a partir de Balances
 
 Inversión a partir de Secretaria de Energía
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-inversiones_anio_anterior <- read_csv("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/resolucin-2057-inversiones-realizadas-ao-anterior.csv", 
+raw_data <- read_csv("../data/secretaria_energia/2057/resolucin-2057-inversiones-realizadas-ao-anterior.csv", 
     col_types = cols(`Fecha Fin Tareas` = col_date(format = "%d/%m/%Y"), 
         `Fecha Inicio Tareas` = col_date(format = "%d/%m/%Y"))) %>% 
   rename(anio = "Año de presentación de la DDJJ",
@@ -91,14 +91,16 @@ inversiones_anio_anterior <- read_csv("C:/Archivos/Datos/Hidrocarburos/Inversion
                             empresa == "YSUR ENERGÍA ARGENTINA S.R.L." ~ "YSUR",
                             empresa == "YSUR PETROLERA ARGENTINA S.A." ~ "YSUR",
                             empresa == "TOTAL AUSTRAL S.A." ~ "Total Austral",
-                            T ~ empresa)) %>% 
-  select(anio, empresa, idempresa,  concepto,
-         cantidad_exploracion, cantidad_explotacion,cantidad_exploracion_complementaria,
-         exploracion_millones_usd,explotacion_millones_usd, exploracion_compl_millones_usd ) 
+                            T ~ empresa)) #%>% 
+  # select(anio, empresa, idempresa,  concepto,
+  #        cantidad_exploracion, cantidad_explotacion,cantidad_exploracion_complementaria,
+  #        exploracion_millones_usd,explotacion_millones_usd, exploracion_compl_millones_usd ) 
 
-unique(inversiones_anio_anterior$concepto)
+unique(raw_data$concepto)
+glimpse(raw_data)
+summary(raw_data)
 
-inversiones_anio_anterior <- inversiones_anio_anterior %>% 
+inversiones_anio_anterior <- raw_data %>% 
   # filter(str_detect(concepto, 'pozo')) %>%
   group_by(empresa, anio) %>% 
   summarise(inversion_explotacion = sum(explotacion_millones_usd, na.rm = T),
@@ -113,9 +115,9 @@ inversiones_anio_anterior
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-resolucin_2057_inversiones_realizadas_mensual <- read_csv("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/resolucin-2057-inversiones-realizadas-mensual.csv")
+resolucin_2057_inversiones_realizadas_mensual <- read_csv("../data/secretaria_energia/2057/resolucin-2057-inversiones-realizadas-mensual.csv")
 
-resolucin_2057_inversiones_fin_concesion<- read_csv("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/resolucin-2057-inversiones-realizadas-fin-de-concesin.csv")
+resolucin_2057_inversiones_fin_concesion<- read_csv("../data/secretaria_energia/2057/resolucin-2057-inversiones-realizadas-fin-de-concesin.csv")
 
 resolucin_2057_inversiones_fin_concesion %>%
   rename(anio = "Año de presentación de la DDJJ",
@@ -135,7 +137,7 @@ resolucin_2057_inversiones_fin_concesion %>%
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-inversiones_2005_2012 <- readxl::read_excel("C:/Archivos/Datos/Hidrocarburos/Inversion/Secretaria de Energia/tablas dinamicas/inversiones_2005_2012.xlsx", 
+inversiones_2005_2012 <- readxl::read_excel("../data/secretaria_energia/2057/inversiones_2005_2012.xlsx", 
     col_types = c("numeric", "text", "text", 
         "numeric", "numeric", "numeric"), 
     skip = 8) %>% 

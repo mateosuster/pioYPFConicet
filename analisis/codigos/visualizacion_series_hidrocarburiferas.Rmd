@@ -598,7 +598,7 @@ Donde:
   + 1963 - 1969 & 1989 - 1992: Anuario de YPF
   + 1970 - 1988:  Kozulj y Pistonesi - Revista IDEE
   + 1993 en adelante: Secretaría de Energía - Base Regalías
-  + El dato del año 1992 se dividió por 10, dado que resultaba excesivamente alto, lo cual es metodológicamente inaceptable pero sirve de ejercicio. 
+  
   
 * Precio Mercado Externo:
   + Años 1964 y 1965: Precio de importación de gas proveniente de Bolivia hacia Argentina de UN Comtrade

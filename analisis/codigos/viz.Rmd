@@ -7,10 +7,12 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-```{r include=FALSE}
+rm(list =ls())
+gc()
+
+knitr::opts_chunk$set(echo = TRUE)
+
 # bibliotecas
 library(data.table)
 library(tidyverse)
@@ -225,12 +227,14 @@ Precios de exportación desde Argentina, benchmarks y Precios del mercado de EEU
   
 
 #### Precios de Referencia del Crudo
-* Fuentes seleccionadas para precio_me_crudo: 
+* Fuentes seleccionadas para el precio de referencia de crudo: 
   + entre 1962 y 1992: precio de exportación argentina de UN Comtrade (clasificación SITC as reported)
   + entre 1993-2001 y 2004-2014: precio de exportación argentina de Mecon
   + entre 2002 y 2003: precio de exportación de Argentina de UN Comtrade (Clasificación HS as reported)
   + 2014 en adelante: precio de exportación argentina de Secretaría de Energía (Regalías)
   + Valores faltantes previos a 1992 (1970 - 1985): Brent (Fuente: Inflation Data)
+  
+##### Precios de transacciones spot 
 
 ```{r}
 precio_ref_crudo_plt <-  ggplot(data[ variable == variables[7], ],
@@ -298,6 +302,8 @@ ggplotly(brecha_precio_crudo_plt)  %>%
   + 1966 en adelante: Precio de exportacion de gas desde Bolivia a Argentina de UN Comtrade
   + Datos faltantes para los años previos a 1963 y período 1968-1971
   
+  
+##### Precios de EEUU y Europa  
 ```{r}
 precio_ref_gas_plt <-  ggplot(data[ (variable %in% variables[9:25])&
                                            (!str_detect(variable, "GNL|LNG|OCDE|importación|exportación") ), ],
@@ -378,4 +384,62 @@ ggplotly(precio_impo_gas_plt)  %>%
 ```
 
 
+
+## Exportaciones e Importaciones
+
+* Fuentes
+  + [SESCO Downstream](https://datos.gob.ar/dataset/energia-refinacion-comercializacion-petroleo-gas-derivados-tablas-dinamicas)
+  + INDEC. PORQUE NO ESTÄ EN EL GRAFICO ???
+  + MECON
+  + UNComtrade
+
+#### Exportaciones e Importaciones de Crudo
+* Exportaciones de Crudo: 
+  + 1962 a 1993: UN Comtrade
+  + 1994 en adelante: SESCO Downstream
+  + Los datos faltantes de SESCO se completaron con MECON
+  + Siguen habiendo datos faltantes para los años 1965, 1970-74, 1976-78, 1980-84
+  
+```{r}
+
+expo_usd_crudo = read.csv("../resultados/data_viz/expo_usd_crudo.csv")
+expo_q_crudo = read.csv("../resultados/data_viz/expo_q_crudo.csv")
+
+ggplot(data[ variable == "Exportaciones de petróleo crudo", ],
+                          aes(anio, valor, color = fuente))+
+  geom_line()+
+  labs(title = "Gráfico #. Exportaciones de petróleo crudo. Argentina (1911 - 2020)",
+       y = "Millones de Barriles",
+       x = "Año",
+       caption = "Fuente: elaboración propia en base a Ministerio de Economía, Secretaría de Energía (SESCO), UN-Comtrade")+
+  theme(legend.position = "bottom", plot.caption = element_text(size = 7.5))+
+  scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
+  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
+
+ggplot(data[ variable == "Importaciones de petróleo crudo", ],
+                          aes(anio, valor, color = fuente))+
+  geom_line()+
+  labs(title = "Gráfico #. Importaciones de petróleo crudo. Argentina (1911 - 2020)",
+       y = "Millones de Barriles",
+       x = "Año",
+       caption = "Fuente: elaboración propia en base a Ministerio de Economía, Secretaría de Energía (SESCO), UN-Comtrade")+
+  theme(legend.position = "bottom", plot.caption = element_text(size = 7.5))+
+  scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
+  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
+
+expo_q_crudo %>%
+  select(-expo_crudo) %>%
+  gather(key = fuente, value = valor , 3:ncol(.)) %>%
+  ggplot(aes(x = anio, y = valor, color =fuente ))+
+  geom_line()
+
+expo_usd_crudo %>%
+  select(-expo_crudo) %>%
+  gather(key = fuente, value = valor , 3:ncol(.)) %>%
+  ggplot(aes(x = anio, y = valor, color =fuente ))+
+  geom_line()
+
+
+
+```
 

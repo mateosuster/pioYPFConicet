@@ -17,19 +17,20 @@ conversor_m3MMBTU_p <- function(x){x / 0.0353}
 ```
 
 ```{r}
-tc_bna <- read.csv("data/tcp/tc_bna.csv", sep=";") %>% 
-  mutate(fecha = as.Date(Fecha.cotizacion, "%d/%m/%Y" ) ,
-         anio = year(fecha),
-         mes = month(fecha) ,
-         compra = as.double(str_replace(Compra, ",", ".")),
-         venta = as.double(str_replace(Venta, ",", "."))) %>% 
+tc_bna <- read_csv("../data/tcp/tc_bna.csv" ) %>% #, sep=";") %>% 
+  # mutate(fecha = as.Date(Fecha.cotizacion, "%d/%m/%Y" ) ,
+  #        anio = year(fecha),
+  #        mes = month(fecha) ,
+  #        compra = as.double(str_replace(Compra, ",", ".")),
+  #        venta = as.double(str_replace(Venta, ",", "."))) %>% 
   select(fecha, anio, mes, compra, venta)
 ```
 
 
 # Producción y precios del crudo
 ```{r}
-produccion_provincia_crudo <- read_excel("data/regalias/produccion_provincia_crudo.xlsx" , 
+produccion_provincia_crudo <- read_excel("../data/secretaria_energia/regalias/produccion_provincia_crudo.xlsx" ,
+# produccion_provincia_crudo <- read_csv("../data/secretaria_energia/regalias/produccion_crudo_regalias.csv" , 
     skip = 10) %>%
   rename(anio = "AÑO", mes = "MES") %>% 
   mutate(unidad = "m3",         
@@ -42,10 +43,10 @@ produccion_provincia_crudo <- read_excel("data/regalias/produccion_provincia_cru
   ungroup() %>% 
   mutate(unidad = "barriles")
 
-precio_tipo_crudo <- read_excel("data/regalias/precio_tipo_crudo.xlsx", skip = 12) %>% 
+precio_tipo_crudo <- read_excel("../data/secretaria_energia/regalias/precio_tipo_crudo.xlsx", skip = 12) %>% 
   rename(anio = "AÑO", mes = "MES") %>% 
   mutate(unidad = "USD/m3",
-         variable = "Precio Mercado Interno del Crudo ",
+         variable = "Precio Mercado Interno del Crudo",
          anio =zoo::na.locf(anio),
          fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
   select(fecha, mes, anio, variable, unidad, everything(.)) %>% 
@@ -54,9 +55,9 @@ precio_tipo_crudo <- read_excel("data/regalias/precio_tipo_crudo.xlsx", skip = 1
   ungroup() %>% 
   mutate(unidad = "USD/barriles")
 precio_tipo_crudo
+summary(precio_tipo_crudo)
 
-
-precio_provincia_crudo <- read_excel("data/regalias/precio_provincia_crudo.xlsx", skip = 12) %>% 
+precio_provincia_crudo <- read_excel("../data/secretaria_energia/regalias/precio_provincia_crudo.xlsx", skip = 12) %>% 
   rename(anio = "AÑO", mes = "MES") %>% 
   mutate(unidad = "USD/m3",
          variable = "Precio Mercado Interno del Crudo ",
@@ -72,14 +73,14 @@ precio_provincia_crudo
 
 # Producción y precios del gas
 ```{r}
-precio_interno_gas <- read_excel("data/regalias/precio_provincia_gas.xlsx", skip = 12) %>% 
+precio_interno_gas <- read_excel("../data/secretaria_energia/regalias/precio_provincia_gas.xlsx", skip = 12) %>% 
   rename(anio = "AÑO", mes = "MES") %>% 
   mutate(unidad = "ARS/Mm3",
          variable = "Precio Mercado Interno del gas",
          anio =zoo::na.locf(anio),
          fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>%
   gather(key = provincia, value = precio_interno, 3:13) %>% 
-  filter(precio_interno > 0 & provincia == "NEUQUEN") %>% 
+  # filter(precio_interno > 0 & provincia == "NEUQUEN") %>% 
   left_join(tc_bna %>% 
               group_by(anio, mes) %>% 
               summarise(tcn_vendedor = mean(venta, na.rm=T)) %>% 

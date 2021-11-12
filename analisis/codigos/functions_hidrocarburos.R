@@ -54,3 +54,16 @@ generar_indice <-  function(serie,fecha, fecha_base){
   (serie/valor_base)
 }
 
+
+plot_theme <- function(x){
+  x+
+    theme_light()+
+    theme(legend.position = "bottom",
+          plot.title = element_text(size=14),
+          plot.subtitle = element_text(size=12),
+          axis.text = element_text(size = 10),
+          axis.title = element_text(size = 11),
+          legend.text = element_text(size = 11) ,
+          strip.text = element_text(size=10)
+    ) 
+}

@@ -24,6 +24,10 @@ output:
   
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 # library(xtable) # ej xtable(tabla) para pasar a latex
+
+rm(list = ls())
+gc()
+
 t0  <- Sys.time()
 
 # knitr::opts_chunk$set(echo = FALSE)
@@ -204,7 +208,7 @@ renta_hidrocarburos_jk <- read_excel("../data/otros autores/renta_hidrocarburos_
   mutate_at(.vars = c("precio_mi_gas", "precio_bolivia_gas_pesos"),
             .funs = conversor_m3MMBTU_p)
 
-  
+
 renta_precio_expo_crudo_jk <- renta_hidrocarburos_jk %>% 
   select(anio, prod_petcru, expo_crudo, crudo_interno, 
          precio_mi_crudo, precio_me_crudo, TCC, TCP, 
@@ -3383,9 +3387,9 @@ renta_indirecto <- renta_dif_precios_crudo %>%
   mutate_all(function(x) {x / 10^6}) %>% #las vbles cargadas anteriormente se pasan a MM
   mutate_all(function(x) replace_na(x, 0)) %>% 
   ungroup() %>% 
-  # left_join(renta_tg %>% 
-  #             filter(stock_seleccionado == "Bolsar") %>% 
-  #             select(anio, renta_empresas = renta_con_tg_union) ) %>% # saco renta empresas 
+  left_join(renta_tg %>%
+              filter(stock_seleccionado == "Bolsar") %>%
+              select(anio, renta_empresas = renta_con_tg_union) ) %>% # saco renta empresas
   # left_join(renta_directo %>%
   #             filter(stock_seleccionado == "ppye_bolsar") %>%
   #             select(anio, renta_empresas = renta_con_tg_normal) %>% 
@@ -3401,15 +3405,13 @@ renta_indirecto <- renta_dif_precios_crudo %>%
          regalias_total = regalias_total / ipc_18,
          retenciones = retenciones / ipc_18, 
          subsidios = subsidios/ipc_18,
-    # renta_empresas =replace_na(renta_empresas,  0),
-         # renta_empresas = renta_empresas/ipc_18,
-         renta_total = renta_dif_precios_gas+ renta_dif_precios_crudo +
-           renta_sobrevaluacion_crudo + renta_sobrevaluacion_gas +
-           # renta_empresas+
-           regalias_total +  retenciones - subsidios,
-         proporcion_subsidios = subsidios/(renta_dif_precios_gas+ renta_dif_precios_crudo +
-           renta_sobrevaluacion_crudo + renta_sobrevaluacion_gas +
-           regalias_total +  retenciones)  ,
+    subsidios =replace_na(subsidios,  0),
+    renta_empresas =replace_na(renta_empresas,  0),
+         renta_empresas =   renta_empresas/ipc_18,
+         renta_total = rowSums(cbind( renta_dif_precios_gas, renta_dif_precios_crudo ,
+           renta_sobrevaluacion_crudo , renta_sobrevaluacion_gas ,
+           renta_empresas, regalias_total ,  retenciones), na.rm = T) - subsidios,
+         proporcion_subsidios = subsidios/renta_total  ,
          renta_pv = (renta_total*ipc_18)/ganancia,
          renta_pbi = (renta_total*ipc_18)/pbi,
          unidad = "Millones de pesos 2018",
@@ -3427,25 +3429,29 @@ renta_indirecto <- renta_dif_precios_crudo %>%
 
 # 
 # #Renta total
-# graf_renta_total <- renta_indirecto %>%
-#   filter(anio >1960) %>%
-#   mutate(subsidios = subsidios*-1) %>%
-#   select(-c(unidad, ipc_18, renta_total, tcc, tcp,
-#              proporcion_subsidios)) %>%
-#   gather(key = tipo_renta,
-#          value = valor,
-#          2:8) %>%
-#   ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
-#   geom_col(position = "stack")+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta de la tierra hidrocarburífera",
-#        subtitle = "Cursos de apropiación. Millones pesos de 2018",
-#        y = "Millones de pesos 2018")+
-#   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
-#   theme_classic()
-# 
+graf_renta_total <- renta_indirecto %>%
+  filter(anio >1960) %>%
+  mutate(subsidios = subsidios*-1) %>%
+  select(-c(unidad, ipc_18, renta_total, tcc, tcp,
+             proporcion_subsidios)) %>%
+  pivot_longer(cols = c(renta_diferencial_precios_gas, renta_diferencial_precios_crudo ,
+           renta_expo_sobrevaluada_crudo , renta_expo_sobrevaluada_gas ,
+           renta_empresas, regalias_total ,  retenciones, subsidios),
+           names_to = "tipo_renta", values_to = "valor") %>% 
+  # gather(key = tipo_renta,
+  #        value = valor,
+  #        2:8) %>%
+  ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
+  geom_col(position = "stack")+
+  theme(legend.position = "bottom")+
+  labs(title = "Renta de la tierra hidrocarburífera",
+       subtitle = "Cursos de apropiación. Millones pesos de 2018",
+       y = "Millones de pesos 2018")+
+  scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  theme_classic()
+graf_renta_total = plot_theme(graf_renta_total)
+graf_renta_total
 # # ggplotly(graf_renta_total, width = 600, height = 400)
-# graf_renta_total
 # 
 # 
 # 
@@ -3714,7 +3720,7 @@ renta_comparacion <- renta_indirecto %>%
           renta_sobrevaluacion = renta_expo_sobrevaluada_crudo+ renta_expo_sobrevaluada_gas,
           renta_diferencial_precios = 
             renta_diferencial_precios_gas+ renta_diferencial_precios_crudo,
-          # renta_empresas = renta_empresas*ipc_18/tcc,
+          renta_empresas = renta_empresas*ipc_18/tcc,
           # renta_empresas = renta_empresas*ipc_18/tcc,
           renta_total = (renta_total*ipc_18) / tcp,
           unidad = "Millones de USD",
@@ -3749,7 +3755,7 @@ renta_comparacion <- renta_indirecto %>%
 #        y = "Millones de USD")+
 #   theme_classic()+
 #   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-# # ggplotly(graf_tipos_renta, width = 800, height = 600)
+# # # ggplotly(graf_tipos_renta, width = 800, height = 600)
 # graf_tipos_renta
 # 
 # 
@@ -3763,16 +3769,20 @@ renta_comparacion <- renta_indirecto %>%
 #   geom_line()+
 #   geom_point()+
 #   theme(legend.position = "bottom")+
-#   labs(title = "Renta hidrocarburífera total (petróleo y gas)",
-#        subtitle = "Con renta total propia metodología autores",
-#        y = "Millones de USD")+
+#   labs(title = "Renta de la tierra hidrocarburífera total de Argentina",
+#        subtitle = "Comparación con otras estimaciones a tipo de cambio comercial",
+#        y = "Millones de USD TCc", x="",
+#        caption = "Nota: en la estimación propia se utilizó la renta por mecanismos")+
 #   theme_classic()+
 #   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
-# graf_renta_total_comparacion
-
+# graf_renta_total_comparacion =plot_theme( graf_renta_total_comparacion)
+# ggsave("../resultados/argentina/comparacion_autores.png", graf_renta_total_comparacion,
+#          width = 10, height = 5)
 # ggplotly(graf_renta_total_comparacion, width = 600, height = 400)
 # ggplotly(graf_renta_total_comparacion_b)
 
+t1  <- Sys.time()
+print(t1-t0)
 ```
 
 
@@ -3812,11 +3822,14 @@ list_col <-  as.data.frame(unique(columnas))
 t1 <- Sys.time()
 delta  <- as.numeric(  t1 - t0, units = "secs")  #calculo la diferencia de tiempos
 print( delta) 
+
 ```
 
 
 ```{r include=FALSE}
 library(data.table)
+
+# Renta de la tierra petrolera por el diferencial de precios entre el mercado interno y las referencias internacionales; y+6:12
 
 ## Exportación de resultados
 
@@ -4111,34 +4124,41 @@ precios_exportacion_gas[,variable := "Precio de exportación de gas natural de A
 ##############################
 # Calculos
 renta_indirecto_pbi = as.data.table(renta_indirecto)
-renta_indirecto_pbi = renta_indirecto_pbi[anio >1961,c(1,18:19)]  
+renta_indirecto_pbi = renta_indirecto_pbi[anio >1961,c("anio", "renta_pv", "renta_pbi")]  
 setnames(renta_indirecto_pbi, c("renta_pv", "renta_pbi"), c("RvsPV", "RvsPBI") )
 renta_indirecto_pbi[, unidad := "Ratio"]
 setcolorder(renta_indirecto_pbi, c("anio", "unidad", "RvsPV", "RvsPBI"))
 
 
 #
-renta_indirecto = as.data.table(renta_indirecto)
-renta_indirecto = renta_indirecto[anio > 1961,c(1:2, 6:12, 16) ]
-setnames(renta_indirecto, 
+renta_indirecto_dt = as.data.table(renta_indirecto)
+renta_indirecto_dt = renta_indirecto_dt[anio > 1961, c("anio", "renta_diferencial_precios_crudo",
+                                  "renta_diferencial_precios_gas"  ,"retenciones",
+                                  "regalias_total", "renta_expo_sobrevaluada_crudo"  ,
+                                  "renta_expo_sobrevaluada_gas" , "renta_empresas", 
+                                  "subsidios", "renta_total")]  
+                                  # c(1:2, 6:12, 16) ]
+setnames(renta_indirecto_dt, 
         c("renta_diferencial_precios_crudo", "renta_diferencial_precios_gas"  ,
           "retenciones", "regalias_total", "renta_expo_sobrevaluada_crudo"  ,
-          "renta_expo_sobrevaluada_gas" ,"subsidios", "renta_total"  ), 
-        c("Rdifp_crudo","Rdifp_gas" , "Rret", "Rreg", "Rsvx_crudo", "Rsvx_gas", "Subs", "Rtt"  )
+          "renta_expo_sobrevaluada_gas" , "renta_empresas",
+          "subsidios", "renta_total"  ), 
+        c("Rdifp_crudo","Rdifp_gas" , "Rret", "Rreg", "Rsvx_crudo", "Rsvx_gas", "Rkindv", "Subs", "Rtt"  )
         )
 # renta_indirecto[ ,`:=`  (Rret = fcase(Rret == 0, NA,default = Rret), Rreg = fcase(Rreg == 0, NA, default = Rreg),  
 #                          Subs = fcase(Subs == 0, NA, default=Subs))]
 # renta_indirecto[, lapply(.SD, function(x) ifelse(x==0, NA, x)), .SDcols = c("Rret", "Rreg", "Subs")]
-renta_indirecto[Rret == 0, Rret := NA]
-renta_indirecto[Rreg == 0, Rreg := NA]
-renta_indirecto[Subs == 0, Subs := NA]
-renta_indirecto = merge(renta_indirecto, ipc_promedio[, c("anio", "IPC_18")], by = "anio", all.x = T)
-renta_indirecto[,c("Rdifp_crudo","Rdifp_gas" , "Rret", "Rreg",
-                   "Rsvx_crudo", "Rsvx_gas", "Subs", "Rtt"  )  :=  lapply(.SD, 
-                                                                          function(x) (x*renta_indirecto$IPC_18)*10^6 ),
+renta_indirecto_dt[Rret == 0, Rret := NA]
+renta_indirecto_dt[Rreg == 0, Rreg := NA]
+renta_indirecto_dt[Subs == 0, Subs := NA]
+renta_indirecto_dt[Rkindv == 0, Rkindv := NA]
+renta_indirecto_dt = merge(renta_indirecto_dt, ipc_promedio[, c("anio", "IPC_18")], by = "anio", all.x = T)
+renta_indirecto_dt[,c("Rdifp_crudo","Rdifp_gas" , "Rret", "Rreg",
+                   "Rsvx_crudo", "Rsvx_gas", "Rkindv", "Subs", "Rtt"  )  :=  lapply(.SD, 
+                                                                          function(x) (x*renta_indirecto_dt$IPC_18)*10^6 ),
         .SDcols = c("Rdifp_crudo","Rdifp_gas" , "Rret", "Rreg", 
-                    "Rsvx_crudo", "Rsvx_gas", "Subs", "Rtt"  ) ]
-renta_indirecto[, unidad := "Pesos corrientes"]
+                    "Rsvx_crudo", "Rsvx_gas", "Rkindv", "Subs", "Rtt"  ) ]
+renta_indirecto_dt[, unidad := "Pesos corrientes"]
 
 renta_directo= as.data.table(renta_directo)
 renta_directo[, ipc_18 := NULL]
@@ -4393,6 +4413,10 @@ all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU,
 write.csv(all_raw_data, "../resultados/argentina/variables.csv", row.names = F)
 
 
+t2 <- Sys.time()
+delta  <- as.numeric(  t2 - t0, units = "secs")  #calculo la diferencia de tiempos
+print( delta) 
+
 ```
 
 
@@ -4419,7 +4443,7 @@ writexl::write_xlsx(list(indice = indice,
                          pv_y_pbi = ganancia_y_pbi ,
                          raw_data = all_raw_data, 
                          
-                         RTPG_mecanismos = renta_indirecto,
+                         RTPG_mecanismos = renta_indirecto_dt,
                          RTPG_PextQ = renta_directo,
                          RTPG_mecanismos_vs_pib = renta_indirecto_pbi,
                          RTPG_PextQ_vs_pib = renta_directo_pbi,

@@ -259,7 +259,7 @@ ggsave("../resultados/comparacion_paises/Renta de la tierra del gas y el petról
 #### Banco Mundial
 ```{r}
 # Oil rents (% of GDP) 
-renta_wb <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/banco mundial/API_NY.GDP.PETR.RT.ZS_DS2_en_csv_v2_2446738.csv", 
+renta_wb <- read_csv("../data/banco mundial/API_NY.GDP.PETR.RT.ZS_DS2_en_csv_v2_2446738.csv", 
     skip = 3) %>%
   rename(pais = "Country Name") %>% 
   filter(pais %in% c("Argentina", "Bolivia", "Venezuela, RB", "Brazil")) %>% 
@@ -587,10 +587,13 @@ x <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg
 
 y <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
            sheet = "costos_pg_ccnn") %>% 
-  select(anio, valor = precio_produccion, unidad =unidad_costos) %>% 
+  select(anio, valor = Pp, unidad =unidad_costos) %>% 
   mutate(variable = "Precio de produccion")
 
-costos_arg <- rbind(x, y) %>% mutate(pais = "Argentina") %>%  filter(anio >0)
+costos_arg <- rbind(x, y) %>% mutate(pais = "Argentina") %>%  filter(anio >0) %>% 
+  left_join(tcp_arg) %>% 
+  mutate(valor = (valor*TCc)/TCp) %>% 
+  select(-c(TCc, TCp))
   
 ```
 ## Venezuela
@@ -601,6 +604,18 @@ costos_vzl <- read_excel("../data/venezuela/VARIABLES Renta Venezuela.xlsx", she
          "Precio de costo (Balances)" = "Costo por barril extracción PDVSA USD (TC Pdvsa)") %>% 
   gather(key = variable, value = valor, 2:ncol(.)) %>% 
   mutate(unidad = "USD/BOE", pais = "Venezuela")
+
+costos_vzl = read_excel("../data/venezuela/renta_de_la_tierra_petrolera_venGAMMA.xlsx",
+           sheet = "13. Costos x barril") %>% 
+  select(anio = Anio ,
+         # "Precio de costo (CCNN)" = "Costo/b_TCC_U$D", 
+         # "Precio de produccion" = "Pp_TCC_U$D",
+         "Precio de costo (CCNN)" = "Costo/b_TCP_U$D", 
+         "Precio de produccion" = "Pp_TCP_U$D", 
+         "Precio de costo (Balances)" = "Costo por barril extracción PDVSA en usd por  TC Pdvsa")  %>% 
+  gather(key = variable, value = valor, 2:ncol(.)) %>% 
+  mutate(unidad = "USD/BOE", pais = "Venezuela")
+
   
 ```
 ## Brazil
@@ -631,8 +646,24 @@ costos_bol <- read_excel("../data/bolivia/TG YPFB.xlsx", sheet = "Costos II sin 
 
 ### Comparacion
 ```{r}
-costos <-  rbind(costos_arg, costos_vzl, costos_blz, costos_bol) %>% 
+# costos <-  rbind(costos_arg, costos_vzl, costos_blz, costos_bol) %>% 
+costos <-  rbind(costos_arg, costos_vzl) %>% 
   rename(valor_costo = valor, tipo_costo = variable)
+
+plt_costo = costos %>% 
+  filter(anio >1995) %>% 
+  ggplot(aes(anio, valor_costo, color = pais))+
+  geom_line()+
+  labs(title = "Costos por barril comparados",
+       subtitle= "Valuados a tipo de cambio de paridad",
+       x = "", y = "USD TCp/BOE")+
+  facet_wrap(~tipo_costo, scales = "free_x")+
+  scale_color_manual("Paises", values=c(  "dodgerblue1", "#CC6666"))
+plt_costo = plot_theme(plt_costo)+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.8, hjust = .6))
+ggsave("../resultados/comparacion_paises/costos_arg_vzla.png", 
+       plt_costo, width = 10, height = 5)
+
 ```
 
 
