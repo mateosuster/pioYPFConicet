@@ -66,9 +66,9 @@ plt_tcp = tcp_long %>%
 plt_tcp = plot_theme(plt_tcp)
 
 #ipc us
-# ipc_us <- read_excel("../data/venezuela/renta_de_la_tierra_petrolera_venGAMMA.xlsx", 
-#                       sheet = "11. Precios") %>% 
-#   select(anio = Anio, ipc_us_97 = "IPC_EEUU_1=1997" ) 
+ipc_us_97 <- read_excel("../data/venezuela/renta_de_la_tierra_petrolera_venGAMMA.xlsx",
+                      sheet = "11. Precios") %>%
+  select(anio = Anio, ipc_us_97 = "IPC_EEUU_1=1997" )
 
 ipc_us <- read_csv("../data/bls/cpi.csv") %>% 
   rename(anio = Year) %>% 
@@ -170,6 +170,38 @@ plt_pxq =plot_theme(plt_pxq)+theme(axis.text.x=element_text(angle = 45, vjust = 
 ggsave("../resultados/comparacion_paises/renta_PxQ_arg_vs_ven.png", 
        plot = plt_pxq,  width = 10, height = 5)
 
+# renta vzla vs autores
+comparacion_vzla = read_excel("../data/venezuela/Renta_Comparación.xlsx", sheet = "Renta") %>% 
+  # select(c(1, 14:20)) %>%
+  select( anio = Anio,
+    "Propia"= "Rpq...16",  "Baptista" ="R_Baptista...17",
+          "Banco Mundial" = "R_BancoMundial...18", "Delgado" = "R_Delgado",
+         "Kornblihtt&Dachevsky (2011)" = "R_KornDachev2011...20",
+         # "Kornblihtt&Dachevsky (2017)" = "Rmec_KornDachev2017...21"
+    "PODE"= "R_PODE...22",
+    ) %>% 
+  mutate_all(as.double) %>% 
+  reshape2::melt(id.vars = c("anio")) %>% 
+  na.omit() %>% 
+  left_join(ipc_us_97) %>% 
+  left_join(ipc_us) %>%
+  mutate(value = (value *ipc_us_97)/ipc_us_20,
+         unidad = "Millones de USD de 2020" ) %>%
+  select(-c(ipc_us_97, ipc_us_20)) 
+
+plot_renta_vzla = comparacion_vzla %>% 
+  ggplot(aes(anio, value, color = variable))+
+  geom_line()+
+  labs(title = "Renta de la tierra hidrocarburífera total de Venezuela",
+       subtitle = "Comparación de estimaciones a tipo de cambio de paridad",
+       x= "", y="Millones de USD TCp de 2020",
+       caption = "Nota: la estimación propia corresponde al método de descuentos sobre plusvalía total")+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
+  scale_y_continuous(labels = function(x) format(x, big.mark="."))
+plot_renta_vzla = plot_theme(plot_renta_vzla)+theme(legend.title=element_blank())
+ggsave( "../resultados/comparacion_paises/renta_vzla_comparacion.png",
+        plot_renta_vzla, width = 10, height = 5)
+
 # Renta sobre PBI y PV
 # PxQ
 rt_arg_pxq_pbi = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 
@@ -205,6 +237,18 @@ rt_mec_pbi = rbind(rt_ven_mec_pbi, rt_arg_mec_pbi)  %>%
 
 rt_pbi = rbind(rt_mec_pbi, rt_pxq_pbi)
 
+# Oil rents (% of GDP) 
+renta_wb <- read_csv("../data/banco mundial/API_NY.GDP.PETR.RT.ZS_DS2_en_csv_v2_2446738.csv", 
+                     skip = 3) %>%
+  rename(pais = "Country Name") %>% 
+  filter(pais %in% c("Argentina", "Bolivia", "Venezuela, RB", "Brazil")) %>% 
+  mutate(pais = case_when( pais == "Venezuela, RB" ~ "Venezuela" ,
+                           pais == "Brazil" ~ "Brasil" ,  T ~ pais )) %>% 
+  select(-c(2:4)) %>% 
+  gather(key = anio, value = renta_pbi, 2:ncol(.)) %>% 
+  mutate(fuente = "Banco Mundial", renta_pbi= renta_pbi/100) %>% 
+  na.omit()
+
 renta_wb_plt <- renta_wb %>% 
   filter(pais %in% c("Argentina", "Venezuela")) %>% 
   rename(value = renta_pbi) %>% 
@@ -213,14 +257,14 @@ renta_wb_plt <- renta_wb %>%
          anio = as.double(anio))
 
 #rompe pero no importa
-rt_pbi %>% 
-  filter(tipo_renta == "PxQ", name == "RvsPBI") %>%
-  mutate(fuente = "Estimación propia") %>% 
-  rbind(renta_wb_plt) %>% 
-  ggplot(aes(anio, value, color = fuente))+
-  geom_line()+
-  scale_y_continuous(labels = scales::percent_format())+
-  facet_wrap(~pais, scales = "free")
+# rt_pbi %>% 
+#   filter(tipo_renta == "PxQ", name == "RvsPBI") %>%
+#   mutate(fuente = "Estimación propia") %>% 
+#   rbind(renta_wb_plt) %>% 
+#   ggplot(aes(anio, value, color = fuente))+
+#   geom_line()+
+#   scale_y_continuous(labels = scales::percent_format())+
+#   facet_wrap(~pais, scales = "free")
   
 # plt_rt_vs_pbi_y_pv = rt_pxq_pbi %>% 
 plt_rt_vs_pbi_y_pv = rt_pbi %>% 
@@ -247,7 +291,7 @@ plt_rt_vs_pbi_y_pv = plot_theme(plt_rt_vs_pbi_y_pv)+
 plt_rt_vs_pbi_y_pv
 ggsave(filename =  
          "../resultados/comparacion_paises/renta_plt_rt_vs_pbi_y_pv.png", 
-       plot = plt_rt_vs_pbi_y_pv,  width = 12, height = 7) 
+       plot = plt_rt_vs_pbi_y_pv,  width = 16, height = 8) 
 
 # Renta vzla plot
 plot_rt_ven = rt_ven_pxq_pbi %>% 
