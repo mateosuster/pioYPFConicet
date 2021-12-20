@@ -1,0 +1,433 @@
+anio,unidad,tipo_de_renta,valor,autor
+2010,Millones de USD,regalias,1762.5,Ramon
+2010,Millones de USD,renta_consumidores,61.3,Ramon
+2010,Millones de USD,renta_empresas,6874,Ramon
+2010,Millones de USD,renta_estado_total,3888,Ramon
+2010,Millones de USD,renta_refinadoras,4007,Ramon
+2010,Millones de USD,renta_sobrevaluacion,113,Ramon
+2010,Millones de USD,renta_total,14830,Ramon
+2010,Millones de USD,retenciones,2724,Ramon
+2011,Millones de USD,regalias,1919.5,Ramon
+2011,Millones de USD,renta_consumidores,1810.8,Ramon
+2011,Millones de USD,renta_empresas,2977,Ramon
+2011,Millones de USD,renta_estado_total,6099,Ramon
+2011,Millones de USD,renta_refinadoras,5610,Ramon
+2011,Millones de USD,renta_sobrevaluacion,47,Ramon
+2011,Millones de USD,renta_total,16497,Ramon
+2011,Millones de USD,retenciones,4255,Ramon
+2012,Millones de USD,regalias,2117,Ramon
+2012,Millones de USD,renta_consumidores,248.2,Ramon
+2012,Millones de USD,renta_empresas,2616,Ramon
+2012,Millones de USD,renta_estado_total,6930,Ramon
+2012,Millones de USD,renta_refinadoras,5976,Ramon
+2012,Millones de USD,renta_sobrevaluacion,179,Ramon
+2012,Millones de USD,renta_total,15769,Ramon
+2012,Millones de USD,retenciones,4635,Ramon
+2013,Millones de USD,regalias,2022.7,Ramon
+2013,Millones de USD,renta_consumidores,86.7,Ramon
+2013,Millones de USD,renta_empresas,8029,Ramon
+2013,Millones de USD,renta_estado_total,1194,Ramon
+2013,Millones de USD,renta_refinadoras,5712,Ramon
+2013,Millones de USD,renta_sobrevaluacion,112,Ramon
+2013,Millones de USD,renta_total,15932,Ramon
+2013,Millones de USD,retenciones,1923,Ramon
+2014,Millones de USD,regalias,2127.7,Ramon
+2014,Millones de USD,renta_consumidores,55,Ramon
+2014,Millones de USD,renta_empresas,8635,Ramon
+2014,Millones de USD,renta_estado_total,463,Ramon
+2014,Millones de USD,renta_refinadoras,3163,Ramon
+2014,Millones de USD,renta_sobrevaluacion,226,Ramon
+2014,Millones de USD,renta_total,14830,Ramon
+2014,Millones de USD,retenciones,1306,Ramon
+2015,Millones de USD,regalias,2042.5,Ramon
+2015,Millones de USD,renta_consumidores,0,Ramon
+2015,Millones de USD,renta_empresas,4088,Ramon
+2015,Millones de USD,renta_estado_total,144,Ramon
+2015,Millones de USD,renta_refinadoras,0,Ramon
+2015,Millones de USD,renta_sobrevaluacion,127,Ramon
+2015,Millones de USD,renta_total,5883,Ramon
+2015,Millones de USD,retenciones,0,Ramon
+1992,Millones de USD,renta_total,2496.9,Barrera
+1993,Millones de USD,renta_total,2517.2,Barrera
+1994,Millones de USD,renta_total,2269.2,Barrera
+1995,Millones de USD,renta_total,3050.8,Barrera
+1996,Millones de USD,renta_total,4419.8,Barrera
+1997,Millones de USD,renta_total,4361.5,Barrera
+1998,Millones de USD,renta_total,2657.4,Barrera
+1999,Millones de USD,renta_total,4014.1,Barrera
+2000,Millones de USD,renta_total,7018.4,Barrera
+2001,Millones de USD,renta_total,5613,Barrera
+2002,Millones de USD,renta_total,6010.9,Barrera
+2003,Millones de USD,renta_total,6910.5,Barrera
+2004,Millones de USD,renta_total,9088,Barrera
+2005,Millones de USD,renta_total,11931.3,Barrera
+2006,Millones de USD,renta_total,13447.8,Barrera
+2007,Millones de USD,renta_total,14264.5,Barrera
+2008,Millones de USD,renta_total,19918,Barrera
+2009,Millones de USD,renta_total,10941.4,Barrera
+2010,Millones de USD,renta_total,14008.2,Barrera
+1999,Millones de USD,renta_estado_total,984,Campodonico
+2000,Millones de USD,renta_estado_total,1903,Campodonico
+2001,Millones de USD,renta_estado_total,1833,Campodonico
+2002,Millones de USD,renta_estado_total,1910,Campodonico
+2003,Millones de USD,renta_estado_total,2281,Campodonico
+2004,Millones de USD,renta_estado_total,2689,Campodonico
+2005,Millones de USD,renta_estado_total,3720,Campodonico
+2006,Millones de USD,renta_estado_total,4166,Campodonico
+1999,Millones de USD,renta_consumidores,0,Campodonico
+2000,Millones de USD,renta_consumidores,0,Campodonico
+2001,Millones de USD,renta_consumidores,0,Campodonico
+2002,Millones de USD,renta_consumidores,751,Campodonico
+2003,Millones de USD,renta_consumidores,819,Campodonico
+2004,Millones de USD,renta_consumidores,2130,Campodonico
+2005,Millones de USD,renta_consumidores,2967,Campodonico
+2006,Millones de USD,renta_consumidores,3408,Campodonico
+1999,Millones de USD,renta_empresas,1546,Campodonico
+2000,Millones de USD,renta_empresas,3582,Campodonico
+2001,Millones de USD,renta_empresas,2470,Campodonico
+2002,Millones de USD,renta_empresas,2116,Campodonico
+2003,Millones de USD,renta_empresas,2067,Campodonico
+2004,Millones de USD,renta_empresas,1371,Campodonico
+2005,Millones de USD,renta_empresas,967,Campodonico
+2006,Millones de USD,renta_empresas,1360,Campodonico
+1999,Millones de USD,renta_total,2530,Campodonico
+2000,Millones de USD,renta_total,5485,Campodonico
+2001,Millones de USD,renta_total,4304,Campodonico
+2002,Millones de USD,renta_total,4777,Campodonico
+2003,Millones de USD,renta_total,5168,Campodonico
+2004,Millones de USD,renta_total,6190,Campodonico
+2005,Millones de USD,renta_total,7653,Campodonico
+2006,Millones de USD,renta_total,8934,Campodonico
+1999,Millones de USD,regalias,503,Campodonico
+2000,Millones de USD,regalias,842,Campodonico
+2001,Millones de USD,regalias,705,Campodonico
+2002,Millones de USD,regalias,698,Campodonico
+2003,Millones de USD,regalias,725,Campodonico
+2004,Millones de USD,regalias,843,Campodonico
+2005,Millones de USD,regalias,988,Campodonico
+2006,Millones de USD,regalias,1129,Campodonico
+1999,Millones de USD,impuesto_ganancias,481,Campodonico
+2000,Millones de USD,impuesto_ganancias,1061,Campodonico
+2001,Millones de USD,impuesto_ganancias,1128,Campodonico
+2002,Millones de USD,impuesto_ganancias,781,Campodonico
+2003,Millones de USD,impuesto_ganancias,1109,Campodonico
+2004,Millones de USD,impuesto_ganancias,1217,Campodonico
+2005,Millones de USD,impuesto_ganancias,1725,Campodonico
+2006,Millones de USD,impuesto_ganancias,1885,Campodonico
+1999,Millones de USD,retenciones,,Campodonico
+2000,Millones de USD,retenciones,,Campodonico
+2001,Millones de USD,retenciones,,Campodonico
+2002,Millones de USD,retenciones,431,Campodonico
+2003,Millones de USD,retenciones,447,Campodonico
+2004,Millones de USD,retenciones,629,Campodonico
+2005,Millones de USD,retenciones,1007,Campodonico
+2006,Millones de USD,retenciones,1152,Campodonico
+1996,Millones de USD,renta_empresas,2322,Mansilla
+1997,Millones de USD,renta_empresas,2497,Mansilla
+1998,Millones de USD,renta_empresas,1251,Mansilla
+1999,Millones de USD,renta_empresas,2179,Mansilla
+2000,Millones de USD,renta_empresas,4051,Mansilla
+2001,Millones de USD,renta_empresas,3342,Mansilla
+2002,Millones de USD,renta_empresas,3175,Mansilla
+2003,Millones de USD,renta_empresas,3588,Mansilla
+2004,Millones de USD,renta_empresas,3667,Mansilla
+2005,Millones de USD,renta_empresas,4495,Mansilla
+1996,Millones de USD,renta_consumidores,464,Mansilla
+1997,Millones de USD,renta_consumidores,239,Mansilla
+1998,Millones de USD,renta_consumidores,432,Mansilla
+1999,Millones de USD,renta_consumidores,468,Mansilla
+2000,Millones de USD,renta_consumidores,338,Mansilla
+2001,Millones de USD,renta_consumidores,203,Mansilla
+2002,Millones de USD,renta_consumidores,385,Mansilla
+2003,Millones de USD,renta_consumidores,740,Mansilla
+2004,Millones de USD,renta_consumidores,1935,Mansilla
+2005,Millones de USD,renta_consumidores,3293,Mansilla
+1996,Millones de USD,renta_total,4993,Mansilla
+1997,Millones de USD,renta_total,4971,Mansilla
+1998,Millones de USD,renta_total,2892,Mansilla
+1999,Millones de USD,renta_total,4364,Mansilla
+2000,Millones de USD,renta_total,7450,Mansilla
+2001,Millones de USD,renta_total,6107,Mansilla
+2002,Millones de USD,renta_total,6277,Mansilla
+2003,Millones de USD,renta_total,7368,Mansilla
+2004,Millones de USD,renta_total,8924,Mansilla
+2005,Millones de USD,renta_total,11999,Mansilla
+1996,Millones de USD,renta_estado_total,2207,Mansilla
+1997,Millones de USD,renta_estado_total,2235,Mansilla
+1998,Millones de USD,renta_estado_total,1209,Mansilla
+1999,Millones de USD,renta_estado_total,1717,Mansilla
+2000,Millones de USD,renta_estado_total,3061,Mansilla
+2001,Millones de USD,renta_estado_total,2563,Mansilla
+2002,Millones de USD,renta_estado_total,2718,Mansilla
+2003,Millones de USD,renta_estado_total,3040,Mansilla
+2004,Millones de USD,renta_estado_total,3323,Mansilla
+2005,Millones de USD,renta_estado_total,4212,Mansilla
+1999,Millones de USD,impuesto_ganancias,324.8,Scheimberg
+2003,Millones de USD,impuesto_ganancias,889,Scheimberg
+2006,Millones de USD,impuesto_ganancias,1026.8,Scheimberg
+1999,Millones de USD,ingresos_brutos_sellos,129.8,Scheimberg
+2003,Millones de USD,ingresos_brutos_sellos,155.5,Scheimberg
+2006,Millones de USD,ingresos_brutos_sellos,252.2,Scheimberg
+1999,Millones de USD,regalias,672.2,Scheimberg
+2003,Millones de USD,regalias,855.1,Scheimberg
+2006,Millones de USD,regalias,1400.2,Scheimberg
+1999,Millones de USD,retenciones,,Scheimberg
+2003,Millones de USD,retenciones,371.1,Scheimberg
+2006,Millones de USD,retenciones,899.8,Scheimberg
+1999,Millones de USD,renta_empresas,604.9,Scheimberg
+2003,Millones de USD,renta_empresas,1175.2,Scheimberg
+2006,Millones de USD,renta_empresas,2808,Scheimberg
+1999,Millones de USD,renta_estado_total,1126.8,Scheimberg
+2003,Millones de USD,renta_estado_total,2270.7,Scheimberg
+2006,Millones de USD,renta_estado_total,3579,Scheimberg
+1999,Millones de USD,subsidios,,Scheimberg
+2003,Millones de USD,subsidios,1781.9,Scheimberg
+2006,Millones de USD,subsidios,5953.5,Scheimberg
+1999,Millones de USD,renta_total,1732,Scheimberg
+2003,Millones de USD,renta_total,5228,Scheimberg
+2006,Millones de USD,renta_total,12341,Scheimberg
+1963,Millones de USD,regalias,20.8597520232914,Fárfaro Ruiz y Bil
+1964,Millones de USD,regalias,22.0608687618598,Fárfaro Ruiz y Bil
+1965,Millones de USD,regalias,30.0700317833475,Fárfaro Ruiz y Bil
+1966,Millones de USD,regalias,34.1226797422374,Fárfaro Ruiz y Bil
+1967,Millones de USD,regalias,25.9185996438931,Fárfaro Ruiz y Bil
+1968,Millones de USD,regalias,32.8518758949008,Fárfaro Ruiz y Bil
+1969,Millones de USD,regalias,34.1542265117105,Fárfaro Ruiz y Bil
+1970,Millones de USD,regalias,36.785934747496,Fárfaro Ruiz y Bil
+1971,Millones de USD,regalias,39.3510237168559,Fárfaro Ruiz y Bil
+1972,Millones de USD,regalias,33.1773613188148,Fárfaro Ruiz y Bil
+1973,Millones de USD,regalias,59.5214989604166,Fárfaro Ruiz y Bil
+1974,Millones de USD,regalias,129.648864316886,Fárfaro Ruiz y Bil
+1975,Millones de USD,regalias,52.1173757197125,Fárfaro Ruiz y Bil
+1976,Millones de USD,regalias,8.44270836261309,Fárfaro Ruiz y Bil
+1977,Millones de USD,regalias,112.551915165667,Fárfaro Ruiz y Bil
+1978,Millones de USD,regalias,171.521791975499,Fárfaro Ruiz y Bil
+1979,Millones de USD,regalias,188.252841593436,Fárfaro Ruiz y Bil
+1980,Millones de USD,regalias,241.315339026314,Fárfaro Ruiz y Bil
+1981,Millones de USD,regalias,248.598066814012,Fárfaro Ruiz y Bil
+1982,Millones de USD,regalias,147.444457960375,Fárfaro Ruiz y Bil
+1983,Millones de USD,regalias,261.48921130624,Fárfaro Ruiz y Bil
+1984,Millones de USD,regalias,287.16842305377,Fárfaro Ruiz y Bil
+1985,Millones de USD,regalias,226.47482738679,Fárfaro Ruiz y Bil
+1986,Millones de USD,regalias,201.380993374075,Fárfaro Ruiz y Bil
+1987,Millones de USD,regalias,180.992641497056,Fárfaro Ruiz y Bil
+1988,Millones de USD,regalias,0,Fárfaro Ruiz y Bil
+1989,Millones de USD,regalias,203.162554604592,Fárfaro Ruiz y Bil
+1990,Millones de USD,regalias,513.128312920757,Fárfaro Ruiz y Bil
+1991,Millones de USD,regalias,327.600100524973,Fárfaro Ruiz y Bil
+1992,Millones de USD,regalias,,Fárfaro Ruiz y Bil
+1993,Millones de USD,regalias,358.586572120894,Fárfaro Ruiz y Bil
+1994,Millones de USD,regalias,368.167120104081,Fárfaro Ruiz y Bil
+1995,Millones de USD,regalias,445.865127305195,Fárfaro Ruiz y Bil
+1996,Millones de USD,regalias,591.500980115565,Fárfaro Ruiz y Bil
+1997,Millones de USD,regalias,582.4175292028,Fárfaro Ruiz y Bil
+1998,Millones de USD,regalias,370.36792511034,Fárfaro Ruiz y Bil
+1999,Millones de USD,regalias,502.714329088434,Fárfaro Ruiz y Bil
+2000,Millones de USD,regalias,840.806455296851,Fárfaro Ruiz y Bil
+2001,Millones de USD,regalias,695.622505716091,Fárfaro Ruiz y Bil
+2002,Millones de USD,regalias,646.670514742948,Fárfaro Ruiz y Bil
+2003,Millones de USD,regalias,731.29850752798,Fárfaro Ruiz y Bil
+2004,Millones de USD,regalias,847.521738946069,Fárfaro Ruiz y Bil
+2005,Millones de USD,regalias,987.512512402651,Fárfaro Ruiz y Bil
+2006,Millones de USD,regalias,1129.19676586507,Fárfaro Ruiz y Bil
+2007,Millones de USD,regalias,1085.02479195813,Fárfaro Ruiz y Bil
+2008,Millones de USD,regalias,1159.51181892316,Fárfaro Ruiz y Bil
+2009,Millones de USD,regalias,1088.02877020904,Fárfaro Ruiz y Bil
+2010,Millones de USD,regalias,1259.90588641326,Fárfaro Ruiz y Bil
+2011,Millones de USD,regalias,1397.5970582899,Fárfaro Ruiz y Bil
+1963,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1964,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1965,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1966,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1967,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1968,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1969,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1970,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1971,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1972,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1973,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1974,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1975,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1976,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1977,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1978,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1979,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1980,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1981,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1982,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1983,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1984,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1985,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1986,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1987,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1988,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1989,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1990,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1991,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1992,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1993,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1994,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1995,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1996,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1997,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1998,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+1999,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+2000,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+2001,Millones de USD,retenciones,,Fárfaro Ruiz y Bil
+2002,Millones de USD,retenciones,434.62566404325,Fárfaro Ruiz y Bil
+2003,Millones de USD,retenciones,450.776930829135,Fárfaro Ruiz y Bil
+2004,Millones de USD,retenciones,701.287844495035,Fárfaro Ruiz y Bil
+2005,Millones de USD,retenciones,963.59959300306,Fárfaro Ruiz y Bil
+2006,Millones de USD,retenciones,840.81814449766,Fárfaro Ruiz y Bil
+2007,Millones de USD,retenciones,611.316434570776,Fárfaro Ruiz y Bil
+2008,Millones de USD,retenciones,890.154470581217,Fárfaro Ruiz y Bil
+2009,Millones de USD,retenciones,1077.18454918781,Fárfaro Ruiz y Bil
+2010,Millones de USD,retenciones,1521.40747699229,Fárfaro Ruiz y Bil
+2011,Millones de USD,retenciones,1309.333834,Fárfaro Ruiz y Bil
+1963,Millones de USD,renta_sobrevaluacion,-0.0217859249847928,Fárfaro Ruiz y Bil
+1964,Millones de USD,renta_sobrevaluacion,0.0262426040217883,Fárfaro Ruiz y Bil
+1965,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1966,Millones de USD,renta_sobrevaluacion,0.0182869278358623,Fárfaro Ruiz y Bil
+1967,Millones de USD,renta_sobrevaluacion,-0.0100113608552872,Fárfaro Ruiz y Bil
+1968,Millones de USD,renta_sobrevaluacion,0.0131243743860987,Fárfaro Ruiz y Bil
+1969,Millones de USD,renta_sobrevaluacion,-0.0058171329131276,Fárfaro Ruiz y Bil
+1970,Millones de USD,renta_sobrevaluacion,-0.0303333742303428,Fárfaro Ruiz y Bil
+1971,Millones de USD,renta_sobrevaluacion,0.0169870849871657,Fárfaro Ruiz y Bil
+1972,Millones de USD,renta_sobrevaluacion,-0.0281993447420955,Fárfaro Ruiz y Bil
+1973,Millones de USD,renta_sobrevaluacion,0.182956157293342,Fárfaro Ruiz y Bil
+1974,Millones de USD,renta_sobrevaluacion,2.07185398423217,Fárfaro Ruiz y Bil
+1975,Millones de USD,renta_sobrevaluacion,0.475912197498218,Fárfaro Ruiz y Bil
+1976,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1977,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1978,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1979,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1980,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1981,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1982,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1983,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1984,Millones de USD,renta_sobrevaluacion,0,Fárfaro Ruiz y Bil
+1985,Millones de USD,renta_sobrevaluacion,-9.81395916010445,Fárfaro Ruiz y Bil
+1986,Millones de USD,renta_sobrevaluacion,-0.734371987604279,Fárfaro Ruiz y Bil
+1987,Millones de USD,renta_sobrevaluacion,-0.775153037850287,Fárfaro Ruiz y Bil
+1988,Millones de USD,renta_sobrevaluacion,-0.619158970086044,Fárfaro Ruiz y Bil
+1989,Millones de USD,renta_sobrevaluacion,-24.5968668952652,Fárfaro Ruiz y Bil
+1990,Millones de USD,renta_sobrevaluacion,46.9584972148238,Fárfaro Ruiz y Bil
+1991,Millones de USD,renta_sobrevaluacion,72.4247838025899,Fárfaro Ruiz y Bil
+1992,Millones de USD,renta_sobrevaluacion,161.036498991425,Fárfaro Ruiz y Bil
+1993,Millones de USD,renta_sobrevaluacion,257.328072613685,Fárfaro Ruiz y Bil
+1994,Millones de USD,renta_sobrevaluacion,549.264934684507,Fárfaro Ruiz y Bil
+1995,Millones de USD,renta_sobrevaluacion,819.531134907494,Fárfaro Ruiz y Bil
+1996,Millones de USD,renta_sobrevaluacion,902.81210990161,Fárfaro Ruiz y Bil
+1997,Millones de USD,renta_sobrevaluacion,948.89086153636,Fárfaro Ruiz y Bil
+1998,Millones de USD,renta_sobrevaluacion,607.245925396729,Fárfaro Ruiz y Bil
+1999,Millones de USD,renta_sobrevaluacion,601.559965456064,Fárfaro Ruiz y Bil
+2000,Millones de USD,renta_sobrevaluacion,1280.34083654914,Fárfaro Ruiz y Bil
+2001,Millones de USD,renta_sobrevaluacion,1013.96831372068,Fárfaro Ruiz y Bil
+2002,Millones de USD,renta_sobrevaluacion,-701.777260670404,Fárfaro Ruiz y Bil
+2003,Millones de USD,renta_sobrevaluacion,-385.397491592846,Fárfaro Ruiz y Bil
+2004,Millones de USD,renta_sobrevaluacion,-260.132745321494,Fárfaro Ruiz y Bil
+2005,Millones de USD,renta_sobrevaluacion,-31.4140079580025,Fárfaro Ruiz y Bil
+2006,Millones de USD,renta_sobrevaluacion,-16.1249393263463,Fárfaro Ruiz y Bil
+2007,Millones de USD,renta_sobrevaluacion,129.519962902457,Fárfaro Ruiz y Bil
+2008,Millones de USD,renta_sobrevaluacion,309.670385377873,Fárfaro Ruiz y Bil
+2009,Millones de USD,renta_sobrevaluacion,304.262973185257,Fárfaro Ruiz y Bil
+2010,Millones de USD,renta_sobrevaluacion,698.938362838235,Fárfaro Ruiz y Bil
+2011,Millones de USD,renta_sobrevaluacion,728.844712114925,Fárfaro Ruiz y Bil
+1963,Millones de USD,renta_diferencial_precios,-49.8832866928677,Fárfaro Ruiz y Bil
+1964,Millones de USD,renta_diferencial_precios,-69.7166888232399,Fárfaro Ruiz y Bil
+1965,Millones de USD,renta_diferencial_precios,-57.9399149072435,Fárfaro Ruiz y Bil
+1966,Millones de USD,renta_diferencial_precios,-68.8416572635997,Fárfaro Ruiz y Bil
+1967,Millones de USD,renta_diferencial_precios,-79.1177942626761,Fárfaro Ruiz y Bil
+1968,Millones de USD,renta_diferencial_precios,-142.96583175244,Fárfaro Ruiz y Bil
+1969,Millones de USD,renta_diferencial_precios,-148.694317453195,Fárfaro Ruiz y Bil
+1970,Millones de USD,renta_diferencial_precios,-145.621843825631,Fárfaro Ruiz y Bil
+1971,Millones de USD,renta_diferencial_precios,-37.3998795430422,Fárfaro Ruiz y Bil
+1972,Millones de USD,renta_diferencial_precios,64.7844682090042,Fárfaro Ruiz y Bil
+1973,Millones de USD,renta_diferencial_precios,1.63623680858799,Fárfaro Ruiz y Bil
+1974,Millones de USD,renta_diferencial_precios,1293.08763164673,Fárfaro Ruiz y Bil
+1975,Millones de USD,renta_diferencial_precios,925.17512420899,Fárfaro Ruiz y Bil
+1976,Millones de USD,renta_diferencial_precios,1199.80724820143,Fárfaro Ruiz y Bil
+1977,Millones de USD,renta_diferencial_precios,1094.81414105236,Fárfaro Ruiz y Bil
+1978,Millones de USD,renta_diferencial_precios,944.977904937419,Fárfaro Ruiz y Bil
+1979,Millones de USD,renta_diferencial_precios,6149.72802775049,Fárfaro Ruiz y Bil
+1980,Millones de USD,renta_diferencial_precios,8914.52739236629,Fárfaro Ruiz y Bil
+1981,Millones de USD,renta_diferencial_precios,6849.33556026177,Fárfaro Ruiz y Bil
+1982,Millones de USD,renta_diferencial_precios,4001.53321308497,Fárfaro Ruiz y Bil
+1983,Millones de USD,renta_diferencial_precios,3427.96158590335,Fárfaro Ruiz y Bil
+1984,Millones de USD,renta_diferencial_precios,2718.6433062346,Fárfaro Ruiz y Bil
+1985,Millones de USD,renta_diferencial_precios,3032.78482952897,Fárfaro Ruiz y Bil
+1986,Millones de USD,renta_diferencial_precios,331.878526646331,Fárfaro Ruiz y Bil
+1987,Millones de USD,renta_diferencial_precios,1114.05627522928,Fárfaro Ruiz y Bil
+1988,Millones de USD,renta_diferencial_precios,733.879764701884,Fárfaro Ruiz y Bil
+1989,Millones de USD,renta_diferencial_precios,834.802739436568,Fárfaro Ruiz y Bil
+1990,Millones de USD,renta_diferencial_precios,-16.8335641378918,Fárfaro Ruiz y Bil
+1991,Millones de USD,renta_diferencial_precios,-2280.83749479275,Fárfaro Ruiz y Bil
+1992,Millones de USD,renta_diferencial_precios,634.805008994144,Fárfaro Ruiz y Bil
+1993,Millones de USD,renta_diferencial_precios,-131.281637596762,Fárfaro Ruiz y Bil
+1994,Millones de USD,renta_diferencial_precios,124.69807956226,Fárfaro Ruiz y Bil
+1995,Millones de USD,renta_diferencial_precios,97.4569858933532,Fárfaro Ruiz y Bil
+1996,Millones de USD,renta_diferencial_precios,-432.703082588629,Fárfaro Ruiz y Bil
+1997,Millones de USD,renta_diferencial_precios,-119.57182061964,Fárfaro Ruiz y Bil
+1998,Millones de USD,renta_diferencial_precios,-7.41344885019727,Fárfaro Ruiz y Bil
+1999,Millones de USD,renta_diferencial_precios,37.7164914543454,Fárfaro Ruiz y Bil
+2000,Millones de USD,renta_diferencial_precios,-592.211419710563,Fárfaro Ruiz y Bil
+2001,Millones de USD,renta_diferencial_precios,-147.653603146628,Fárfaro Ruiz y Bil
+2002,Millones de USD,renta_diferencial_precios,363.095774300071,Fárfaro Ruiz y Bil
+2003,Millones de USD,renta_diferencial_precios,447.631483458651,Fárfaro Ruiz y Bil
+2004,Millones de USD,renta_diferencial_precios,836.713242937849,Fárfaro Ruiz y Bil
+2005,Millones de USD,renta_diferencial_precios,2666.61453541359,Fárfaro Ruiz y Bil
+2006,Millones de USD,renta_diferencial_precios,4317.58530292813,Fárfaro Ruiz y Bil
+2007,Millones de USD,renta_diferencial_precios,6438.20435229518,Fárfaro Ruiz y Bil
+2008,Millones de USD,renta_diferencial_precios,12834.6744646994,Fárfaro Ruiz y Bil
+2009,Millones de USD,renta_diferencial_precios,3927.59288735061,Fárfaro Ruiz y Bil
+2010,Millones de USD,renta_diferencial_precios,6963.77409611934,Fárfaro Ruiz y Bil
+2011,Millones de USD,renta_diferencial_precios,12158.3927437686,Fárfaro Ruiz y Bil
+1963,Millones de USD,renta_total,-29.0453205945611,Fárfaro Ruiz y Bil
+1964,Millones de USD,renta_total,-47.6295774573584,Fárfaro Ruiz y Bil
+1965,Millones de USD,renta_total,-27.869883123896,Fárfaro Ruiz y Bil
+1966,Millones de USD,renta_total,-34.7006905935265,Fárfaro Ruiz y Bil
+1967,Millones de USD,renta_total,-53.2092059796383,Fárfaro Ruiz y Bil
+1968,Millones de USD,renta_total,-110.100831483154,Fárfaro Ruiz y Bil
+1969,Millones de USD,renta_total,-114.545908074397,Fárfaro Ruiz y Bil
+1970,Millones de USD,renta_total,-108.866242452365,Fárfaro Ruiz y Bil
+1971,Millones de USD,renta_total,1.96813125880079,Fárfaro Ruiz y Bil
+1972,Millones de USD,renta_total,97.933630183077,Fárfaro Ruiz y Bil
+1973,Millones de USD,renta_total,61.3406919262979,Fárfaro Ruiz y Bil
+1974,Millones de USD,renta_total,1424.80834994785,Fárfaro Ruiz y Bil
+1975,Millones de USD,renta_total,977.7684121262,Fárfaro Ruiz y Bil
+1976,Millones de USD,renta_total,1208.24995656404,Fárfaro Ruiz y Bil
+1977,Millones de USD,renta_total,1207.36605621803,Fárfaro Ruiz y Bil
+1978,Millones de USD,renta_total,1116.49969691292,Fárfaro Ruiz y Bil
+1979,Millones de USD,renta_total,6337.98086934393,Fárfaro Ruiz y Bil
+1980,Millones de USD,renta_total,9155.8427313926,Fárfaro Ruiz y Bil
+1981,Millones de USD,renta_total,7097.93362707578,Fárfaro Ruiz y Bil
+1982,Millones de USD,renta_total,4148.97767104534,Fárfaro Ruiz y Bil
+1983,Millones de USD,renta_total,3689.45079720959,Fárfaro Ruiz y Bil
+1984,Millones de USD,renta_total,3005.81172928837,Fárfaro Ruiz y Bil
+1985,Millones de USD,renta_total,3249.44569775566,Fárfaro Ruiz y Bil
+1986,Millones de USD,renta_total,532.525148032802,Fárfaro Ruiz y Bil
+1987,Millones de USD,renta_total,1294.27376368848,Fárfaro Ruiz y Bil
+1988,Millones de USD,renta_total,733.260605731798,Fárfaro Ruiz y Bil
+1989,Millones de USD,renta_total,1013.3684271459,Fárfaro Ruiz y Bil
+1990,Millones de USD,renta_total,543.253245997689,Fárfaro Ruiz y Bil
+1991,Millones de USD,renta_total,-1880.81261046519,Fárfaro Ruiz y Bil
+1992,Millones de USD,renta_total,,Fárfaro Ruiz y Bil
+1993,Millones de USD,renta_total,484.633007137817,Fárfaro Ruiz y Bil
+1994,Millones de USD,renta_total,1042.13013435085,Fárfaro Ruiz y Bil
+1995,Millones de USD,renta_total,1362.85324810604,Fárfaro Ruiz y Bil
+1996,Millones de USD,renta_total,1061.61000742854,Fárfaro Ruiz y Bil
+1997,Millones de USD,renta_total,1411.73657011952,Fárfaro Ruiz y Bil
+1998,Millones de USD,renta_total,970.200401656871,Fárfaro Ruiz y Bil
+1999,Millones de USD,renta_total,1141.99078599884,Fárfaro Ruiz y Bil
+2000,Millones de USD,renta_total,1528.93587213543,Fárfaro Ruiz y Bil
+2001,Millones de USD,renta_total,1561.93721629014,Fárfaro Ruiz y Bil
+2002,Millones de USD,renta_total,742.614692415865,Fárfaro Ruiz y Bil
+2003,Millones de USD,renta_total,1244.30943022292,Fárfaro Ruiz y Bil
+2004,Millones de USD,renta_total,2125.39008105746,Fárfaro Ruiz y Bil
+2005,Millones de USD,renta_total,4586.3126328613,Fárfaro Ruiz y Bil
+2006,Millones de USD,renta_total,6271.47527396452,Fárfaro Ruiz y Bil
+2007,Millones de USD,renta_total,8264.06554172655,Fárfaro Ruiz y Bil
+2008,Millones de USD,renta_total,15194.0111395816,Fárfaro Ruiz y Bil
+2009,Millones de USD,renta_total,6397.06917993272,Fárfaro Ruiz y Bil
+2010,Millones de USD,renta_total,10444.0258223631,Fárfaro Ruiz y Bil
+2011,Millones de USD,renta_total,15594.1683481734,Fárfaro Ruiz y Bil

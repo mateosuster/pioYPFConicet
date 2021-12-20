@@ -269,20 +269,25 @@ renta_wb_plt <- renta_wb %>%
 # plt_rt_vs_pbi_y_pv = rt_pxq_pbi %>% 
 plt_rt_vs_pbi_y_pv = rt_pbi %>% 
   # filter(tipo_renta == "PxQ") %>% 
+  # filter(pais == "Argentina") %>%
   mutate(fuente = "Estimación propia") %>% 
   ggplot(aes(anio, value, fill = pais))+
+  # ggplot(aes(anio, value))+
   geom_col(position = "stack")+
   geom_line(data = renta_wb_plt, mapping = aes(anio, value, color = fuente)  , label = "Banco Mundial" )+
+  # geom_line(data = renta_wb_plt[renta_wb_plt$pais=="Argentina",], mapping = aes(anio, value, color= fuente)  , label = "Banco Mundial" )+
   scale_y_continuous(labels = scales::percent_format())+
   labs(title= "Renta de la tierra del petróleo y gas",
        subtitle = "Peso sobre el PBI y plusvalía total",
        x = "", y = "")+
   scale_fill_manual("País", values=c(  "dodgerblue1", "#CC6666"))+
+  # scale_fill_manual("País", values=c(  "dodgerblue1"))+
   scale_color_manual(name = "",  values = c("black"))+
   facet_wrap(tipo_renta~pais~name,
-  # facet_wrap(pais~name, 
+  # facet_wrap(tipo_renta~name,
              scales = "free",
              ncol = 4)
+             # ncol = 2)
   # facet_wrap(name~pais, scales = "free")
 plt_rt_vs_pbi_y_pv = plot_theme(plt_rt_vs_pbi_y_pv)+
   theme(axis.text.x = element_text(angle = 45, vjust = 0.9, hjust=1),
@@ -290,7 +295,8 @@ plt_rt_vs_pbi_y_pv = plot_theme(plt_rt_vs_pbi_y_pv)+
         strip.text = element_text(size=10))
 plt_rt_vs_pbi_y_pv
 ggsave(filename =  
-         "../resultados/comparacion_paises/renta_plt_rt_vs_pbi_y_pv.png", 
+         # "../resultados/comparacion_paises/renta_plt_rt_vs_pbi_y_pv.png", 
+         "../resultados/comparacion_paises/renta_plt_rt_vs_pbi_y_pv_ARG.png", 
        plot = plt_rt_vs_pbi_y_pv,  width = 16, height = 8) 
 
 # Renta vzla plot
@@ -344,7 +350,7 @@ plt_rt_tot =renta_agraria_hidrocarburifera %>%
 plt_rt_tot = plot_theme(plt_rt_tot)
 plt_rt_tot
 ggsave( "../resultados/comparacion_paises/renta_total_arg.png", plt_rt_tot,
-        width = 10, height = 5)
+        width = 12, height = 7)
 
 # TG
 tg_arg <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", 

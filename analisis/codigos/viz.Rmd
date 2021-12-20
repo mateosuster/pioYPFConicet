@@ -20,18 +20,28 @@ library(knitr)
 library(kableExtra)
 library(ggplot2)
 library(plotly)
+library(readxl)
+source("functions_hidrocarburos.R")
 ```
 
-
+# Variables
 ```{r}
-# datos
+# datos de variables
 data = fread("../resultados/argentina/variables.csv")
 variables = unique(data$variable)
 
 glimpse(data)
 
-```
+#TC
+tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
+tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
 
+ipc_us <- as.data.table(read_csv("../data/bls/cpi.csv")) 
+setnames(ipc_us,"Year", "anio"  )
+ipc_us = ipc_us[, .(ipc_us_20 = mean(Value, na.rm=T)), by = anio]
+ipc_us[, ipc_us_20 := generar_indice(serie = ipc_us_20, 
+                                    fecha = anio, fecha_base = 2020)]
+```
 
 ## Producción
 
@@ -441,5 +451,203 @@ expo_usd_crudo %>%
 
 
 
+```
+
+
+# Renta Hidrocarburífera Total. En precios constantes, sobre Plusvalía Total y PBI
+
+Existen dos caminos para llegar al monto total de renta de la tierra hidrocarburífera: uno es descontando la ganancia normal de las empresas a la plusvalía total del sector y el otro es por medio de la suma de mecanismos de apropiación.
+
+$$Renta\_hidrocarburífera = PV_{hidrocarburífera} - Gcia\_Normal_{hidrocarburífera}$$
+Donde:
+
+* $Gcia\_Normal_{hidrocarburífera}$ = Ganancia Normal del sector hidrocarburífero
+* $PV_{hidrocarburífera}$ = Plusvalía del sector hidrocarburífero  
+
+$$Gcia\_Normal_{hidrocarburífera} = KTA_{hidrocarburífero} * TG_{referencia}$$
+
+
+Donde:
+
+* $KTA_{hidrocarburos}$ = Stock de capital adelantado del sector hidrocarburífero 
+* $TG_{referencia}$ = Tasa de ganancia normal de referencia.
+
+En este caso, seleccionamos la tasa de ganancia del sector industrial como parámetro para diferenciar la renta de la ganancia. A su vez, para el capital total adelantado de las empresas hidrocarburíferas, seleccionamos unicamente el valor resultante de la estimación de la PPyE de Bolsar, por lo que le faltan los inventarios y salarios adelantados.
+
+El cálculo de renta total hidrocarburífera que se obtiene por medio de descontar la ganancia normal a la plusvalía total del sector, debe ser igual a la renta obtenida por medio de la agregación de los distintos mecanismos de apropiación. Es decir:
+
+$$Renta\_hidrocarburífera = Renta\_diferencial\_precios + Renta\_sobrevaluación + Renta\_empresas + Impuestos\_netos\_específicos $$
+$$Impuestos\_netos\_específicos = Retenciones + Regalías - Subsidios$$
+
+
+```{r}
+renta_pextq = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ") %>% 
+  select(anio ,unidad, valor = Rtt) %>% 
+  mutate(var = "Renta por descuentos sobre plusvalía")
+
+renta_mecanismos = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos") %>% 
+  select(anio ,unidad, valor = Rtt) %>% 
+  mutate(var = "Renta por suma de mecanismos")
+
+
+renta_arg = as.data.table(rbind(renta_pextq, renta_mecanismos))
+
+merge_func <- function(...) merge(..., all.x = T, by = "anio")
+
+renta_usd = Reduce(merge_func, list(renta_arg, tcp_arg, ipc_us))
+renta_usd[, valor := ((valor/1e6)/TCp)/ipc_us_20]
+renta_usd[, unidad := "Millones de USD TCp de 2020"]
+# renta_usd = merge(renta_usd, tcp_arg, by = "anio", all.x= T)
+
+renta_plot1 = ggplot(renta_usd[anio > 1995], aes(anio, valor, color = var))+
+  geom_line()+
+  labs(title = "Renta hidrocarburífera total de Argentina",
+       subtitle = "Comparación de estimaciones propias",
+       y = "Millones de USD TCp de 2020")+
+  # scale_y_continuous(breaks = seq(0, 60*1e4, 10*1e4))
+  scale_y_continuous(breaks = seq(0, 60000, 10000))
+renta_plot1 = plot_theme(renta_plot1)+theme(legend.title = element_blank(),
+                              axis.title.x = element_blank())
+
+ggsave( filename = "../resultados/argentina/renta_mecanismos_y_pxq_ARG.png", 
+        renta_plot1, width = 12, height = 10)
+renta_plot1
+```
+
+```{r}
+renta_pextq_pbi = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ_vs_pib") %>% 
+  mutate(var = "Renta por descuentos sobre plusvalía")
+
+renta_mecanismos_pbi = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos_vs_pib") %>% 
+  mutate(var = "Renta por suma de mecanismos")
+
+renta_pbi = as.data.table(rbind(renta_pextq_pbi, renta_mecanismos_pbi))
+renta_pbi = renta_pbi[, !"unidad", with=F]
+renta_pbi = melt(renta_pbi, id.vars = c("anio", "var"))
+
+renta_plot2 = ggplot(renta_pbi, aes(anio, value, color = var))+
+  geom_line()+
+  facet_wrap(~variable, ncol =1)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 2))+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))
+renta_plot2 = plot_theme(renta_plot2)+theme(legend.title = element_blank(),
+                              axis.title.x = element_blank(),
+                              axis.text.x = element_text(angle = 45,
+                                                         vjust= 0.7, hjust= 0.5),
+                              axis.title.y = element_blank())
+renta_plot2
+```
+```{r}
+renta_mecanismos = as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos"))
+ 
+renta_mecanismos = renta_mecanismos[,!c("Rtt", "IPC_18", "unidad"), with = F] 
+renta_mecanismos[, Subs := Subs *-1]
+renta_mecanismos = melt(renta_mecanismos, id.vars = "anio",
+                        variable.name = "tipo_renta",
+                        value.name = "valor")
+renta_mecanismos = Reduce(merge_func, list(renta_mecanismos, tcp_arg, ipc_us))
+renta_mecanismos[, valor := ((valor/1e6)/TCp)/ipc_us_20]
+renta_mecanismos[, unidad := "Millones de USD TCp de 2020"]
+
+renta_plot3 = ggplot(renta_mecanismos, aes(anio, valor, 
+                             color = tipo_renta, fill = tipo_renta))+
+  geom_col(position = "stack")+
+  theme(legend.position = "bottom")+
+  labs(title = "Renta de la tierra hidrocarburífera",
+       subtitle = "Cursos de apropiación",
+       y = "Millones USD TCc de 2020")+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
+  scale_y_continuous(breaks = seq(0, 50000, 10000),
+                     labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  theme_classic()
+renta_plot3 = plot_theme(renta_plot3)+theme(legend.title = element_blank(),
+                              axis.title.x = element_blank(),
+                              axis.text.x = element_text(angle = 45,
+                                                         vjust= 0.7, hjust= 0.5))
+renta_plot3
+ggsave("../resultados/argentina/renta_mecanismos_tcp.png",renta_plot3)
+```
+
+# Comparación con estimación de otros autores
+```{r}
+#cargo renta autores
+renta_autores <- fread("../resultados/argentina/renta_autores.csv") 
+renta_autores = merge(renta_autores, ipc_us, all.x=T, by = "anio")
+renta_autores[, valor := valor /ipc_us_20]
+renta_autores[, unidad := "Millones de USD TCc de 2020"]
+renta_autores = renta_autores[,!"ipc_us_20", with=F]
+renta_autores = merge(renta_autores, tcp_arg, all.x= T, by = "anio")
+renta_autores[,valor := (valor*TCc)/TCp]
+renta_autores= renta_autores[, !c("TCc", "TCp"), with = F]
+
+#preproceso renta total
+renta_usd = renta_usd[, !c("TCc", "TCp", "ipc_us_20"), with = F]
+setnames(renta_usd, "var", "tipo_de_renta")
+renta_usd[, autor := "Propia"]
+
+#preproceso renta mecanismos
+renta_mecanismos[, autor := "Propia"]
+renta_mecanismos = renta_mecanismos[, !c("TCc", "TCp", "ipc_us_20"), with = F]
+setnames(renta_mecanismos, "tipo_renta", "tipo_de_renta")
+renta_mecanismos = dcast(renta_mecanismos, anio+autor+unidad~tipo_de_renta, value.var = "valor")
+renta_mecanismos[, `:=`(renta_diferencial_precios = rowSums(cbind(Rdifp_crudo, Rdifp_gas), na.rm=T),
+                        renta_estado_total = rowSums(cbind(Rret, Rreg), na.rm=T),
+                        renta_sobrevaluacion = rowSums(cbind(Rsvx_crudo, Rsvx_gas), na.rm=T),
+                        Subs = Subs*-1)]
+renta_mecanismos= renta_mecanismos[, !c("Rdifp_crudo", "Rdifp_gas",
+                                        "Rsvx_crudo", "Rsvx_gas"), with=F]
+setnames(renta_mecanismos, c("Rkindv", "Subs", "Rret",  "Rreg"), 
+         c("renta_empresas", "subsidios", "retenciones", "regalias") )
+renta_mecanismos = melt(renta_mecanismos,id.vars = c("anio", "autor", "unidad"), variable.name = "tipo_de_renta",
+     value.name = "valor")
+#junto los datos
+renta_comparacion = rbind(renta_usd, renta_mecanismos, renta_autores)
+```
+
+
+```{r}
+#grafico renta total
+graf_renta_total_comparacion = ggplot(data = renta_comparacion[str_detect(tipo_de_renta , "renta_total|Renta por suma de mecanismos") & anio > 1990], 
+       aes(anio, valor, color = autor))+
+  geom_line()+
+  # geom_point()+
+  theme(legend.position = "bottom")+
+  labs(title = "Renta de la tierra hidrocarburífera total de Argentina",
+       subtitle = "Comparación con otras estimaciones",
+       y = "Millones de USD TCp de 2020", x="",
+       caption = "Nota: en la estimación propia se utilizó la renta por por suma de mecanismos")+
+  theme_classic()+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
+  scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
+graf_renta_total_comparacion =plot_theme( graf_renta_total_comparacion)+theme(
+  legend.title = element_blank())
+graf_renta_total_comparacion
+
+ggsave("../resultados/argentina/comparacion_autores_usd_tcp.png", graf_renta_total_comparacion,
+         width = 10, height = 5)
+```
+
+```{r}
+#grafico comparacion con otros autores
+graf_tipos_renta <- ggplot(data = renta_comparacion[!str_detect(tipo_de_renta, c("renta_total|Renta por descuentos sobre plusvalía|Renta por suma de mecanismos|renta_estado_total"
+                                 # "renta_diferencial_precios",
+                               ))& anio >1990],
+       aes(anio, valor, color = autor))+
+  geom_line()+
+  geom_point(size = 0.5)+
+  geom_hline(yintercept = 0)+
+  facet_wrap(~tipo_de_renta, scales = "free_y")+
+  labs(title = "Renta de la tierra hidrocarburífera",
+       subtitle = "Comparación de estimaciones",
+       y = "Millones USD TCp de 2020")+
+  scale_x_continuous(breaks = seq(1990, 2020, 5))
+# # # ggplotly(graf_tipos_renta, width = 800, height = 600)
+graf_tipos_renta = plot_theme(graf_tipos_renta)+theme(
+  axis.text.x = element_text(angle = 45, hjust = 1),
+  strip.text = element_text(12), legend.title = element_blank() )
+
+graf_tipos_renta
+ggsave("../resultados/argentina/comparacion_autores_tipo_renta_usd_tcp.png",
+       graf_tipos_renta, width = 16, height = 10)
 ```
 

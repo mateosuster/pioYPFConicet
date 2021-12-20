@@ -59,12 +59,12 @@ plot_theme <- function(x){
   x+
     theme_light()+
     theme(legend.position = "bottom",
-          plot.title = element_text(size=18),
-          plot.subtitle = element_text(size=16),
-          plot.caption = element_text(14),
-          axis.text = element_text(size = 14),
-          axis.title = element_text(size = 14),
-          legend.text = element_text(size = 14) ,
+          plot.title = element_text(size=16),
+          plot.subtitle = element_text(size=14),
+          plot.caption = element_text(12),
+          axis.text = element_text(size = 11),
+          axis.title = element_text(size = 13),
+          legend.text = element_text(size = 15) ,
           strip.text = element_text(size=16)
     ) 
 }

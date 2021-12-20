@@ -43,6 +43,7 @@ library(huxtable) #revisar esto para dar formato al eje Y
 # library(PerformanceAnalytics)
 library(Hmisc)
 library(zoo)
+source("functions_hidrocarburos.R")
 
 options(scipen = 9999999)
 
@@ -56,9 +57,7 @@ Funciones de conversión
 * [BP](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2019-approximate-conversion-factors.pdf)
 * [EIA](https://www.eia.gov/kids/what-is-energy/energy-calculators.php#natgascalc)
 
-```{r}
-source("functions_hidrocarburos.R")
-```
+
 
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
@@ -276,8 +275,20 @@ renta_autores <- read_csv("../data/otros autores/renta_autores.csv",
                           # row.names = F,
     col_types = cols(X1 = col_skip())) %>% 
   select(-"...1") %>% 
-  rbind(renta_bil_fr)
+  rbind(renta_bil_fr)%>%
+  mutate(tipo_de_renta = case_when(tipo_de_renta=="subsidio_consumo_total" ~"subsidios",
+                                   T~ tipo_de_renta) ,
+         valor = case_when(
+           # (tipo_de_renta == "subsidios")&(autor=="Propia")&(anio<2008) ~ NA_real_,
+           (tipo_de_renta == "retenciones")& 
+             (
+               # (autor=="Propia")|
+                (autor=="Fárfaro Ruiz y Bil"))&(anio<2002)~NA_real_,
+                           # (tipo_de_renta == "renta_empresas")&(autor=="Propia")&(anio<1997)~NA_real_,
+                           T ~valor
+                           ))
 
+# data.table::fwrite(renta_autores, file = "../resultados/argentina/renta_autores.csv")
 
 ```
 
@@ -1090,7 +1101,8 @@ precios_referencia_y_expo_crudo <-  precio_expo_crudo  %>%
   full_join(wti_fred) %>% 
   mutate(precio_expo_crudo_indec = case_when(precio_expo_crudo_indec > 300 ~ NA_real_,
                                              T ~ precio_expo_crudo_indec),
-         precio_me_crudo = case_when(anio %in% 1993:2001 | anio %in% 2004:2014 ~ precio_expo_mecon_crudo,
+         precio_me_crudo = case_when(
+           anio %in% 1993:2001 | anio %in% 2004:2014 ~ precio_expo_mecon_crudo,
                                      anio %in% 2002:2003 ~ precio_expo_comtrade_hs_crudo,
                                      anio > 2014 ~ precio_expo_regalias_crudo,
                                      is.na(precio_expo_comtrade_sitc_crudo) ~ brent_historic,
@@ -3353,14 +3365,6 @@ renta_directo <- renta_tg %>%
   filter(anio >1997)
 renta_directo
 
-# renta_directo %>%
-#   filter(anio >1960) %>%
-#   ggplot(aes(anio, renta_total))+
-#   geom_line()+
-#   labs(title = "Renta hidrocarburífera total a partir de estimación propia del VBP",
-#        y = "Millones de pesos de 2018")+
-#   theme(axis.text.x = element_text(angle = 90))
-
 
 renta_directo_pbi <- renta_directo %>%
   left_join(ganancia_y_pbi %>% rename(unidad_pbi_gcia = unidad),  by = "anio") %>%
@@ -3410,7 +3414,7 @@ renta_indirecto <- renta_dif_precios_crudo %>%
               # select(anio,  subsidios = subsidios_ejes), by ="anio") %>%
   group_by(anio ) %>% 
   mutate_all(function(x) {x / 10^6}) %>% #las vbles cargadas anteriormente se pasan a MM
-  mutate_all(function(x) replace_na(x, 0)) %>% 
+  # mutate_all(function(x) replace_na(x, 0)) %>% 
   ungroup() %>% 
   left_join(renta_tg %>%
               filter(stock_seleccionado == "Bolsar") %>%
@@ -3430,12 +3434,12 @@ renta_indirecto <- renta_dif_precios_crudo %>%
          regalias_total = regalias_total / ipc_18,
          retenciones = retenciones / ipc_18, 
          subsidios = subsidios/ipc_18,
-    subsidios =replace_na(subsidios,  0),
-    renta_empresas =replace_na(renta_empresas,  0),
+    # subsidios =replace_na(subsidios,  0),
+    # renta_empresas =replace_na(renta_empresas,  0),
          renta_empresas =   renta_empresas/ipc_18,
          renta_total = rowSums(cbind( renta_dif_precios_gas, renta_dif_precios_crudo ,
            renta_sobrevaluacion_crudo , renta_sobrevaluacion_gas ,
-           renta_empresas, regalias_total ,  retenciones), na.rm = T) - subsidios,
+           renta_empresas, regalias_total ,  retenciones, subsidios*-1), na.rm = T),
          proporcion_subsidios = subsidios/renta_total  ,
          renta_pv = (renta_total*ipc_18)/ganancia,
          renta_pbi = (renta_total*ipc_18)/pbi,
@@ -3450,7 +3454,8 @@ renta_indirecto <- renta_dif_precios_crudo %>%
   select(anio, unidad, ipc_18,tcc,tcp, everything(.) , -sobrevaluacion) %>% 
   # select(-renta_dif_precios_crudo)
   # select(-renta_dif_precios_brent) %>% 
-  distinct()
+  distinct() %>% 
+  filter(anio > 1960)
 
 # 
 # #Renta total
@@ -3473,9 +3478,11 @@ graf_renta_total <- renta_indirecto %>%
        subtitle = "Cursos de apropiación. Millones pesos de 2018",
        y = "Millones de pesos 2018")+
   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
   theme_classic()
 graf_renta_total = plot_theme(graf_renta_total)
 graf_renta_total
+ggsave("../resultados/argentina/renta_mecanismos.png",graf_renta_total)
 # # ggplotly(graf_renta_total, width = 600, height = 400)
 # 
 # 
@@ -3524,37 +3531,37 @@ graf_renta_total
 
 
 #comparacion con FR
-graf_comparacion_rentas <- renta_indirecto %>%
-  mutate(fuente = "Propia via suma de mecanismos") %>%
-  select(anio, unidad,fuente,  renta_total ) %>%
-  # bind_rows(renta_directo_pbi %>%
-  #               mutate(fuente = "Propia via descuentos sobre VBP") %>%
-  #              select(anio,fuente,  renta_total ) ) %>%
-  bind_rows(renta_hidrocarburos_fr %>%
-              mutate(fuente = "FR y B") %>%
-              select(anio, unidad, fuente,  renta_total)) %>%
-  bind_rows(renta_hidrocarburos_jk %>%
-        select(anio, renta_total) %>%
-        left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-        mutate(renta_total = renta_total/(10^6)/ipc_18,
-               fuente = "JK",
-               unidad = "Millones de pesos 2018") ) %>%
-  bind_rows(renta_fd %>%
-               left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-              mutate(renta_total = (renta_total/1000)/ipc_18,
-              # mutate(renta_total = (pv_neta/1000)/ipc_18,
-                     fuente = "FD",
-               unidad = "Millones de pesos 2018") ) %>%
-  filter(anio >= 1962) %>%
-  ggplot(aes(anio, renta_total, color = fuente))+
-  geom_line()+
-  # geom_point(alpha = 0.35)+
-  theme(legend.position = "bottom")+
-  labs(title = "Renta hidrocarburífera total (petróleo y gas)",
-       subtitle = "Comparación de estimaciones. Millones pesos de 2018",
-       y = "Millones de pesos 2018")+
-  theme_classic()
-graf_comparacion_rentas
+# graf_comparacion_rentas <- renta_indirecto %>%
+#   mutate(fuente = "Propia via suma de mecanismos") %>%
+#   select(anio, unidad,fuente,  renta_total ) %>%
+#   # bind_rows(renta_directo_pbi %>%
+#   #               mutate(fuente = "Propia via descuentos sobre VBP") %>%
+#   #              select(anio,fuente,  renta_total ) ) %>%
+#   bind_rows(renta_hidrocarburos_fr %>%
+#               mutate(fuente = "FR y B") %>%
+#               select(anio, unidad, fuente,  renta_total)) %>%
+#   bind_rows(renta_hidrocarburos_jk %>%
+#         select(anio, renta_total) %>%
+#         left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+#         mutate(renta_total = renta_total/(10^6)/ipc_18,
+#                fuente = "JK",
+#                unidad = "Millones de pesos 2018") ) %>%
+#   bind_rows(renta_fd %>%
+#                left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
+#               mutate(renta_total = (renta_total/1000)/ipc_18,
+#               # mutate(renta_total = (pv_neta/1000)/ipc_18,
+#                      fuente = "FD",
+#                unidad = "Millones de pesos 2018") ) %>%
+#   filter(anio >= 1962) %>%
+#   ggplot(aes(anio, renta_total, color = fuente))+
+#   geom_line()+
+#   # geom_point(alpha = 0.35)+
+#   theme(legend.position = "bottom")+
+#   labs(title = "Renta hidrocarburífera total (petróleo y gas)",
+#        subtitle = "Comparación de estimaciones. Millones pesos de 2018",
+#        y = "Millones de pesos 2018")+
+#   theme_classic()
+# graf_comparacion_rentas
 
 
 
@@ -3772,15 +3779,7 @@ renta_comparacion <- renta_indirecto %>%
   
 
 #grafico comparacion con otros autores
-graf_tipos_renta <- renta_comparacion %>%
-  mutate(tipo_de_renta = case_when(tipo_de_renta=="subsidio_consumo_total" ~"subsidios",
-                                   T~ tipo_de_renta) ,
-         valor = case_when((tipo_de_renta == "subsidios")&(autor=="Propia")&(anio<2008) ~ NA_real_,
-                           (tipo_de_renta == "retenciones")&
-                             ((autor=="Propia")|(autor=="Fárfaro Ruiz y Bil"))&(anio<2002)~NA_real_,
-                           (tipo_de_renta == "renta_empresas")&(autor=="Propia")&(anio<1997)~NA_real_,
-                           T ~valor
-                           )) %>% 
+graf_tipos_renta <- renta_comparacion  %>% 
   filter(!(tipo_de_renta%in% c("renta_total",
                                "renta_diferencial_precios",
                                "renta_estado_total"))) %>%
@@ -3815,6 +3814,7 @@ graf_renta_total_comparacion <- renta_comparacion %>%
        y = "Millones de USD TCp de 2020", x="",
        caption = "Nota: en la estimación propia se utilizó la renta por mecanismos")+
   theme_classic()+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
 graf_renta_total_comparacion =plot_theme( graf_renta_total_comparacion)+theme(
   legend.title = element_blank())
@@ -4206,6 +4206,7 @@ renta_indirecto_dt[, unidad := "Pesos corrientes"]
 
 renta_directo= as.data.table(renta_directo)
 renta_directo[, ipc_18 := NULL]
+renta_directo[, IPC_18 := NULL]
 setnames(renta_directo, 
          c("ppye", "tg_hidrocarburos", "tg_normal" , "pv", "subsidios", "gcia_normal_hidrocarburos", "renta_total" ),
          c("Kcfa", "TG_pyg", "TGnorm", "PV", "Subs",  "Gnorm_pyg", "Rtt")
