@@ -1653,7 +1653,8 @@ expo_q_crudo <- comex_crudo_sesco %>%
   left_join(comex_hidrocarburos_mecon %>% 
               select(anio, expo_mecon_crudo = expo_bbl_crudo)) %>% 
   left_join(cantidades_expo_hidro_indec %>% 
-              select(-expo_indec_gas)) %>% 
+              select(anio, expo_indec_crudo) %>% 
+              na.omit(), by = "anio") %>% 
   full_join(expo_crudo_sitc %>% 
               select(anio, unidad = unidad_cantidad, expo_comtrade_crudo = expo_bbl )) %>% 
   mutate(expo_crudo = case_when(anio < 1999  ~ expo_comtrade_crudo,
@@ -1666,7 +1667,6 @@ expo_q_crudo <- comex_crudo_sesco %>%
   select(anio, unidad,expo_crudo, everything(.), -variable) %>% 
   arrange(anio)
 
-
 # Merge crudo USD
 expo_usd_crudo <- comex_crudo_sesco %>% 
   filter(variable == "exportacion" , unidad == "USD") %>% 
@@ -1678,24 +1678,20 @@ expo_usd_crudo <- comex_crudo_sesco %>%
               select(anio, expo_indec_crudo)) %>% 
   full_join(expo_crudo_sitc %>% 
             select(anio, unidad = unidad_valor, expo_comtrade_crudo = expo_usd_comtrade_crudo)) %>%
-  mutate(expo_crudo_mecon = expo_crudo_mecon *1000000,
+  mutate(expo_crudo_mecon = expo_crudo_mecon *1e6,
          expo_crudo = case_when(anio <1994 ~ expo_comtrade_crudo,
                                 anio >= 1994 ~ expo_crudo_sesco)) %>% 
   ungroup() %>% 
   select(anio, unidad, expo_crudo, everything(.), -c(variable, producto)) %>% 
   arrange(anio) %>% 
-  group_by(anio, unidad) %>% 
-  mutate_all(function(x) {x/10^6})
+  group_by(anio, unidad) #%>% 
+  # mutate_all(function(x) {x/10^6})
 
 # writexl::write_xlsx(list(usd = expo_usd_crudo, 
                          # cantidades = expo_q_crudo,
                          # precio_exportacion_y_referencia = precios_referencia_y_expo_crudo), 
                     # path = "C:/Archivos/Datos/Hidrocarburos/Estimacion propia/resultados/expo_crudo.xlsx")
 
-
-
-write.csv(expo_q_crudo, file = "../resultados/data_viz/expo_q_crudo.csv", row.names = F)
-write.csv(expo_usd_crudo, file = "../resultados/data_viz/expo_usd_crudo.csv", row.names = F)
 ```
 
 
@@ -1714,11 +1710,6 @@ comex_gas <- comercio_exterior %>%
   summarise(valor = sum(valor, na.rm = T))%>% 
   mutate(producto = "gas")
 
-# writexl::write_xlsx(list(comex_crudo_sesco %>% filter(unidad == "USD", variable == "exportacion"),
-#                          comex_crudo_sesco %>% filter(unidad == "USD", variable == "importacion"),
-#                          comex_gas %>% filter(unidad == "USD", variable == "importacion"),
-#                          comex_gas %>% filter(unidad == "USD", variable == "exportacion")), 
-#                     path = "comex_sesco.xlsx")
 
 #Expo gas SESCO cantidades
 expo_sesco_q_gas <- comex_gas  %>%
@@ -1757,7 +1748,8 @@ expo_q_gas <-  expo_sesco_q_gas %>%
               mutate(unidad = "Miles de m3",
                      expo_gas_mecon = expo_gas_mecon * 1000) ) %>% 
   left_join(cantidades_expo_hidro_indec %>% 
-              select(-expo_indec_crudo)) %>% 
+              select(expo_indec_gas, anio) %>% 
+              na.omit()) %>% 
   full_join(expo_gas_sitc %>%
               select(anio, expo_gas_comtrade = expo_Mm3, unidad = unidad_cantidad )) %>% 
   # mutate(dif = expo_sesco_gas/ expo_indec_gas - 1 ) %>%
@@ -1787,20 +1779,7 @@ expo_usd_gas <- expo_sesco_usd_gas %>%
                                 anio >= 1997 ~ expo_sesco_gas)) %>% 
   select(anio, unidad, expo_gas, everything(.)) %>% 
   arrange(anio)
-  
 
-# writexl::write_xlsx(list( cantidades = expo_q_gas, 
-#                           USD = expo_usd_gas, 
-#                           precio_expo_y_referencia = precio_expo_y_me_gas),
-#                     path = "resultados/expo_gas.xlsx")
-
-# comex_crudo_sesco %>% filter(unidad == "m3", variable == "exportacion")
-# comex_gas %>% filter(unidad == "m3", variable == "exportacion")
- 
-
-
-write.csv(expo_q_gas, file = "../resultados/data_viz/expo_q_gas.csv", row.names = F)
-write.csv(expo_usd_gas, file = "../resultados/data_viz/expo_usd_gas.csv", row.names = F)
 ```
 
 
@@ -3636,50 +3615,6 @@ ggsave("../resultados/argentina/renta_mecanismos.png",graf_renta_total)
 
 ## Costos
 
-$$Q\_total = Q_{petróleo} + Q_{gas} $$
-Donde:
-  
-  * $Q\_total$ = Cantidades producidas de petróleo y gas en Barriles Equivalentes de Petróleo
-  * $Q_{petróleo}$ = Cantidades producidas de petróleo crudo en barriles equivalentes de petróleo (BOE)
-  * $Q_{gas}$ = Cantidades producidas de gas natural en barriles equivalentes de petróleo (BOE)
-  
-
-$$ Costos\_totales =  CI + MS + ConKfijo$$
-
-Donde:
-
-* $Costos\_totales$ = Costos totales hidrocarburíferos
-* $CI$ = Consumo Intermedio, distintas estimaciones
-* $MS$ = Masa Salarial, distintas estimaciones
-* $ConKfijo$ = Consumo de Capital Fijo
-
-
-$$Costos\_totales\_con\_Gcia = Costos\_totales + Gcia\_Normal_{hidrocarburífera} $$
-Donde:
-
-* $Costos\_totales\_con\_Gcia$ = Costos totales hidrocarburíferos con ganancia normal 
-* $Gcia\_Normal_{hidrocarburífera}$ = Ganancia normal del sector hidrocarburífero
-
-$$ Precio\_costo = \frac{Costos\_totales}{Q\_total}   $$
-Donde:
-* $Precio\_costo$ = Precio de costo en BOE
-
-A partir de esto se puede calcular un costo recuperable del petróleo y del gas
-
-$$Costo\_crudo = Q_{petróleo} * Precio\_costo$$
-$$Costo\_gas = Q_{gas} * Precio\_costo$$
-
-
-$$Precio\_produccion = \frac{Costos\_totales\_con\_Gcia}{Q\_total}$$
-
-$$Precio\_vta\_potencial =  \frac{Q\_total*Pext_{petróleo} - Costos\_totales}{Q\_total} $$
-
-
-Donde:
-* $Precio\_produccion$= Precio de produccion
-* $Precio_vta_potencial$ = Precio de venta potencial
-* $Pext_{petróleo}$ = Precio de exportación/referencia internacional del petróleo crudo
-
 ```{r}
 #estimacion costos propia
 costos <- produccion_total %>% 
@@ -3724,13 +3659,6 @@ costos <- produccion_total %>%
 #expresar en usd tcc y tcp
 # costos
 
-# costos %>% 
-#            filter(anio > 1997) %>% 
-#   ggplot(aes(anio, precio_costo, color = fuente))+ 
-#   geom_line(alpha = 0.5, size = 1.4)+
-#     labs(title = "Precio de costo",
-#          subtitle= "Estimacion propia a partir de CCNN y reestimacion de VBP con criterio CCNN", 
-#          y = "USD/BOE", x = "Año")
 
 
 ```
@@ -3873,8 +3801,6 @@ print( delta)
 ```{r include=FALSE}
 library(data.table)
 
-# Renta de la tierra petrolera por el diferencial de precios entre el mercado interno y las referencias internacionales; y+6:12
-
 ## Exportación de resultados
 
 #Variables
@@ -3949,25 +3875,63 @@ prod_merge_gas_MMBTU[, fuente := fcase(codigo_variable == "Q_gas_regalias", "Sec
                                    default = NA  )]
 
 # expo q crudo
-expo_q_crudo = as.data.table(expo_q_crudo)
-expo_q_crudo[, `:=`  ("...1" = NULL, "expo_crudo" = NULL) ]
-expo_q_crudo[, variable := "Exportaciones de petróleo crudo"]
-setnames(expo_q_crudo, 
+expo_q_crudo_dt = as.data.table(expo_q_crudo)
+expo_q_crudo_dt[, `:=`  ( "expo_crudo" = NULL) ]
+expo_q_crudo_dt[, variable := "Exportaciones de petróleo crudo"]
+setnames(expo_q_crudo_dt, 
          old = c("expo_sesco_crudo", "expo_mecon_crudo", "expo_indec_crudo","expo_comtrade_crudo" ),
          new = c( "Sec. Energía - SESCO", "MECON", "INDEC", "UN-Comtrade" ))
-expo_q_crudo = melt(expo_q_crudo, 
+expo_q_crudo_dt = melt(expo_q_crudo_dt, 
                         id.vars = c("anio", "variable", "unidad"), 
                         variable.name = "fuente", value.name = "valor")
-expo_q_crudo = expo_q_crudo[!is.na(valor)]
-expo_q_crudo[, codigo_variable := fcase( fuente==  "Sec. Energía - SESCO" , "X_crudo_sesco",
+# expo_q_crudo = expo_q_crudo[!is.na(valor)]
+expo_q_crudo_dt[, codigo_variable := fcase( fuente==  "Sec. Energía - SESCO" , "X_crudo_sesco",
                                          fuente== "MECON", "X_crudo_mecon", 
                                          fuente== "INDEC", "X_crudo_indec", 
                                          fuente==   "UN-Comtrade", "X_crudo_comtrade" ) ]
+#expo USD crudo
+expo_usd_crudo =as.data.table(expo_usd_crudo)
+expo_usd_crudo[, expo_crudo := NULL]
+expo_usd_crudo[, variable := "Exportaciones de petróleo crudo"]
+setnames(expo_usd_crudo, 
+         old = c("expo_crudo_sesco", "expo_crudo_mecon", "expo_indec_crudo","expo_comtrade_crudo" ),
+         new = c( "Sec. Energía - SESCO", "MECON", "INDEC", "UN-Comtrade" ))
+expo_usd_crudo = melt(expo_usd_crudo, 
+                        id.vars = c("anio", "variable", "unidad"), 
+                        variable.name = "fuente", value.name = "valor")
+# expo_usd_crudo = na.omit(expo_usd_crudo)
+expo_usd_crudo[, codigo_variable := fcase( fuente==  "Sec. Energía - SESCO" , "X_crudo_sesco",
+                                         fuente== "MECON", "X_crudo_mecon", 
+                                         fuente== "INDEC", "X_crudo_indec", 
+                                         fuente==   "UN-Comtrade", "X_crudo_comtrade" ) ]
+#impo crudo
+impo_crudo= as.data.table(comex_crudo_sesco)
+impo_crudo[, producto := NULL]
+impo_crudo = impo_crudo[variable == "importacion" & unidad != "ton"]
+impo_crudo[,  `:=`  (variable = "Importaciones de petróleo crudo",
+                     codigo_variable = "M_crudo_sesco",
+                     fuente = "Sec. Energía - SESCO")]
 
+#impo_gas
+impo_gas= as.data.table(comex_gas)
+impo_gas[, producto := NULL]
+impo_gas = impo_gas[variable == "importacion" & unidad != "ton"]
+impo_gas[,  `:=`  (variable = "Importaciones de gas natural",
+                     codigo_variable = "M_gas_sesco",
+                     fuente = "Sec. Energía - SESCO")]
+impo_gas[, valor := fcase(unidad == "m3", conversor_m3MMBTU_q(valor) ,
+                          unidad == "USD", valor)]
+impo_gas[, unidad := fcase(unidad == "m3", "MMBTU" ,
+                           unidad == "USD", "USD")]
+# impo_gas[, valor := fcase(unidad == "m3", valor/Hmisc::yearDays(as.Date(paste0(anio, "-01-01" ))) ,
+#                           # default = valor)]
+#                           unidad == "USD", valor)]
+# impo_gas[, unidad := fcase(unidad == "m3", "m3/d" ,
+#                            unidad == "USD", "USD")]     # CONVERSION A m3/dia
 
 # expo q gas
 expo_q_gas_MMBTU = as.data.table(expo_q_gas_MMBTU)
-expo_q_gas_MMBTU[, `:=`  ("...1" = NULL, "expo_gas" = NULL) ]
+expo_q_gas_MMBTU[, `:=`  ( "expo_gas" = NULL) ]
 expo_q_gas_MMBTU[, variable := "Exportaciones de gas natural"]
 setnames(expo_q_gas_MMBTU, 
          old = c("expo_sesco_gas", "expo_gas_mecon", "expo_indec_gas","expo_gas_comtrade" ),
@@ -3975,8 +3939,24 @@ setnames(expo_q_gas_MMBTU,
 expo_q_gas_MMBTU = melt(expo_q_gas_MMBTU, 
                         id.vars = c("anio", "variable", "unidad"), 
                         variable.name = "fuente", value.name = "valor")
-expo_q_gas_MMBTU = expo_q_gas_MMBTU[!is.na(valor)]
+# expo_q_gas_MMBTU = expo_q_gas_MMBTU[!is.na(valor)]
 expo_q_gas_MMBTU[, codigo_variable := fcase( fuente==  "Sec. Energía - SESCO" , "X_gas_sesco",
+                                         fuente== "MECON", "X_gas_mecon", 
+                                         fuente== "INDEC", "X_gas_indec", 
+                                         fuente==   "UN-Comtrade", "X_gas_comtrade" ) ]
+
+# expo USD gas
+expo_usd_gas = as.data.table(expo_usd_gas)
+expo_usd_gas[, expo_gas := NULL]
+expo_usd_gas[, variable := "Exportaciones de gas natural"]
+setnames(expo_usd_gas, 
+         old = c("expo_sesco_gas", "expo_gas_mecon", "expo_gas_indec","expo_gas_comtrade" ),
+         new = c( "Sec. Energía - SESCO", "MECON", "INDEC", "UN-Comtrade" ))
+expo_usd_gas = melt(expo_usd_gas, 
+                        id.vars = c("anio", "variable", "unidad"), 
+                        variable.name = "fuente", value.name = "valor")
+# expo_usd_gas = expo_usd_gas[!is.na(valor)]
+expo_usd_gas[, codigo_variable := fcase( fuente==  "Sec. Energía - SESCO" , "X_gas_sesco",
                                          fuente== "MECON", "X_gas_mecon", 
                                          fuente== "INDEC", "X_gas_indec", 
                                          fuente==   "UN-Comtrade", "X_gas_comtrade" ) ]
@@ -4450,7 +4430,9 @@ setnames(costos_pg_ccnn, c("produccion_total", "costos_totales",
 
 #concatenacion de all data
 all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU, 
-               expo_q_crudo , expo_q_gas_MMBTU,
+               expo_q_crudo_dt , expo_usd_crudo, 
+               expo_q_gas_MMBTU, expo_usd_gas,
+               impo_crudo, impo_gas,
                precio_mi_crudo, precio_interno_gas_mmbtu_usd, 
                precios_referencia_crudo, precios_exportacion_crudo, 
                precios_referencia_gas, precios_exportacion_gas,
