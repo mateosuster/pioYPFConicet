@@ -24,7 +24,11 @@ library(readxl)
 source("functions_hidrocarburos.R")
 ```
 
-# Variables
+# Datos
+
+# Variables preprocesadas
+El siguient dataset con variables del mercado hidrocarburífero de largo plazo se elabora a partir del script (preprocesamiento)[https://github.com/mateosuster/pioYPFConicet/blob/main/analisis/codigos/preprocesamiento.Rmd], disponible en nuestro repositorio de GitHub. Esta base de datos también se encuentra publicada en el repositorio (Harvard Datverse)[https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/UTKSOE].
+
 ```{r}
 # datos de variables
 data = fread("../resultados/argentina/variables.csv")
@@ -38,7 +42,7 @@ cat("\n")
 unique(data$unidad)
 ```
 
-
+Además, se requieren otros datasets para realizar conversiones a dolares de poder adquisitivo constante. Por lo tanto, cargamos los datos del tipo de cambio de paridad y el índice de precios al consumidor de Estados Unidos.
 ```{r}
 #TC
 tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
@@ -140,8 +144,7 @@ as.data.frame(dcast(data[ variable == "Producción de gas natural", ] ,
 
 ## Precio Mercado Interno
 
-  Fuentes: 
-
+ Fuentes: 
 * [Base Ministerio de Hacienda, Informes
 Sectoriales](https://www.argentina.gob.ar/economia/politicaeconomica/regionalysectorial/informesproductivos)
 * [Secretaría de Energía-Regalias](http://datos.minem.gob.ar/dataset/regalias-de-petroleo-crudo-gas-natural-glp-gasolina-y-condensado)
@@ -414,7 +417,7 @@ ggplot(data[ variable == "Exportaciones de petróleo crudo" & unidad == "USD", ]
 
 #### Importaciones de crudo
 
-Se torna = 0 post 2010, hay que revisar comtrade
+Se torna = 0 post 2010, hay que revisar comtrade e INDEC
 ```{r}
 ggplot(data[ variable == "Importaciones de petróleo crudo" & unidad == "barriles", ],
                           aes(anio, valor, color = fuente))+
@@ -711,7 +714,7 @@ Donde:
 
 
 
-## Fuentes para la construcción de series 
+# Fuentes para la construcción de series de largo plazo
 
 * Producción de Crudo: 
   + 1911 a 1992: Anuario de combustibles 
