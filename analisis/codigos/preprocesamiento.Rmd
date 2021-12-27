@@ -25,7 +25,7 @@ output:
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 # library(xtable) # ej xtable(tabla) para pasar a latex
 
-rm(list = ls())
+# rm(list = ls())
 gc()
 
 t0  <- Sys.time()
@@ -970,6 +970,24 @@ precio_expo_indec <- read_csv("../data/indec/precio_anual_promedio_expo_hidro_in
   #                           T ~ unidad))
 
 #UN COMTRADE
+# ojo q existe data_comtrade[data_comtrade$`Qty Unit`=="No Quantity",]
+data_comtrade  <-  read_csv("../data/un_comtrade/all_crude_gas_sict.csv") %>% 
+  mutate(cantidad = case_when(Commodity == "Crude petroleum"~ 
+                                  conversor_kgbbl_q(`Netweight (kg)`) ,
+                                Commodity == "Gas, natural"~
+                                  conversor_kgm3_q( `Netweight (kg)`)),
+         unidad =case_when(Commodity == "Crude petroleum"~ 
+                                  "barriles" ,
+                                Commodity == "Gas, natural"~
+                             "MMBTU"),
+         precio = `Trade Value (US$)` / cantidad ) %>%
+  # rename(anio = Period,
+  #        valor = "Trade Value (US$)") %>% 
+  select(anio = Period, Classification, 
+         trade_flow = "Trade Flow", reporter = Reporter, partner = Partner,
+         commodity_code = "Commodity Code", commodity= Commodity,
+         unidad, cantidad, valor = "Trade Value (US$)", precio)
+
 expo_crudo_uncomtrade_hs <- read_csv("../data/un_comtrade/expo_crudo_uncomtrade_hs.csv") %>% 
   mutate(unidad_precio = "USD/barriles",
          unidad_valor = "USD",
@@ -1506,9 +1524,9 @@ precio_crudo_vs_gas
 
 
 
-## Exportaciones e Importaciones
+## Comercio exterior
 
-#### Exportaciones e Importaciones de Crudo
+#### Exportaciones de crudo
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 ### SESCO
@@ -1596,11 +1614,9 @@ comex_crudo_sesco <- comercio_exterior %>%
          valor = case_when(unidad == "m3" ~ conversor_m3bbl_q(valor),
                            T ~ valor),
          unidad = case_when(unidad == "m3" ~ "barriles",
-                            T ~ unidad))
+                            T ~ unidad),
+         anio = as.double(anio) )
 
-
-#qué productos entran en el filtro de crudo?
-# unique((comercio_exterior %>% filter(str_detect(producto, "PETROLEO") | str_detect(producto, "Cuenca")))$producto)
 
 
 #MECON
@@ -1647,7 +1663,6 @@ expo_q_crudo <- comex_crudo_sesco %>%
   filter(variable == "exportacion",
          unidad == "barriles") %>%
   select(anio, unidad, valor) %>% 
-  mutate(anio = as.double(anio)) %>% 
   ungroup() %>% 
   rename(expo_sesco_crudo = valor) %>% 
   left_join(comex_hidrocarburos_mecon %>% 
@@ -1694,9 +1709,32 @@ expo_usd_crudo <- comex_crudo_sesco %>%
 
 ```
 
+#### Importaciones de crudo
+```{r}
+impo_crudo = comex_crudo_sesco %>% 
+  filter(variable == "importacion", unidad !="ton") %>% 
+  mutate(fuente = "Sec. Energía - SESCO",
+         variable = "Importación de petróleo crudo") %>% 
+  bind_rows(data_comtrade %>%
+              filter(trade_flow == "Import",
+                     commodity_code == 33101) %>%
+              mutate( producto ="crudo",
+                     variable = "Importación de petróleo crudo", fuente = "UN-Comtrade") %>% 
+              select( anio, variable, producto,
+                      USD = valor , barriles = cantidad, fuente) %>% 
+              pivot_longer(cols = c(USD,barriles), names_to = "unidad",
+                           values_to = "valor", names_repair = "unique"))
+impo_crudo %>% 
+  ggplot(aes(anio, valor, color = fuente))+
+  geom_line()+
+  facet_wrap(~unidad, scales = "free")
+
+```
 
 
-#### Exportaciones e Importaciones de Gas
+
+
+#### Exportaciones de gas natural
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -1708,7 +1746,8 @@ comex_gas <- comercio_exterior %>%
          unidad != "Ton") %>%
   group_by(anio, variable, unidad) %>% 
   summarise(valor = sum(valor, na.rm = T))%>% 
-  mutate(producto = "gas")
+  mutate(producto = "gas",
+         anio = as.double(anio))
 
 
 #Expo gas SESCO cantidades
@@ -1728,8 +1767,8 @@ expo_sesco_usd_gas <- comex_gas  %>%
          unidad == "USD") %>% 
   ungroup() %>% 
   select(-c(variable, producto)) %>%
-  rename(expo_sesco_gas = valor) %>%
-  mutate(expo_sesco_gas = replace_na(expo_sesco_gas, 0 ))
+  rename(expo_sesco_gas = valor)# %>%
+  # mutate(expo_sesco_gas = replace_na(expo_sesco_gas, 0 ))
 
 
 #expo UN Comtrade
@@ -1742,7 +1781,6 @@ expo_gas_sitc <- read_csv("../data/un_comtrade/expo_gas_sitc.csv")  %>%
 
 #Merge cantidades
 expo_q_gas <-  expo_sesco_q_gas %>% 
-  mutate(anio = as.double(anio)) %>% 
   left_join(comex_hidrocarburos_mecon %>% 
               select(anio, expo_gas_mecon = expo_MMm3_gas) %>%
               mutate(unidad = "Miles de m3",
@@ -1782,6 +1820,30 @@ expo_usd_gas <- expo_sesco_usd_gas %>%
 
 ```
 
+#### Importaciones de gas natural
+
+```{r}
+
+impo_gas = comex_gas %>% 
+  filter(variable == "importacion", unidad !="ton") %>% 
+  mutate(fuente = "Sec. Energía - SESCO",
+         variable = "Importación de gas natural") %>% 
+  bind_rows(data_comtrade %>%
+              filter(trade_flow == "Import",
+                     commodity_code == 3411) %>%
+              mutate( producto ="gas",
+                     variable = "Importación de gas natural", 
+                     fuente = "UN-Comtrade") %>% 
+              select( anio, variable, producto,
+                      USD = valor , m3 = cantidad, fuente) %>% 
+              pivot_longer(cols = c(USD,m3), names_to = "unidad",
+                           values_to = "valor", names_repair = "unique"))
+impo_gas %>% 
+  ggplot(aes(anio, valor, color = fuente))+
+  geom_line()+
+  facet_wrap(~unidad, scales = "free")
+
+```
 
 ## Empleo, Remuneraciones y Masa Salarial (CCNN)
 
@@ -3905,29 +3967,26 @@ expo_usd_crudo[, codigo_variable := fcase( fuente==  "Sec. Energía - SESCO" , "
                                          fuente== "INDEC", "X_crudo_indec", 
                                          fuente==   "UN-Comtrade", "X_crudo_comtrade" ) ]
 #impo crudo
-impo_crudo= as.data.table(comex_crudo_sesco)
-impo_crudo[, producto := NULL]
-impo_crudo = impo_crudo[variable == "importacion" & unidad != "ton"]
-impo_crudo[,  `:=`  (variable = "Importaciones de petróleo crudo",
-                     codigo_variable = "M_crudo_sesco",
-                     fuente = "Sec. Energía - SESCO")]
+impo_crudo_dt= as.data.table(impo_crudo)
+impo_crudo_dt[, producto := NULL]
+impo_crudo_dt[,  codigo_variable:=  fcase( fuente == "Sec. Energía - SESCO", "M_crudo_sesco",
+                                        fuente == "UN-Comtrade", "M_crudo_comtrade")]
 
 #impo_gas
-impo_gas= as.data.table(comex_gas)
-impo_gas[, producto := NULL]
-impo_gas = impo_gas[variable == "importacion" & unidad != "ton"]
-impo_gas[,  `:=`  (variable = "Importaciones de gas natural",
-                     codigo_variable = "M_gas_sesco",
-                     fuente = "Sec. Energía - SESCO")]
-impo_gas[, valor := fcase(unidad == "m3", conversor_m3MMBTU_q(valor) ,
+impo_gas_dt= as.data.table(impo_gas)
+impo_gas_dt[, producto := NULL]
+impo_gas_dt[,  codigo_variable:=  fcase( fuente == "Sec. Energía - SESCO", "M_gas_sesco",
+                                        fuente == "UN-Comtrade", "M_gas_comtrade")]
+impo_gas_dt[, valor := fcase(unidad == "m3", conversor_m3MMBTU_q(valor) ,
                           unidad == "USD", valor)]
-impo_gas[, unidad := fcase(unidad == "m3", "MMBTU" ,
+impo_gas_dt[, unidad := fcase(unidad == "m3", "MMBTU" ,
                            unidad == "USD", "USD")]
 # impo_gas[, valor := fcase(unidad == "m3", valor/Hmisc::yearDays(as.Date(paste0(anio, "-01-01" ))) ,
 #                           # default = valor)]
 #                           unidad == "USD", valor)]
 # impo_gas[, unidad := fcase(unidad == "m3", "m3/d" ,
 #                            unidad == "USD", "USD")]     # CONVERSION A m3/dia
+
 
 # expo q gas
 expo_q_gas_MMBTU = as.data.table(expo_q_gas_MMBTU)

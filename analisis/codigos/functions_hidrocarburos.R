@@ -3,11 +3,19 @@
 conversor_m3bbl_p <- function(x) {x / 6.2898}
 conversor_m3bbl_q <- function(x) {x * 6.2898}
 
+# 1kg = 0,006289 bbl
+conversor_kgbbl_q <-function(x) {x * 0.0062898107438466}
+
 # Funciones de conversión para gas
 ## Pies cúbico a metro cúbico
 ## 1ft³= 0.02831685m³
 conversor_ft3m3_p <- function(x) {x / 0.02831685}
 conversor_ft3m3_q <- function(x) {x * 0.02831685}
+
+## kilogramo a m3 (densidad del gas)
+# "CHEQUEAR"
+conversor_kgm3_q <- function(x){ x / 0.737 }  # a 15°C http://gasnam.es/wp-content/uploads/2018/01/2016.01.21-Tabla-GASNAM-SEDIGAS-b.pdf
+
 
 ## Pie cúbico a Millón de BTU
 # 1 ft3 =  0.001028 MM BTU
