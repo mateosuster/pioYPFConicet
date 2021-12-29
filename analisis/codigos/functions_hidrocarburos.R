@@ -1,3 +1,23 @@
+#función de conversión
+conversor_hidrocarburos <- function(x, from, to, producto, tipo="cantidad"){
+  if (producto == "gas"){
+    if( from == "MMBTU" & to == "m3"){
+      if(tipo == "cantidad"){ rtr = x * 28.32861 
+        } else if(tipo == "precio") {rtr = x / 28.32861}
+      }
+    
+  } else if(producto == "crudo"){
+    if( from == "m3" & to == "bbl"){
+      if(tipo == "cantidad"){ rtr = x * 6.2898 
+      } else if(tipo == "precio") {rtr = x / 6.2898}
+    }
+  }
+  
+  return(rtr)
+
+}
+
+
 # Funciones de conversión para crudo
 ## Metro cubico a barril (_p = precio, _q = cantidad)
 conversor_m3bbl_p <- function(x) {x / 6.2898}
@@ -63,6 +83,14 @@ generar_indice <-  function(serie,fecha, fecha_base){
 }
 
 
+# GRAFICOS
+theme_propio <- function(x) {x +
+    theme_light()+
+    theme(
+      legend.position = "bottom", 
+      plot.title = element_text(size=11),
+      plot.caption = element_text(size = 7.5))}
+
 plot_theme <- function(x){
   x+
     theme_light()+
@@ -75,4 +103,11 @@ plot_theme <- function(x){
           legend.text = element_text(size = 15) ,
           strip.text = element_text(size=16)
     ) 
+}
+
+plot_ggplotly = function(x){
+  ggplotly(theme_propio(x))  %>%
+    layout(legend = list(
+      orientation = "h",
+      x = 0.1, y = -0.2) )
 }
