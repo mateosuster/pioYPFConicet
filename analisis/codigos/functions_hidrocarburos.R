@@ -89,7 +89,9 @@ theme_propio <- function(x) {x +
     theme(
       legend.position = "bottom", 
       plot.title = element_text(size=11),
-      plot.caption = element_text(size = 7.5))}
+      plot.caption = element_text(size = 7.5),
+      axis.text.x = element_text(angle =45, vjust = 0.6, hjust = 0.5)
+      )}
 
 plot_theme <- function(x){
   x+

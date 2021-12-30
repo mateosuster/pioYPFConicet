@@ -70,11 +70,17 @@ Sectoriales](https://www.argentina.gob.ar/economia/politicaeconomica/regionalyse
 * Kozulj y Pistonesi. Revista  del Instituto de Economía Energética (IDEE) - Fundación Bariloche  (1970 - 1988)
 * [EIA](https://www.eia.gov/international/data/country/ARG/petroleum-and-other-liquids/annual-petroleum-and-other-liquids-production?pd=5&p=0000000000000000000000000000000000vg&u=0&f=A&v=mapbubble&a=-&i=none&vo=value&&t=C&g=none&l=249--6&s=94694400000&e=1546300800000) (1980 - 2019)
 
-### Producción de Crudo
+### Producción de petróleo crudo
 
-NOTA: hacer foco en la producción convencional vs no convencional actual
+A grandes rasgos, la producción de petróleo crudo en Argentina presentó una tendencia creciente hasta finales del siglo XIX, para luego entrar en una fase decreciente. Este recorrido histórico no estuvo excento de momentos fluctuantes de auge y contracción. 
 
-La producción de petróleo crudo de largo plazo proviene del Anuario de Combustibles, de la cual contamos datos desde 1911 hasta 1992. Sus valores para el período 1980-1992 coinciden con los de EIA, por lo cual pueden usarse como fuentes alternativas. Asimismo, la evolución de SESCO es similar a la de EIA, salvo por pequeñas divergencias entre 2008 y 2013. La serie de Regalías presenta un nivel menor que las anteriores debido a las deducciones de producción que realizan las empresas para pagar un menor nivel de Regalías hacia las provincias donde realizan la producción. Por último, la serie del Ministerio de Economía coincide con Regalías en sus primeros años, luego presenta un nivel intermedio entre Regalías y SESCO y a partir de 2009 toma a SESCO como fuente. Salvo el Anuario de Combustibles, el resto de las series presentan datos hasta los últimos años. Por lo tanto, el criterio de selección para la serie de producción con la que se realizarán los cálculos es el siguiente:
+La producción se inicia entre las décadas de 1910 y 1920. Las principales concesiones petroleras se encontraban en en Comodoro Rivadavia, Neuquén, Salta y Mendoza. Entre otras compañías, se encontraban Astra, Shell, Ferrocarrilera de Petróleo, Standard Oil y Gulf Oil. 
+
+Las inversiones extranjeras de la década del 1960, muchas tomando forma en los convenios de YPF con empresas privadas para los trabajos de perforación, exploración y producción, permiten un aumento marcado de la producción. Gracias a ello, por primera vez, en 1962 se logra, aunque sólo momentáneamente, el autoabastecimiento petrolero. En toda esa década se observa un sostenido aumento, el cual se detiene entrado a 1970, lo cual empalma con el embargo petrolero de 1973 y la suba exorbitante del precio a nivel mundial, primero en 1973/74 y luego nuevamente en 1979 (Gráfico N°#).  
+
+La década de 1990 está marcada por un sostenido aumento de la producción, la cual se revierte entrado en los 2000. La crisis del 2001 y la devaluación de la moneda incentivan la exportación en 2002, pero la tendencia decreciente no se logra revertir. La producción de petróleo crudo en 2020 cerró en niveles de 1988/89. El auge de la producción no convencional en Vaca Muerta, y la situación del mercado mundial de energía luego de la crisis destada por la pandemia del COVID-19, son determinantes que explican la situación del mercado hidrocarburífero actual y las tendencias a futuro.
+
+Con respecto a las fuentes, la serie de largo plazo proviene del Anuario de Combustibles, de la cual contamos datos desde 1911 hasta 1992. Sus valores para el período 1980-1992 coinciden con los de EIA, por lo cual pueden usarse como fuentes alternativas. Asimismo, la evolución de SESCO es similar a la de EIA, salvo por pequeñas divergencias entre 2008 y 2013. La serie de Regalías, publicada por la Secretaría de Energía, presenta un nivel menor que las anteriores debido a las deducciones de producción que realizan las empresas para pagar un menor nivel de regalías hacia las provincias donde realizan la producción. Por último, la serie del Ministerio de Economía coincide con Regalías en sus primeros años, luego presenta un nivel intermedio entre Regalías y SESCO y a partir de 2009 toma a SESCO como fuente. Salvo el Anuario de Combustibles, el resto de las series presentan datos hasta los últimos años.
 
 
   
@@ -84,21 +90,19 @@ prod_crudo_plt <-  ggplot(data[ variable == "Producción de petróleo crudo", ],
   geom_line()+
   labs(title = "Gráfico 1. Producción de petróleo crudo. Argentina (1911 - 2020)",
        y = "Millones de barriles",
-       x = "Año",
-       caption = "Fuente: elaboración propia en base a Anuario de Combustibles, EIA, Ministerio de Economía, Secretaría de Energía (Base Regalías y SESCO)")+
-  # scale_shape_discrete(name = "Fuente")+
+       x = "Año")+
   # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
   scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
-  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
+  scale_x_continuous(breaks = seq(1910, 2030, by = 5))
 
 plot_ggplotly(prod_crudo_plt)
 ```
 
-### Producción de Gas Natural
+### Producción de gas natural
 
+La producción de gas natural posee similitudes y diferencias con respecto a la de petróleo crudo. Como rasgo en común, se encuentra el fuerte aumento de la década de 1960 y la tendencia creciente hacia fines del siglo XIX, la cual también se revierte para principios de los 2002. En cuanto a las diferencias, se puede mencionar su menor fluctuación cíclica a lo largo de los años y el cambio de tendencia en la producción a partir de 2013, gracias a los abultados subsidios estatales y la puesta en marcha de yacimientos no convencionales (shale y tigh gas).
 
-
-Al igual que en la producción de petróleo crudo, la serie de largo plazo de producción de gas proviene del Anuario de Combustibles, de la cual contamos datos desde 1913 hasta 1992. A diferencia del crudo, sus valores para el período 1980-1992 no coinciden con los de EIA, pero está última sí coincide con los de Regalías entre 1999 y 2015. En cambio, la serie de SESCO, tiende a continuar la evolución de EIA y Regalías, pero con el nivel del Anuario de Combustibles, por lo que ambos pares de series pueden empalmar coherentemente según su nivel. Nuevamente, los valores de la base de Regalías son menores debido a las deducciones de producción para tributar menos regalías. La serie del Ministerio de Economía toma los valores de SESCO.Por lo tanto, el criterio de selección para la serie de producción de gas para los cálculos es el siguiente:
+La serie de largo plazo de producción de gas también proviene del Anuario de Combustibles, de la cual contamos datos desde 1913 hasta 1992. A diferencia del crudo, sus valores para el período 1980-1992 no coinciden con los de EIA, pero está última sí coincide con los de Regalías entre 1999 y 2015. En cambio, la serie de SESCO, tiende a continuar la evolución de EIA y Regalías, pero con el nivel del Anuario de Combustibles, por lo que ambos pares de series pueden empalmar coherentemente según su nivel. Nuevamente, los valores de la base de Regalías son menores debido a las deducciones de producción para tributar menos regalías. La serie del Ministerio de Economía toma los valores de SESCO. 
 
 ```{r}
 prod_gas_plt <-  ggplot(data[ variable == "Producción de gas natural", ],
@@ -117,6 +121,12 @@ plot_ggplotly(prod_gas_plt)
 
 ```
 
+### Producción convencional y no convencional
+```{r}
+
+```
+
+
 ## Precio Mercado Interno
 
  Fuentes: 
@@ -126,7 +136,6 @@ Sectoriales](https://www.argentina.gob.ar/economia/politicaeconomica/regionalyse
   + Por ausencia de información, el precio de regalias entre 1993 y 1998 es el precio total (es decir, es un ponderado que incluye también el precio del mercado externo). En los años posteriores, dicho precio sí corresponde al del mercado interno.  
 * Kozulj y Pistonesi. Revista  del Instituto de Economía Energética (IDEE) - Fundación Bariloche  (1970 - 1988). Precio oficial interno de la cuenca neuquina a tasa de cambio oficial. Las fuentes utilizadas de esta revista son Secretaria de Energía, YPF, Gas del Estado, Boletin Informativo de Techint y series propias de IDEE
 * Memoria Anual y balances contables de YPF (varios años). Precio intero promedio resultante de la relación entre ventas y cantidades producidas.
-
 
 ####  Precio Mercado Interno de Crudo
 
