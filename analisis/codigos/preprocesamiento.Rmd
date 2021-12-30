@@ -689,15 +689,16 @@ precio_mi_crudo <- precio_mi_regalias_crudo %>%
   mutate_at(.vars = c("precio_mi_regalias_crudo", 
                       "precio_mi_mecon_crudo", "precio_mi_ypf_crudo", "precio_mi_idee_crudo"), 
             .funs = conversor_m3bbl_p) %>% 
-  left_join(precios_mecon %>% 
-              select(anio, precio_mi_mecon_ccnn_crudo = precio_crudo_mi_usd_bbl )) %>% 
+  # left_join(precios_mecon %>% 
+  #             select(anio, precio_mi_mecon_ccnn_crudo = precio_crudo_mi_usd_bbl )) %>% 
   left_join(ipim_base94 %>% 
               select(anio, ipim_nivel_gral_94), by = "anio") %>% 
   rename(regalias = precio_mi_regalias_crudo,
          mecon = precio_mi_mecon_crudo,
          ypf = precio_mi_ypf_crudo,
-         idee = precio_mi_idee_crudo,
-         mecon_ccnn = precio_mi_mecon_ccnn_crudo) %>% 
+         idee = precio_mi_idee_crudo
+         # ,mecon_ccnn = precio_mi_mecon_ccnn_crudo
+         ) %>% 
   arrange(anio) %>% 
   ungroup()
 
@@ -831,8 +832,8 @@ precio_mi_gas <- precio_regalias_mi_gas %>%
                       select(anio,  precio_mi_idee_indexado = precio_mi_indexado_pesos)) %>%
                              # precio_mi_idee_ctes_pesos = precio_transferencia)) %>% 
   left_join(anuario_de_combustible) %>% 
-  left_join(precios_mecon %>% 
-              select(anio , precio_mi_mecon_ccnn_gas = precio_gas_mi_pesos_Mm3)) %>% 
+  # left_join(precios_mecon %>% 
+  #             select(anio , precio_mi_mecon_ccnn_gas = precio_gas_mi_pesos_Mm3)) %>% 
   # mutate(precio_gas_mdoint = case_when(anio < 1988 ~ precio_mi_ypf_gas,
   #                                  anio == 1988 ~  precio_mi_idee_indexado,
   #                                  anio %in% 1989:1991  ~ precio_mi_ypf_gas,
@@ -851,7 +852,7 @@ precio_mi_gas <- precio_regalias_mi_gas %>%
          mecon = precio_mi_mecon_gas,
          ypf = precio_mi_ypf_gas,
          idee = precio_mi_idee_indexado,
-         mecon_ccnn = precio_mi_mecon_ccnn_gas,
+         # mecon_ccnn = precio_mi_mecon_ccnn_gas,
          anuario = precio_mi_anuario_gas) %>% 
   filter(anio < 2021)
 
@@ -3985,15 +3986,19 @@ precio_mi_crudo = as.data.table(precio_mi_crudo)
 precio_mi_crudo[, variable := "Precio del mercado interno del petróleo crudo"]
 precio_mi_crudo[, precio_crudo_mdoint := NULL]
 setnames(precio_mi_crudo,
-         old = c("regalias", "mecon" , "mecon_ccnn", "ypf", "idee" ),
-         new = c("Sec. Energía - Regalías", "MECON", "MECON/CCNN", "YPF", "IDEE"  ))
+         old = c("regalias", "mecon" , 
+                 # "mecon_ccnn",
+                 "ypf", "idee" ),
+         new = c("Sec. Energía - Regalías", "MECON",
+                 # "MECON/CCNN",
+                 "YPF", "IDEE"  ))
 precio_mi_crudo = melt(precio_mi_crudo, 
                         id.vars = c("anio", "variable", "unidad"), 
                         variable.name = "fuente", value.name = "valor")
 # precio_mi_crudo = precio_mi_crudo[(!is.na(valor)) & (valor > 0) ]
 precio_mi_crudo[,  codigo_variable := fcase(fuente == "Sec. Energía - Regalías", "Pi_crudo_regalias",
                                             fuente == "MECON",  "Pi_crudo_mecon",
-                                            fuente == "MECON/CCNN", "Pi_crudo_mecon_ccnn",
+                                            # fuente == "MECON/CCNN", "Pi_crudo_mecon_ccnn",
                                             fuente =="YPF", "Pi_crudo_ypf", 
                                             fuente == "IDEE","Pi_crudo_idee" )]
 
@@ -4002,8 +4007,12 @@ precio_interno_gas_mmbtu_usd = as.data.table(precio_interno_gas_mmbtu_usd)
 precio_interno_gas_mmbtu_usd[, variable := "Precio del mercado interno del gas natural"]
 precio_interno_gas_mmbtu_usd[, precio_gas_mdoint := NULL]
 setnames(precio_interno_gas_mmbtu_usd,
-         old = c("anuario", "regalias", "mecon" , "mecon_ccnn", "ypf", "idee" ),
-         new = c("Anuario de combustibles", "Sec. Energía - Regalías", "MECON", "MECON/CCNN", "YPF", "IDEE"  ))
+         old = c("anuario", "regalias", "mecon" ,
+                 # "mecon_ccnn",
+                 "ypf", "idee" ),
+         new = c("Anuario de combustibles", "Sec. Energía - Regalías", "MECON",
+                 # "MECON/CCNN", 
+                 "YPF", "IDEE"  ))
 precio_interno_gas_mmbtu_usd = melt(precio_interno_gas_mmbtu_usd, 
                         id.vars = c("anio", "variable", "unidad"), 
                         variable.name = "fuente", value.name = "valor")
@@ -4011,7 +4020,7 @@ precio_interno_gas_mmbtu_usd = melt(precio_interno_gas_mmbtu_usd,
 precio_interno_gas_mmbtu_usd[,  codigo_variable := fcase(fuente == "Sec. Energía - Regalías", "Pi_gas_regalias",
                                             fuente == "Anuario de combustibles",  "Pi_gas_anuario",
                                             fuente == "MECON",  "Pi_gas_mecon",
-                                            fuente == "MECON/CCNN", "Pi_gas_mecon_ccnn",
+                                            # fuente == "MECON/CCNN", "Pi_gas_mecon_ccnn",
                                             fuente =="YPF", "Pi_gas_ypf", 
                                             fuente == "IDEE","Pi_gas_idee" )]
 
