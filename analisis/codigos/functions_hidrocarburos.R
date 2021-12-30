@@ -1,3 +1,5 @@
+
+
 #función de conversión
 conversor_hidrocarburos <- function(x, from, to, producto, tipo="cantidad"){
   if (producto == "gas"){
@@ -107,9 +109,15 @@ plot_theme <- function(x){
     ) 
 }
 
-plot_ggplotly = function(x){
+plot_ggplotly = function(x, titulo, subtitulo = FALSE){
   ggplotly(theme_propio(x))  %>%
-    layout(legend = list(
-      orientation = "h",
-      x = 0.1, y = -0.2) )
+    layout( legend = list( orientation = "h", x = 0.1, y = -0.2) ,
+            title = list(text = ifelse(subtitulo == F, 
+                                       paste0(titulo, '<br>', '<sup>'),
+                                       paste0(titulo, '<br>', '<sup>',  subtitulo, '</sup>'))
+                         ),
+            margin = list( t = 50, b = 50
+                           # ,l= 80, r=80
+                           )
+            )
 }

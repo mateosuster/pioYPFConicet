@@ -478,6 +478,7 @@ prod_regalias_gas <- read_delim("../data/secretaria_energia/regalias/produccion_
   select(fecha, unidad, "TOTAL CUENCA", everything(.)) %>% 
   rename(prod_gas_Mm3 = "TOTAL CUENCA") %>% 
   group_by(anio, unidad ) %>% 
+  mutate_all(function(x) str_remove_all(x,",")) %>% 
   mutate_all(as.double) %>% 
   summarise(gas_regalias = sum(prod_gas_Mm3))
 
@@ -544,8 +545,6 @@ prod_merge_gas <-  prod_regalias_gas %>%
          eia = gas_eia) %>% 
   filter(anio < 2021)
 
-
-
 #diferencia promedio del 14% entre las bases (es mayor la de mecon)
 # summary(prod_merge_gas)
 
@@ -562,8 +561,7 @@ prod_merge_gas_bep <- prod_merge_gas_MMBTU %>%
   ungroup() %>% 
   mutate(unidad = "BEP")
 
-write.csv(prod_merge_gas_MMBTU, file = "../resultados/data_viz/produccion_gas.csv", row.names = FALSE)
-# write.csv(prod_merge_gas_bep, file = "resultados/prod_merge_gas_bep.csv")
+
 ```
 
 
@@ -1591,7 +1589,7 @@ comercio_exterior <- comex_post2010 %>%
 
 #expo e impo de Crudo. cantidades y valor
 comex_crudo_sesco <- comercio_exterior %>% 
-  filter(str_detect(producto, "PETROLEO") | str_detect(producto, "Cuenca"),
+  filter(str_detect(producto, "PETROLEO") | str_detect(producto, "Cuenca") |str_detect(producto, "Crudo importado"),
          unidad != "Ton") %>% 
   group_by(anio, variable, unidad) %>% 
   summarise(valor = sum(valor, na.rm = T)) %>% 
@@ -1603,8 +1601,6 @@ comex_crudo_sesco <- comercio_exterior %>%
          anio = as.double(anio) ) %>% 
   filter(valor >0)
 
-
-
 #MECON
 comex_hidrocarburos_mecon <- read_excel("../data/mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls", 
     sheet = "Com. exterior", skip = 7) %>%
@@ -1613,7 +1609,7 @@ comex_hidrocarburos_mecon <- read_excel("../data/mecon/base-mineria-e-hidrocarbu
          impo_Mm3_crudo = 'Importaciones...3',
          saldo_Mm3_crudo = `Balance (X-M)...4`,
          expo_MMm3_gas = 'Exportaciones...5',
-         impo_Mm3_gas = 'Importaciones...6',
+         impo_MMm3_gas = 'Importaciones...6',
          saldo_Mm3_gas = `Balance (X-M)...7`,
          expo_metaliferos_otros_MMusd = `Minerales metalíferos, escorias y cenizas`,
          expo_crudo_MMusd = `Petróleo crudo`,
@@ -1709,11 +1705,11 @@ impo_crudo = comex_crudo_sesco %>%
               select( anio, variable, producto,
                       USD = valor , barriles = cantidad, fuente) %>% 
               pivot_longer(cols = c(USD,barriles), names_to = "unidad",
-                           values_to = "valor", names_repair = "unique"))
-# impo_crudo %>% 
-#   ggplot(aes(anio, valor, color = fuente))+
-#   geom_line()+
-#   facet_wrap(~unidad, scales = "free")
+                           values_to = "valor", names_repair = "unique")) %>% 
+  bind_rows(comex_hidrocarburos_mecon %>% 
+    select(anio, valor = impo_bbl_crudo) %>% 
+    mutate( fuente = "MECON",
+           variable = "Importación de petróleo crudo", producto = "crudo", unidad = "barriles" ) )
 
 ```
 
@@ -1823,12 +1819,11 @@ impo_gas = comex_gas %>%
               select( anio, variable, producto,
                       USD = valor , m3 = cantidad, fuente) %>% 
               pivot_longer(cols = c(USD,m3), names_to = "unidad",
-                           values_to = "valor", names_repair = "unique"))
-impo_gas %>% 
-  ggplot(aes(anio, valor, color = fuente))+
-  geom_line()+
-  facet_wrap(~unidad, scales = "free")
-
+                           values_to = "valor", names_repair = "unique")) %>% 
+  bind_rows(comex_hidrocarburos_mecon %>% 
+              select(anio, valor = impo_MMm3_gas) %>% 
+              mutate( fuente = "MECON", valor = valor*1e6, 
+                      variable = "Importación de gas natural", producto = "gas", unidad = "m3" ) )
 ```
 
 ## Empleo, Remuneraciones y Masa Salarial (CCNN)
@@ -3928,7 +3923,8 @@ expo_usd_crudo[, codigo_variable := fcase( fuente==  "Sec. Energía - SESCO" , "
 impo_crudo_dt= as.data.table(impo_crudo)
 impo_crudo_dt[, producto := NULL]
 impo_crudo_dt[,  codigo_variable:=  fcase( fuente == "Sec. Energía - SESCO", "M_crudo_sesco",
-                                        fuente == "UN-Comtrade", "M_crudo_comtrade")]
+                                        fuente == "UN-Comtrade", "M_crudo_comtrade",
+                                        fuente == "MECON","M_crudo_mecon")]
 
 
 
@@ -3979,8 +3975,10 @@ impo_gas_dt[, unidad := fcase(unidad == "m3", "MMBTU" ,
 #                           unidad == "USD", valor)]
 # impo_gas[, unidad := fcase(unidad == "m3", "m3/d" ,
 #                            unidad == "USD", "USD")]     # CONVERSION A m3/dia
+```
 
 
+☺```{r include=FALSE}
 # Precio crudo Mdo interno
 precio_mi_crudo = as.data.table(precio_mi_crudo)
 precio_mi_crudo[, variable := "Precio del mercado interno del petróleo crudo"]
