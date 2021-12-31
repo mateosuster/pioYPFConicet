@@ -985,24 +985,20 @@ expo_crudo_sitc <- read_csv("../data/un_comtrade/expo_crudo_sitc.csv") %>%
          expo_usd_comtrade_crudo = "Trade Value (US$)")
 
 #Merge bases
-precio_expo_crudo <- precio_me_regalias_crudo %>% 
-  rename(precio_expo_regalias_crudo = precio_total_tipo_crudo) %>% 
-  select(-tipo_precio) %>% 
+precio_expo_crudo <- expo_crudo_sitc %>% 
+              select(anio, unidad = unidad_precio, precio_expo_comtrade_sitc_crudo) %>% 
+  left_join( precio_me_regalias_crudo %>% 
+    rename(precio_expo_regalias_crudo = precio_total_tipo_crudo) %>% 
+    select(-tipo_precio) )%>% 
   left_join(precios_mecon %>% 
               select(anio, precio_expo_mecon_crudo = precio_crudo_me_usd_bbl )) %>%
   left_join(precio_expo_indec %>% 
               select(-c(precio_expo_gas_indec, unidad_gas))) %>%
   left_join(expo_crudo_uncomtrade_hs %>% 
               select(anio, unidad = unidad_precio, precio_expo_comtrade_hs_crudo)) %>% 
-  full_join(expo_crudo_sitc %>% 
-              select(anio, unidad = unidad_precio, precio_expo_comtrade_sitc_crudo)) %>%
   arrange(anio) %>% 
-  # mutate(precio_expo_crudo = case_when(anio < 1993 ~ precio_expo_comtrade_sitc_crudo,
-  #                                    anio %in% 1993:2014 ~ precio_expo_mecon_crudo,
-  #                                    anio > 2014 ~ precio_expo_regalias_crudo)) %>% 
-  # select(anio, unidad, precio_expo_crudo, everything(.), -TCC)
   select(anio, unidad, everything(.), -TCC)
-# precio_expo_crudo
+precio_expo_crudo
 
 ```
 
@@ -1109,15 +1105,8 @@ precios_referencia_y_expo_crudo <-  precio_expo_crudo  %>%
   arrange(anio) %>% 
   filter(anio < 2021)
 
-
-write.csv(precios_referencia_y_expo_crudo,
-                    file = "../resultados/data_viz/precio_expo_y_mdo_mundial_crudo.csv",row.names = F)
-
 precios_referencia_y_expo_crudo %>% 
   select(-precio_me_crudo)
-
-
-
 ```
 
 #### Precios de Referencia del Gas
@@ -3978,7 +3967,7 @@ impo_gas_dt[, unidad := fcase(unidad == "m3", "MMBTU" ,
 ```
 
 
-☺```{r include=FALSE}
+```{r include=FALSE}
 # Precio crudo Mdo interno
 precio_mi_crudo = as.data.table(precio_mi_crudo)
 precio_mi_crudo[, variable := "Precio del mercado interno del petróleo crudo"]

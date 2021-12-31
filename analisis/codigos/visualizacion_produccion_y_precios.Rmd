@@ -3,12 +3,16 @@ title: "Producción y precios del sector hidrocarburífero argentino"
 author:
 - affiliation: UNGS/CONICET
   name: Mateo Suster
-output: html_document
+output: 
+  html_document:
+    toc: yes
+    toc_float: true
+    toc_depth: 5
 ---
 
 Se presentan a continuación una breve descripción de las variables referidas a precios y producción del mercado hidrocarburífero argentino de largo plazo. Las mismas son el núcleo con el que se calcula el valor total de la producción y sus componentes: salario, ganancia y renta de la tierra. Los resultados aquí presentados, son parte del Proyecto de Investigación Orientada (PIO) Conicet-YPF "La apropiación de la renta petrolera diferencial por distintos sujetos sociales en Argentina comparado con Venezuela y Brasil (2002 a la actualidad)".
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 #limpieza de memoria
 # rm(list =ls())
 gc()
@@ -47,21 +51,6 @@ variables
 # data %>% distinct(variable, codigo_variable)
 ```
 
-Para realizar conversiones a dolares de poder adquisitivo constante cargamos los datos del tipo de cambio de paridad (actualizado hasta 2018) y el índice de precios al consumidor de Estados Unidos. 
-```{r}
-#TC
-tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
-tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
-
-ipc_us <- as.data.table(read_csv("../data/bls/cpi.csv")) 
-setnames(ipc_us,"Year", "anio"  )
-ipc_us = ipc_us[, .(ipc_us_20 = mean(Value, na.rm=T)), by = anio]
-ipc_us[, ipc_us_20 := generar_indice(serie = ipc_us_20, 
-                                    fecha = anio, fecha_base = 2020)]
-
-tail(tcp_arg)
-```
-
 # Producción
 
 Fuentes: 
@@ -96,7 +85,7 @@ prod_crudo_plt <-  ggplot(data[ variable == "Producción de petróleo crudo", ],
   scale_x_continuous(breaks = seq(1910, 2030, by = 5))
 
 plot_ggplotly(prod_crudo_plt,
-              "Gráfico N° 1. Producción de petróleo crudo", "Argentina (1911 - 2020)")
+              "Gráfico N°1. Producción de petróleo crudo", "Argentina (1911 - 2020)")
 ```
 
 ### Gas natural
@@ -118,13 +107,9 @@ prod_gas_plt <-  ggplot(data[ variable == "Producción de gas natural", ],
   # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
-plot_ggplotly(prod_gas_plt, "Gráfico N° 2. Producción de gas", "Argentina (1913 - 2020)")
+plot_ggplotly(prod_gas_plt, "Gráfico N°2. Producción de gas", "Argentina (1913 - 2020)")
 ```
 
-### Convencional y no convencional
-```{r}
-
-```
 
 # Comercio exterior
 
@@ -152,7 +137,7 @@ expo_q_crudo_plt <- ggplot(data[ variable == "Exportación de petróleo crudo" &
 
 
 plot_ggplotly(expo_q_crudo_plt, 
-              "Gráfico N° 4. Exportación de petróleo crudo (cantidades)" ,
+              "Gráfico N°4. Exportación de petróleo crudo (cantidades)" ,
               "Argentina (1960 - 2020)") 
 ```
 
@@ -195,7 +180,7 @@ expo_q_gas_plt = ggplot(data[ variable == "Exportación de gas natural" &
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
 plot_ggplotly(expo_q_gas_plt,
-              "Gráfico N° 6. Exportación de gas natural (cantidades)",
+              "Gráfico N°6. Exportación de gas natural (cantidades)",
               "Argentina (1960 - 2020)")
 ```
 
@@ -228,7 +213,7 @@ impo_q_crudo_plt = ggplot(data[ variable == "Importación de petróleo crudo" & 
   scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
-plot_ggplotly(impo_q_crudo_plt, "Gráfico N° 8. Importaciones de petróleo crudo (cantidades)", 
+plot_ggplotly(impo_q_crudo_plt, "Gráfico N°8. Importaciones de petróleo crudo (cantidades)", 
               "Argentina (1994 - 2020)")
 ```
 
@@ -238,13 +223,13 @@ Las diferencias entre UN-Comtrade y SESCO, en sus momentos de sobre o subestimac
 ```{r}
 impo_v_crudo_plt = ggplot(data[ variable == "Importación de petróleo crudo" & unidad == "USD", ],
                           aes(anio, valor, color = fuente))+
-  geom_line()+
+  geom_line(alpha =alpha_n)+
   labs(y = "Millones de USD", x = "Año")+
   scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
 plot_ggplotly(impo_v_crudo_plt,
-              "Gráfico N° 9. Importaciones de petróleo crudo (en valores)", 
+              "Gráfico N°9. Importaciones de petróleo crudo (en valores)", 
               "Argentina (1962 - 2020)")
 ```
 
@@ -261,13 +246,13 @@ impo_q_gas_plt = ggplot(data[ variable == "Importación de gas natural" & unidad
                                                               from = "MMBTU", to ="m3",
                                                             producto = "gas", 
                                                             tipo = "cantidad"), color = fuente))+
-  geom_line()+
+  geom_line(alpha =alpha_n)+
   geom_point()+
   labs(y = "miles de millones de m3", x = "Año")+
   scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
-plot_ggplotly(impo_q_gas_plt, "Gráfico N° 10. Importaciones de gas natural (cantidades)", 
+plot_ggplotly(impo_q_gas_plt, "Gráfico N°10. Importaciones de gas natural (cantidades)", 
               "Argentina (1962 - 2020)")
 ```
 
@@ -278,7 +263,7 @@ Las fuentes de UN-Comtrade y SESCO vuelven a presentar las diferencias anteriorm
 ```{r}
 impo_gas_v_plt= ggplot(data[ variable == "Importación de gas natural" & unidad == "USD", ],
                           aes(anio, valor, color = fuente))+
-  geom_line()+
+  geom_line(alpha =alpha_n)+
   labs(y = "Millones de USD", x = "Año")+
   scale_y_continuous(labels = scales::unit_format(unit ="", scale = 1e-6))+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
@@ -291,29 +276,27 @@ plot_ggplotly(impo_gas_v_plt,
 # Precios
 ## Mercado Interno
 
- Fuentes: 
-* [Base Ministerio de Hacienda, Informes
-Sectoriales](https://www.argentina.gob.ar/economia/politicaeconomica/regionalysectorial/informesproductivos)
-* [Secretaría de Energía-Regalias](http://datos.minem.gob.ar/dataset/regalias-de-petroleo-crudo-gas-natural-glp-gasolina-y-condensado)
-  + Por ausencia de información, el precio de regalias entre 1993 y 1998 es el precio total (es decir, es un ponderado que incluye también el precio del mercado externo). En los años posteriores, dicho precio sí corresponde al del mercado interno.  
+Fuentes: 
+
+* [Base Ministerio de Hacienda, Informes Sectoriales](https://www.argentina.gob.ar/economia/politicaeconomica/regionalysectorial/informesproductivos)
+* [Secretaría de Energía-Regalias](http://datos.minem.gob.ar/dataset/regalias-de-petroleo-crudo-gas-natural-glp-gasolina-y-condensado). Por ausencia de información, el precio de regalias entre 1993 y 1998 es el precio total (es decir, es un ponderado que incluye también el precio del mercado externo). En los años posteriores, dicho precio sí corresponde al del mercado interno.  
 * Kozulj y Pistonesi. Revista  del Instituto de Economía Energética (IDEE) - Fundación Bariloche  (1970 - 1988). Precio oficial interno de la cuenca neuquina a tasa de cambio oficial. Las fuentes utilizadas de esta revista son Secretaria de Energía, YPF, Gas del Estado, Boletin Informativo de Techint y series propias de IDEE
 * Memoria Anual y balances contables de YPF (varios años). Precio intero promedio resultante de la relación entre ventas y cantidades producidas.
 
 ####  Petróleo crudo
 
-El precio de venta del petróleo crudo en el mercado interno posee claras oscilaciones a lo largo del tiempo, pero una tendencia marcada hacia un máximo en 2014, para luego atavesar una caída. Sin embargo, los niveles observados en 2020, luego de iniciada la pandemia del COVID-19 continuán siendo altos en términos históricos (USD 40/barril). Previa a la publicación de datos oficiales, a partir de 1993, las fuentes que se presentan, IDEE y balance de YPF, presentan momentos de convergencias y diferencias (esto último, principalmente en la década de 1980, donde YPF es más bajo). Existen valores faltantes para los años de 1989 y 1992.
+El precio de venta del petróleo crudo en el mercado interno posee oscilaciones a lo largo del tiempo, pero una tendencia marcada hacia un máximo en 2014, para luego atavesar una caída. Sin embargo, los niveles observados en 2020, luego de iniciada la pandemia del COVID-19 continuán siendo altos en términos históricos (USD 40 por barril). Previa a la publicación de datos oficiales en 1993, las fuentes que se presentan, IDEE y balance de YPF, presentan momentos de convergencias y diferencias (esto último, principalmente en la década de 1980, donde YPF es más bajo). Existen valores faltantes para los años de 1989 y 1992.
 
 ```{r}
 precio_crudo_plt <- ggplot(data[ variable == variables[7], ],
                           aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° 3. Precios del mercado interno del petróleo crudo. Argentina (1963 - 2020)",
-       y = "USD/barril", x = "Año",
-       caption = "Fuente: elaboración propia en base a IDEE, Ministerio de Economía, Secretaría de Energía (Base Regalías) y Balances Contables de YPF")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  geom_line(alpha =alpha_n)+
+  labs(y = "USD/barril", x = "Año")+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
-plot_ggplotly(precio_crudo_plt)
+plot_ggplotly(precio_crudo_plt,
+              "Gráfico N°12. Precios del mercado interno del petróleo crudo",
+              "Argentina (1963 - 2020)")
 
 ```
 
@@ -321,26 +304,25 @@ plot_ggplotly(precio_crudo_plt)
 
 #### Gas natural
 
-Los precios del mercado interno del gas natural poseen un comportamiento estable hasta fines de los '70, momento en el cual aumentan drásticamente. En 1980, en línea con el aumento del crudo, el precio del gas supera USD 1/MMBTU, aunque cae en los años subsiguientes; mientras que en la década de 1990 se mantiene estable y cae con la devaluación del 2002. A partir de ahí, presentó una clara tendencia ascendente hasta 2017, la cual se detuvo en el interregno 2011-2015.
+Los precios del mercado interno del gas natural poseen un comportamiento estable hasta fines de los '70, momento en el cual aumentan drásticamente. En 1980, en línea con el aumento del crudo, el precio del gas supera USD 1/MMBTU, aunque cae en los años subsiguientes; mientras que en la década de 1990 se mantiene estable y cae con la devaluación del 2002. A partir de ahí, presentó una clara tendencia ascendente hasta 2017, la cual se detuvo en el interregno 2011-2015. Es llamativo el nivel del precio resultante de los balances de YPF: mientras que en el crudo parece acoplarse a IDEE, en el gas natural es extremadamente bajo.
 
 ```{r}
 precio_gas_plt <-  ggplot(data[ variable == variables[8], ],
                           aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° 4. Precios del mercado interno del gas natural. Argentina (1963 - 2020)",
-       y = "USD/MMBTU", x = "Año",
-       caption = "Fuente: elaboración propia en base a IDEE, Ministerio de Economía, Secretaría de Energía (Base Regalías) y Balances Contables de YPF")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  geom_line(alpha =alpha_n)+
+  labs(y = "USD/MMBTU", x = "Año")+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
-plot_ggplotly(precio_gas_plt)
+plot_ggplotly(precio_gas_plt,
+              "Gráfico N°13. Precios del mercado interno del gas natural",
+              "Argentina (1963 - 2020)")
 ```
 
 <br>
 
 
 ## Referencia del mercado mundial
-Precios de exportación desde Argentina, benchmarks y Precios del mercado de EEUU (solo gas, internos y de expo/impo)
+Precios de exportación desde Argentina, benchmarks y precios del mercado de EEUU (solo gas, internos y de exportación e importación)
 
 * [Secretaría de Energía-Regalias](http://datos.minem.gob.ar/dataset/regalias-de-petroleo-crudo-gas-natural-glp-gasolina-y-condensado)) (2006-hoy)
 * [MECON](http://datos.minem.gob.ar/dataset/precio-de-exportacion-de-petroleo-crudo). Serie corta y sin transformaciones
@@ -359,149 +341,97 @@ Precios de exportación desde Argentina, benchmarks y Precios del mercado de EEU
   
 
 #### Petróleo crudo
-  
 ##### Transacciones spot
 
-Notas: 
-- Agregar dubai.
-- conviene ajustar por inflación?
-
-Con respecto a los precios de referencia internacional del petróleo crudo, tanto el precio Brent como WTI atravesaron una escalada inflacionaria a partir del cambio de sistema monetario internacional en 1973, la cual se detuvo en 1981. En ese año se ha detectado un punto de quiebre en la variable según el test de raíz unitaria de Zivot y Andrews (Grilli y Yang, 1988). El boom de las commodities del siglo XXI se ve afectado por la crisis de 2008 y luego se detiene y cae luego de 2011.   
+Con respecto a los precios de referencia internacional del petróleo crudo, tanto el precio Brent como WTI atravesaron una escalada inflacionaria a partir del cambio de sistema monetario internacional en 1973, la cual se detuvo en 1981 (Lewinger, 2015). En ese año se ha detectado un punto de quiebre en la variable según el test de raíz unitaria de Zivot y Andrews (Grilli y Yang). El boom de las commodities del siglo XXI se ve afectado por la crisis de 2008 y luego se detiene y cae luego de 2011.   
 
 ```{r}
 precio_ref_crudo_plt <-  ggplot(data[ variable == variables[9], ],
                           aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° 4. Precios de referencia del mercado mundial del crudo (1946 - 2020)",
-       y = "USD/MMBTU", x = "Año",
-       caption = "Fuente: elaboración propia en base a EIA e Inflation Data")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  geom_line(alpha =alpha_n)+
+  labs(y = "USD/barril", x = "Año")+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
-plot_ggplotly(precio_ref_crudo_plt)
+plot_ggplotly(precio_ref_crudo_plt, 
+              "Gráfico N°14. Precios de referencia del mercado mundial del crudo" ,
+              "(1946 - 2020)")
 
 ```
 ##### Precio de exportación de Argentina
 
-A grandes rasgos, los precios de exportación de crudo resultantes de distitnas fuentes, no presentan tanta diferencia con respecto al precio de exportación de crudo.
+A grandes rasgos, los precios de exportación de crudo resultantes de distitnas fuentes, no presentan diferencia en cuanto a la evolución respecto al precio de referencia, a excepción del fuerte aumento de la década de los '80. Dicho aumento no se refleja en el precio provisto por UN-Comtrade porque prácticamente la exportación es inexistente en ese período. La información de fuentes locales recién está disponible a partir de 2006.
 
 ```{r}
 precio_expo_crudo_plt <-  ggplot(data[ variable == variables[10] 
                                        & anio >1960, ],
                           aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° #. Precios de exportacion de crudo. Argentina (1964 - 2020)",
-       y = "USD/barril", x = "Año",
-       caption = "Fuente: elaboración propia en base a Sec. Energía, MECON, UN-Comtrade...")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  geom_line(alpha =alpha_n)+
+  labs(y = "USD/barril", x = "Año")+
   scale_x_continuous(breaks = seq(1960, 2030, by = 10))
 
-plot_ggplotly(precio_expo_crudo_plt)
+plot_ggplotly(precio_expo_crudo_plt, "Gráfico N°15. Precios de exportacion de crudo", "Argentina (1964 - 2020)")
 ```
 
   
 ##### Diferencial de precios  
  
+La diferencia marcada en el nivel anterior se puede observar en el siguiente gráfico, donde se presenta el precio de exportación de Argentina frente al precio del mercado interno, salvo por el período de acople al precio internacional de la década de 1990 y el breve interregno de 2015-2017. Para un detalle de las fuentes seleccionadas, veáse el anexo metodológico. 
 ```{r}
 # visualizacion diferencial de precio mdo interno
 # ggsave("../resultados/argentina/precio_interno_vs_externo.jpg")
 
-brecha_precio_crudo_plt <-  ggplot(data[ 
-                                          # variable %in%  variables[c(5,7)],
-                                           codigo_variable %in% c("Pi_crudo_regalias","Pext_brent" ),
-                                         ],
-                          aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° #. Precio de venta al mercado interno, exportacion y referencias del petróleo crudo (1960 - 2020)",
-       y = "USD/barril", x = "Año",
-       caption = "Fuente: elaboración propia en base a EIA, Sec. de Energía y MECON")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
-  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
+data_dif_precios = as.data.table(readxl::read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx",
+                              sheet ="crudo_dif_pre_y_sv")) 
 
-plot_ggplotly(brecha_precio_crudo_plt)
+brecha_precio_crudo_plt <-  ggplot(melt(
+  data_dif_precios[anio >1960,c("anio","Pi_crudo", "Pext_crudo" )], id.vars = "anio"),
+                          aes(anio, value, color = variable))+
+  geom_line(alpha =alpha_n)+
+  geom_point()+
+  labs(y = "USD/barril", x = "Año")+
+  scale_x_continuous(breaks = seq(1950, 2030, by = 10))
+
+plot_ggplotly(brecha_precio_crudo_plt, 
+              "Gráfico N°16. Diferencial de precios interno y externo",
+              "Argentina (1960 - 2020)")
 
 ```
 
 #### Gas natural
-##### Mercado intero de América del norte y Europa  
-
-Nota: sacar los nombres de paises de las leyendas
-
-Sobre los precios del gas en EEUU y Europa, es interesante analizar la divergencia entre los mismos desatada a partir de la crisis de 2009. ¿Aumento de la producción en EEUU hizo bajar el precio? ¿Mecanismo de compensanción para la recuperación de la crisis? ...
-
-
-```{r}
-precio_ref_gas_plt <-  ggplot(data[ (variable %in% variables[11:27])&
-                                           (!str_detect(variable, "GNL|LNG|OCDE|importación|exportación") ), ],
-                          aes(anio, valor, color = variable))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° #. Precios de referencia del gas natural de EEUU y Europa (1960 - 2020)",
-       y = "USD/MMBTU", x = "Año",
-       caption = "Fuente: elaboración propia en base a EIA y BP")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
-  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
-
-
-plot_ggplotly(precio_ref_gas_plt)
-```
-
-##### Comercio exterior de EEUU y Alemania  
-
-En los precios de exportación e importación del gas natural se observa un patrón similar con respecto a la tendencia de la divergencia marcada anteriormente.
-```{r}
-precio_ref_gas_plt_2 <-  ggplot(data[ (variable %in% variables[11:27])&
-                                           (!str_detect(variable, "GNL|LNG|OCDE") )&
-                                      (str_detect(variable, "importación|exportación") )&
-                                        (anio >1983), ],
-                          aes(anio, valor, color = variable))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° #. Precios de exportación e importación del gas natural de EEUU y Europa (1984 - 2020)",
-       y = "USD/MMBTU", x = "Año",
-       caption = "Fuente: elaboración propia en base a EIA y BP")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
-  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
-
-plot_ggplotly(precio_ref_gas_plt_2)
-
-```
-
 ##### Precio de exportación de Argentina
 
+El precio de exportación del gas natural de Argentina en general siempre fue caro en términos internacionales. Con el boom de commodities del siglo XXI, este se dispara hasta más de USD 20 por MMBTU. El hecho de que el gas no sea un commodity transable internacionalmente permite esta divergencia y alto precio.
 
-valores atipicos indec 2002 y 2003
-valores atipicos comtrade 1970 y 1979
+Las fuentes presentaban varios valores atípicos (por ejemplo, UN-Comtrade en 1970 y 1979 e INDEC en 2002 y 2003), los cuales fueron filtrados en la etapa de preprocesamiento.  
 ```{r}
 precio_expo_gas_plt <-  ggplot(data[ (variable %in% variables[33])
                                      & anio >=1960, ],
                           aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.8)+
-  labs(title = "Gráfico N° #. Precios de exportación del gas natural. Argentina (1962 - 2020)",
-       y = "USD/MMBTU", x = "Año",
-       caption = "Fuente: elaboración propia en base a Sec. de Energía, MECON, IDEE y UN-Comtrade")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  geom_line(alpha =alpha_n)+
+  labs(y = "USD/MMBTU", x = "Año")+
   scale_x_continuous(breaks = seq(1960, 2030, by = 10))
 
 
-plot_ggplotly(precio_expo_gas_plt)
+plot_ggplotly(precio_expo_gas_plt, "Gráfico N°17. Precios de exportación del gas natural", 
+              "Argentina (1962 - 2020)")
 
 ```
 
 ##### Precio de importación de Argentina y Brazil
 
-valroes atipicos en comtrade 1994 y 1997
+Los precios de importación del gas natural para Argentina desde Bolivia presentan dos ciclos: uno iniciado en la década de 1970 y que culmina en 1985, que acompaña a la inflación del crudo a nivel internacional, y otro con el boom de commodities del siglo XXI. Se incorporó el precio de importación de Brazil, el cual presenta una evolución similar y un menor nivel en la década de los 2000 y 2010.
+
+Las series también presentaban valores atípicos en algunos casos (por ejemplo, UN-Comtrade en 1994 y 1997), los cuales se quitaron del análisis.  
 ```{r}
 precio_impo_gas_plt <-  ggplot(data[ (variable %in% variables[28:32]) &
                                        anio >=1960
                                        , ],
                           aes(anio, valor, color = variable))+#, group =codigo_variable))+
-  geom_line(alpha = 0.8 , aes(linetype = fuente))+
-  labs(title = "Gráfico N° #. Precios de importación del gas natural. Argentina (1962 - 2020)",
-       y = "USD/MMBTU", x = "Año",
-       caption = "Fuente: elaboración propia en base a Sec. de Energía, MECON, IDEE y UN-Comtrade")+
-  # scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  geom_line(alpha =alpha_n , aes(linetype = fuente))+
+  labs(y = "USD/MMBTU", x = "Año")+
   scale_x_continuous(breaks = seq(1910, 2030, by = 10))
 
-plot_ggplotly(precio_impo_gas_plt)
+plot_ggplotly(precio_impo_gas_plt, "Gráfico N°18. Precios de importación del gas natural" ,"Argentina (1962 - 2020)")
 
 ```
 

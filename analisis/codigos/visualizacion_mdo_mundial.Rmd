@@ -1,0 +1,95 @@
+---
+title: "Situación mundial del mercado hidrocarburífero"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+#limpieza de memoria
+# rm(list =ls())
+gc()
+
+# configuración de impresión
+knitr::opts_chunk$set(echo = TRUE)
+
+# bibliotecas
+library(data.table)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(plotly)
+library(readxl)
+source("functions_hidrocarburos.R")
+
+# parámetros para los graficos
+alpha_n = 0.7
+```
+
+# Datos
+
+```{r}
+# datos 
+data = fread("../resultados/argentina/variables.csv")
+glimpse(data)
+
+#variables
+cat("\n")
+variables = unique(data$variable)
+variables
+
+# data %>% distinct(variable, codigo_variable)
+```
+
+Para realizar conversiones a dolares de poder adquisitivo constante cargamos los datos del tipo de cambio de paridad (actualizado hasta 2018) y el índice de precios al consumidor de Estados Unidos. 
+```{r}
+#TC
+tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
+tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
+
+ipc_us <- as.data.table(read_csv("../data/bls/cpi.csv")) 
+setnames(ipc_us,"Year", "anio"  )
+ipc_us = ipc_us[, .(ipc_us_20 = mean(Value, na.rm=T)), by = anio]
+ipc_us[, ipc_us_20 := generar_indice(serie = ipc_us_20, 
+                                    fecha = anio, fecha_base = 2020)]
+
+tail(tcp_arg)
+```
+
+
+
+##### Mercado intero de América del norte y Europa  
+
+Nota: sacar los nombres de paises de las leyendas
+
+Sobre los precios del gas en EEUU y Europa, es interesante analizar la divergencia entre los mismos desatada a partir de la crisis de 2009. ¿Aumento de la producción en EEUU hizo bajar el precio? ¿Mecanismo de compensanción para la recuperación de la crisis? ...
+
+
+```{r}
+precio_ref_gas_plt <-  ggplot(data[ (variable %in% variables[11:27])&
+                                           (!str_detect(variable, "GNL|LNG|OCDE|importación|exportación") ), ],
+                          aes(anio, valor, color = variable))+
+  geom_line(alpha = alpha_n)+
+  labs(y = "USD/MMBTU", x = "Año")+
+  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
+
+
+plot_ggplotly(precio_ref_gas_plt,  "Gráfico N°#. Precios de referencia del gas natural de EEUU y Europa (1960 - 2020)")
+```
+
+##### Comercio exterior de EEUU y Alemania  
+
+En los precios de exportación e importación del gas natural se observa un patrón similar con respecto a la tendencia de la divergencia marcada anteriormente.
+```{r}
+precio_ref_gas_plt_2 <-  ggplot(data[ (variable %in% variables[11:27])&
+                                           (!str_detect(variable, "GNL|LNG|OCDE") )&
+                                      (str_detect(variable, "importación|exportación") )&
+                                        (anio >1983), ],
+                          aes(anio, valor, color = variable))+
+  geom_line(alpha =alpha_n)+
+  labs(y = "USD/MMBTU", x = "Año")+
+  scale_x_continuous(breaks = seq(1910, 2030, by = 10))
+
+plot_ggplotly(precio_ref_gas_plt_2, "Gráfico N°#. Precios de exportación e importación del gas natural de EEUU y Europa (1984 - 2020)")
+
+```
+
