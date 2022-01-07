@@ -23,9 +23,7 @@ output:
 # Inicio
   
 ```{r message=FALSE, warning=FALSE, include=FALSE}
-# library(xtable) # ej xtable(tabla) para pasar a latex
-
-# rm(list = ls())
+rm(list = ls())
 gc()
 
 t0  <- Sys.time()
@@ -39,24 +37,13 @@ library(lubridate)
 library(fs)
 library(ggplot2)
 library(plotly)
-library(huxtable) #revisar esto para dar formato al eje Y
-# library(PerformanceAnalytics)
+# library(huxtable) #revisar esto para dar formato al eje Y
 library(Hmisc)
 library(zoo)
-source("functions_hidrocarburos.R")
+source("functiones_hidrocarburos.R")
 
 options(scipen = 9999999)
-
-# setwd("C:/Archivos/repos/hidrocarburos/analisis/codigos")
-
 ```
-
-Funciones de conversión 
-
-* [Canada – National Energy Board. Energy Conversion Tables](https://apps.cer-rec.gc.ca/Conversion/conversion-tables.aspx?GoCTemplateCulture=en-CA#2-3)
-* [BP](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2019-approximate-conversion-factors.pdf)
-* [EIA](https://www.eia.gov/kids/what-is-energy/energy-calculators.php#natgascalc)
-
 
 
 
@@ -283,13 +270,8 @@ renta_autores <- read_csv("../data/otros autores/renta_autores.csv",
 
 
 # Variables
-
-
-
-### Producción de Crudo
-
-
-
+## Producción
+### Petróleo crudo
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Anuario de combustibles
 prod_anuario <- read_excel("../data/anuario_de_combustibles/Produccion_Desde_1911.xls") %>% 
@@ -436,8 +418,6 @@ prod_merge_crudo <-  prod_regalias_crudo %>%
   filter(anio < 2021)
 
 
-write.csv(prod_merge_crudo, file = "../resultados/data_viz/produccion_crudo.csv", row.names = F)
-
 #diferencia promedio del 6% entre las bases (es mayor la de mecon)
 # summary(prod_merge_crudo)
 
@@ -448,16 +428,11 @@ existencias_petroleo <- read_excel("../data/secretaria_energia/existencias_crudo
   rename(existencias_crudo = existencias) %>% 
   mutate(existencias_crudo = conversor_m3bbl_q(existencias_crudo),
          unidad = "barriles")
-
-# plot(existencias_petroleo$anio, existencias_petroleo$existencias_crudo)
-
 ```
 
 
 
-### Producción de Gas Natural
-
-
+### Gas natural
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Base MECON
 prod_mecon_gas <- hidrocarburos_base_mecon %>% 
@@ -560,13 +535,10 @@ prod_merge_gas_bep <- prod_merge_gas_MMBTU %>%
   mutate_all(conversor_MMBTUbep_q) %>% 
   ungroup() %>% 
   mutate(unidad = "BEP")
-
-
 ```
 
 
-
-### Produccion total
+### Produccion total, en barriles equivalentes de petróleo
 ```{r}
 produccion_total <- prod_merge_gas_bep %>% 
   select(anio, unidad,prod_gas) %>%
@@ -574,10 +546,7 @@ produccion_total <- prod_merge_gas_bep %>%
               select(anio, unidad,prod_crudo) %>%  mutate(unidad ="BEP") ) %>% 
   mutate(produccion_total_bep = prod_crudo + prod_gas)
 
-produccion_total
 ```
-
-
 
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
@@ -586,13 +555,8 @@ produccion_total
 ```
 
 
-
-## Precio Mercado Interno
-
-
-####  Precio Mercado Interno de Crudo
-
-  
+## Precio del mercado interno
+###  Petróleo crudo
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Memorias de YPF
 vtas_precio_memo_ypf_crudo <- read_excel("../data/ypf/vtas_valor_cantidad_precio_crudo.xlsx") %>% 
@@ -716,18 +680,11 @@ precio_mi_crudo <-  precio_mi_crudo %>%
          -c(ipim_nivel_gral_94, idee_estimado,mecon_estimado,indice_ypf_72,idee_estimado )) %>% 
   filter(anio < 2021)
 
-  
 ```
 
 
 
-
-
-
-#### Precio Mercado Interno de Gas Natural
-
-
-
+### Gas natural
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Anuario YPF
 vtas_precio_memo_ypf_gas <- read_excel("../data/ypf/vtas_valor_cantidad_precio_gas.xlsx") %>% 
@@ -811,8 +768,6 @@ precio_mi_idee_gas <- read_excel("../data/idee/Precios del gas natural y derivad
   mutate(precio_mi_indexado_usd = precio_mi_indexado_pesos/tcc )  
   # select(-c(unidad, precio_transferencia))
 
-# writexl::write_xlsx(precio_mi_idee_gas, path = "precio_mi_idee_gas.xlsx")
-
 #conversor de moneda 
 # %>% 
 #   mutate(precio_transferencia = case_when(
@@ -839,10 +794,9 @@ precio_mi_gas <- precio_regalias_mi_gas %>%
   #                                  anio > 1992 ~ precio_mi_regalias_gas),
   #        dif_ypf_idee = precio_mi_ypf_gas/precio_mi_idee_indexado-1 ) %>%
   mutate(variable = "Precio del mercado interno del gas natural según distintas fuentes",
-         precio_gas_mdoint = case_when(anio %in% 1963:1969|anio %in% 1989:1991 ~
+         precio_gas_mdoint = case_when(anio %in% 1963:1969|anio %in% 1989:1992 ~
                                            precio_mi_ypf_gas, 
                                          anio %in% 1970:1988 ~ precio_mi_idee_indexado,
-                                         anio == 1992  ~ precio_mi_ypf_gas,
                                          anio > 1992 ~ precio_mi_regalias_gas) ) %>% 
   arrange(anio) %>%
   select(anio, unidad,variable, precio_gas_mdoint, everything(.) ) %>% 
@@ -876,8 +830,6 @@ precio_interno_gas_mmbtu_usd <- precio_mi_gas_MMBTU %>%
          value = valor)
 
 
-write.csv(precio_interno_gas_mmbtu_usd, file = "../resultados/data_viz/precio_mi_gas.csv", row.names = F)
-
 #precio revista transpuesto
 # writexl::write_xlsx(precio_mi_idee_gas %>% 
 #                       select(anio,  precio_transferencia_ypf_a_GE =precio_transferencia ) %>% 
@@ -898,21 +850,11 @@ write.csv(precio_interno_gas_mmbtu_usd, file = "../resultados/data_viz/precio_mi
 #   ggplot(aes(anio, valor, color = variable))+
 #   geom_line()
 # graf_mi_gas
-
-# precio_mi_gas %>% 
-#   filter(anio > 2000) %>% 
-#   select(anio, precio_gas_mdoint, precio_mi_mecon_ccnn_gas)
 ```
 
 
-
-
 ## Precios de Referencia del Mercado Mundial
-
-  
-
 #### Precios de Referencia del Crudo
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Base regalias
 precio_me_regalias_crudo <- read_delim("../data/secretaria_energia/regalias/precio_mercado_externo_crudo_regalias.csv", 
@@ -999,9 +941,7 @@ precio_expo_crudo <- expo_crudo_sitc %>%
   arrange(anio) %>% 
   select(anio, unidad, everything(.), -TCC)
 precio_expo_crudo
-
 ```
-
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -1105,15 +1045,10 @@ precios_referencia_y_expo_crudo <-  precio_expo_crudo  %>%
   arrange(anio) %>% 
   filter(anio < 2021)
 
-precios_referencia_y_expo_crudo %>% 
-  select(-precio_me_crudo)
 ```
 
 #### Precios de Referencia del Gas
-
-
 ##### Exportación Argentina
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 ### Precio de Exportación del Gas 
 #regalias
@@ -1176,7 +1111,6 @@ precio_expo_gas_usd <- expo_gas_comtrade  %>%
 ```
 
 ##### Referencias mundiales
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 ### Precio Referencia Mercado Externo Gas 
 #### Precios Mundiales
@@ -1235,7 +1169,6 @@ price_eeuu_MMBTU <-  price_eeuu %>%
 
 #eurostat
 
-
 #BP
 bp_gas_prices <- read_excel("../data/bp/bp-stats-review-2020-all-data.xlsx", 
     sheet = "Gas - Prices ", skip = 3) %>% 
@@ -1283,16 +1216,10 @@ fmi_gas_price <- fmi_prices %>%
          fmi_henry_hub =  fmi_henry_hub * bp_gas_2016$bp_gas_henry_hub,
          fmi_natural_gas_eu = fmi_natural_gas_eu * bp_gas_2016$bp_gas_netherlands_ttf,
          unidad = "USD/MMBTU")
-
-
-# unique(fmi_prices$`Commodity Name`)
-# unique(fmi_prices$`Unit Name`)
-# unique(fmi_prices$`Country Name`)
 ```
 
 
 ##### Bolivia
- 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 #### Precio de importación de Bolivia
@@ -1414,29 +1341,6 @@ comparacion_bep <- precio_mdomundial_gas_bep %>%
 #   mutate_all(conversor_m3MMBTU_p) %>% 
 #   mutate(unidad = "USD/bep") %>% 
 #   select(anio, unidad, everything(.))
-  
-write.csv(precio_mdomundial_gas_MMBTU, file = "../resultados/data_viz/precio_mdomundial_gas_MMBTU.csv",
-          row.names = F)
-
-# writexl::write_xlsx(list(MMBTU = precio_mdomundial_gas_MMBTU, 
-#                          BEP = precio_mdomundial_gas_bep), path = "resultados/precio_mdo_mundial_gas.xlsx")
-
-#grafico precios bep
-# graf_precio_mdo_mundial_gas_bep <- precio_mdomundial_gas_bep %>% 
-#   select(-precio_externo_gas) %>% 
-#   gather(key = tipo_precio,
-#          value = valor,
-#          3:ncol(.)) %>%
-#   # filter(!(tipo_precio %in% c("precio_gas_bolivia_usd_idee", "precio_impo_gas_bolivia_MMBTU_comtrade",
-#   #                             "precio_expo_gas_comtrade", "precio_expo_gas_indec"))) %>%
-#   filter(!(tipo_precio %in% c("precio_expo_gas_indec"))) %>% 
-#   ggplot(aes(x = anio, y = valor, color = tipo_precio))+
-#   geom_line() +
-#   theme(legend.position = "bottom")+
-#   labs(y = "USD/bep")
-# plotly::ggplotly(graf_precio_mdo_mundial_gas_bep)
-
-
 
 
 #precios en ars. INCOMPLETO
@@ -1455,15 +1359,11 @@ precio_expo_y_me_gas <- precio_expo_gas %>%
   left_join(henry_hub) %>% 
   arrange(anio)
 
-# writexl::write_xlsx(precio_expo_y_me_gas, path = "precio_expo_y_mdo_mundial_gas.xlsx")
-# writexl::write_xlsx(comparacion_bep, path = "comparacion_bep.xlsx")
-
 
 comparacion_precios <- precio_mdomundial_gas_MMBTU %>% 
   select(anio, unidad, precio_externo_gas) %>% 
   left_join(precio_interno_gas_mmbtu_usd %>% 
               select(anio, unidad, precio_gas_mdoint))
- 
 ```
 
 
@@ -1491,15 +1391,12 @@ precio_crudo_vs_gas
 # ggplotly(graf, width = 800, length=600)
 # graf
 
-# writexl::write_xlsx(precio_crudo_vs_gas, path= "precio del crudo vs gas.xlsx")  
 ```
 
 
 
 ## Comercio exterior
-
 #### Exportaciones de crudo
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 ### SESCO
 #cantidades. post 2010 (hasta 2019)
@@ -1673,10 +1570,7 @@ expo_usd_crudo <- comex_crudo_sesco %>%
   group_by(anio, unidad) #%>% 
   # mutate_all(function(x) {x/10^6})
 
-# writexl::write_xlsx(list(usd = expo_usd_crudo, 
-                         # cantidades = expo_q_crudo,
-                         # precio_exportacion_y_referencia = precios_referencia_y_expo_crudo), 
-                    # path = "C:/Archivos/Datos/Hidrocarburos/Estimacion propia/resultados/expo_crudo.xlsx")
+
 
 ```
 
@@ -1704,10 +1598,7 @@ impo_crudo = comex_crudo_sesco %>%
 
 
 
-
 #### Exportaciones de gas natural
-
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #SESCO
 comex_gas <- comercio_exterior %>% 
@@ -1792,7 +1683,6 @@ expo_usd_gas <- expo_sesco_usd_gas %>%
 ```
 
 #### Importaciones de gas natural
-
 ```{r}
 
 impo_gas = comex_gas %>% 
@@ -1815,9 +1705,142 @@ impo_gas = comex_gas %>%
                       variable = "Importación de gas natural", producto = "gas", unidad = "m3" ) )
 ```
 
-## Empleo, Remuneraciones y Masa Salarial (CCNN)
+
+## Retenciones
+```{r echo=FALSE}
+retenciones_campodonico <- read_excel("../data/afip/retenciones.xlsx" , 
+    sheet = "usd") %>% 
+  left_join(tcp_anual %>% select(-TCP)) %>% 
+  mutate(retenciones_hc = retenciones_hg * TCC * 1000000,
+         unidad = "ars") %>% 
+  select(anio, unidad, retenciones_hc)
+
+retenciones_crudo <- read_excel( "../data/afip/retenciones.xlsx" ) %>%
+  rename(retenciones_crudo_jk = retenciones_jk,
+         retenciones_crudo_bfr = "retenciones_bfr_M$2008") %>% 
+  mutate(retenciones_crudo_bfr = retenciones_crudo_bfr * ipc08_bfr * 1000 ,
+         unidad = "ars") %>% 
+  select(-ipc08_bfr) %>% 
+  left_join(retenciones_campodonico)
+```
 
 
+
+## Regalías
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#regalias Sec de Energia
+#filtro con productos
+productos <- list("crudo", "gas", "gasolina", "glp")
+
+#loop para levantar las bases
+lista_regalias = list()
+for(i in productos){
+  regalias_i <- read_delim(paste0("../data/secretaria_energia/regalias/regalias_", i, ".csv"), 
+    ";", escape_double = FALSE, trim_ws = TRUE, 
+    skip = 1)
+  lista_regalias[[i]] <- regalias_i
+}
+
+
+
+#bases individuales
+regalias_crudo <- lista_regalias$crudo %>% 
+  mutate(moneda = "USD",
+         producto = "crudo")
+regalias_gas <- lista_regalias$gas %>% 
+  mutate(moneda = "ars",
+         producto = "gas")
+regalias_gasolina <- lista_regalias$gasolina %>% 
+  mutate(moneda = "USD",
+         producto = "gasolina")
+regalias_glp <- lista_regalias$glp %>% 
+  mutate(moneda = "ars",
+         producto = "glp")
+
+
+
+#base completa
+regalias_sec_en <-  regalias_crudo %>% 
+  bind_rows(regalias_gas, regalias_gasolina, regalias_glp) %>% 
+  rename(anio = "AÑO",
+         mes = "MES", 
+         regalias_se = "TOTAL PROVINCIA") %>% 
+  mutate(fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
+  select(fecha, anio, mes, producto, moneda, regalias_se, everything(.)) %>% 
+  group_by(producto, anio, moneda ) %>% 
+  summarise(regalias_se = sum(regalias_se)) %>% 
+  left_join(tcp_anual %>% select(-TCP)) %>% 
+  mutate(regalias_se = case_when(moneda == "USD" ~ regalias_se * TCC,
+                                    T ~ regalias_se),
+         unidad = "ars") %>% 
+  select(-c(TCC, moneda))
+
+#FR y DB
+regalias_fr <-  read_excel("../data/ypf/Anuario Estadistico YPF - Datos ventas 1963-1991.xlsx", 
+    sheet = "Regalías cálculo" , skip =2) %>% 
+   select(anio = "...1" , regalias_fr = "Regalías...9")
+
+
+# base completa
+regalias <- regalias_sec_en %>%   
+  group_by(anio, unidad) %>% 
+  summarise(regalias_se = sum(regalias_se, na.rm = T))  %>% 
+  # full_join(regalias_fr, by  = "anio") %>% 
+  full_join(renta_hidrocarburos_fr %>% 
+              mutate(regalias =  (regalias*ipc_18)*10^6) %>% 
+              select(anio, regalias_fr = regalias ), by  = "anio") %>% 
+  mutate(regalias_total = case_when(anio <1991 ~  0,# regalias_fr,
+                                    anio >= 1991 ~regalias_se)) %>% 
+  arrange(anio)
+
+regalias_usd <- regalias %>%
+  left_join(tcp_anual_b %>% select(anio, tcc)) %>%
+  mutate(regalias = regalias_total /tcc,
+         unidad = "USD") %>%
+  select(-c(regalias_total, tcc))
+
+
+```
+
+## Subsidios
+```{r}
+# CEFIP cont et al. Subsidios como % del PBI
+subsidios_cefip <- read_excel("../data/cefip/subsidios.xlsx") %>% 
+  gather(key = anio,
+         value = subsidios_porcentaje_pbi,
+         2:ncol(.)) %>% 
+  filter(sector %in% c( "Plan Gas",
+                       # "ENARSA","CAMMESA", 
+                       "Subsidios FF GN y GLP")) %>% 
+  mutate(anio = as.double(anio)) %>% 
+  left_join(ganancia_y_pbi %>% 
+              select(anio, pbi)) %>%
+  mutate(subsidios_porcentaje_pbi=as.double(subsidios_porcentaje_pbi),
+         subsidios_cefip = subsidios_porcentaje_pbi/100 * pbi * 10^6) %>% 
+  group_by(anio) %>% 
+  summarise(unidad = "Pesos corrientes",
+            subsidios_cefip=sum(subsidios_cefip, na.rm = T))
+
+#ejes 
+subsidios_ejes <- read_excel("../data/ejes/subsidios.xlsx" ) %>% 
+  rename(subsidios_usd = subsidios_hidrocarburos) %>% 
+  right_join(tcp_anual_b %>% 
+               select(anio, tcc), by = "anio") %>%
+  group_by(anio) %>% 
+  summarise(unidad = "Pesos corrientes",
+         subsidios_ejes = subsidios_usd*tcc*10^6)
+
+subsidios_hidrocarburos <- subsidios_ejes%>% 
+  select(anio, unidad, subsidios_ejes) %>% 
+  full_join(subsidios_cefip, by =c("anio", "unidad")) %>% 
+  arrange(-anio) %>% 
+  mutate(unidad = "Pesos corrientes")
+         # x = subsidios_cefip/subsidios_ejes)
+subsidios_hidrocarburos  
+```
+
+
+## Empleo, remuneraciones y masa Salarial
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #anuarios CEPAL
 cepal_1991 <- read_excel( "../data/cepal/cepal_1991.xlsx") %>% 
@@ -1943,35 +1966,14 @@ masa_salarial_hidrocarburos <- masa_salarial_ccnn %>%
   #                       anio >= 1996 ~masa_salarial_oede)) %>% 
   arrange(anio)
 masa_salarial_hidrocarburos  
-
-
 ```
 
 
 
 
 ## Activos
-
-Pasar datos de bs de uso en yacimientos para armar relación activo yacimeinto/total
-
-Fuentes:
-
-* Balances de Bolsar (unicamente empresas que cotizan en la bolsa de valores argentina). Revisar el stock del sector distribución porque se presenta demasiado grande con respecto al de los demás. Falta pasar los datos del activo de casi todas las empresas
-* AFIP. Con esta fuente no tenemos calculo de renta, sino que solo usamos la TG como parámetro. Nota: "_c" significa casos presentados de la variable correspondiente
-* Memorias de YPF. La década de los 80 presenta picos que hay que revisar
-
-
-* Calculo del Capital Total Adelantado (KTA) 
-
-  + Bolsar: Es equivalente a la suma de Propiedad, Planta y Equipos Neta (descontando los terrenos y obras en curso) y los Inventarios. Cuando los datos lo habilitan, se le agregó los salarios adelantados (salarios y cargas consumidos sobre rotación). Luego, cuando no se presentaron datos de Propiedad, Planta y Equipos, se tomó el activo no corriente.
-  + AFIP: Es equivalente a la suma de Bienes de Uso, Bienes de Cambio, Inventarios y Disponibilidades.
-  + Memoria YPF: Suma de Bienes de Uso y Bienes de Cambio
-
-
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # BOLSAR
-
 #segmentos de YPF y Petrobras
 ypf_seg <- read_delim("../data/ypf/ypf_segmentos.csv", 
     ",", escape_double = FALSE, trim_ws = TRUE) %>% 
@@ -2168,61 +2170,6 @@ stock_ypf <- balance_ypf %>%
 # Stock de la rama
 stock_rama <- stock_afip %>% 
   bind_rows(stock_balances_rama)
-
-# write.csv(stock_rama, file ="/Archivos/Datos/Stock/stock_hidrocarburos.csv")
-
-```
-
-
-### Stock de segmentos de YPF y Petrobras
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-# graf_stock_segmentos <- union_segmentos %>% 
-#   ggplot(aes(anio, valor, color = sector))+
-#   geom_line()+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Stock de capital de segmentos",
-#        subtitle = "YPF y Petrobras Argentina",
-#        y = "Millones de pesos de 2018")+
-#   theme_classic()+
-#   facet_wrap(variable ~ empresa )
-# 
-# ggplotly(graf_stock_segmentos, width = 700, height = 500)
-
-
-```
-
-### Stock por empresas
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-# graf_stock_emp <- stock_balances_empresas %>%
-#   filter(
-#     # variable %in% c("KTA", "activo"),
-#          sector != "distribucion") %>% 
-#   ggplot(aes(anio, valor, color = empresa))+ 
-#   geom_line()+
-#   geom_point()+
-#   labs(title = "Stock de capital por empresa",
-#         y = "Millones de pesos de 2018")+
-#   facet_wrap(~variable)
-# ggplotly(graf_stock_emp, width = 700, height = 500)
-
-
-```
-
-### YPF largo plazo
-Comparación entre la Memoria YPF (recopilado por BFR) y los balances extríados de Bolsar
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-# graf_stock_ypf <-  stock_ypf %>% 
-#   ggplot(aes(anio, valor, color = sector))+ 
-#   geom_line()+
-#   geom_point()+
-#   labs(title = "Stock de capital de YPF",
-#         y = "Millones de pesos de 2018")+
-#   facet_wrap(~variable)
-# ggplotly(graf_stock_ypf, width = 700, height = 500)
-
 ```
 
 
@@ -2259,8 +2206,6 @@ listado_pozos <- read_csv("../data/secretaria_energia/cap_iv/listado-de-pozos-ca
 
 
 ```{r}
-
-
 ppye_ypf <- ypf_seg %>% 
   filter(sector  == "upstream" ) %>% 
   mutate(anio = year(fecha)) %>% 
@@ -2367,131 +2312,7 @@ estimacion_ppye_total_via_ypf <- stock_y_pozos_ypf %>%
 
 
 
-
-## Regalías
-
-* Fuentes: 
-  + Secretaría de Energía (Base Regalías)
-
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#regalias Sec de Energia
-#filtro con productos
-productos <- list("crudo", "gas", "gasolina", "glp")
-
-#loop para levantar las bases
-lista_regalias = list()
-for(i in productos){
-  regalias_i <- read_delim(paste0("../data/secretaria_energia/regalias/regalias_", i, ".csv"), 
-    ";", escape_double = FALSE, trim_ws = TRUE, 
-    skip = 1)
-  lista_regalias[[i]] <- regalias_i
-}
-
-
-
-#bases individuales
-regalias_crudo <- lista_regalias$crudo %>% 
-  mutate(moneda = "USD",
-         producto = "crudo")
-regalias_gas <- lista_regalias$gas %>% 
-  mutate(moneda = "ars",
-         producto = "gas")
-regalias_gasolina <- lista_regalias$gasolina %>% 
-  mutate(moneda = "USD",
-         producto = "gasolina")
-regalias_glp <- lista_regalias$glp %>% 
-  mutate(moneda = "ars",
-         producto = "glp")
-
-
-
-#base completa
-regalias_sec_en <-  regalias_crudo %>% 
-  bind_rows(regalias_gas, regalias_gasolina, regalias_glp) %>% 
-  rename(anio = "AÑO",
-         mes = "MES", 
-         regalias_se = "TOTAL PROVINCIA") %>% 
-  mutate(fecha = as.Date(parse_date_time(paste0(anio, mes), orders = "ym"))) %>% 
-  select(fecha, anio, mes, producto, moneda, regalias_se, everything(.)) %>% 
-  group_by(producto, anio, moneda ) %>% 
-  summarise(regalias_se = sum(regalias_se)) %>% 
-  left_join(tcp_anual %>% select(-TCP)) %>% 
-  mutate(regalias_se = case_when(moneda == "USD" ~ regalias_se * TCC,
-                                    T ~ regalias_se),
-         unidad = "ars") %>% 
-  select(-c(TCC, moneda))
-
-#FR y DB
-regalias_fr <-  read_excel("../data/ypf/Anuario Estadistico YPF - Datos ventas 1963-1991.xlsx", 
-    sheet = "Regalías cálculo" , skip =2) %>% 
-   select(anio = "...1" , regalias_fr = "Regalías...9")
-
-
-# base completa
-regalias <- regalias_sec_en %>%   
-  group_by(anio, unidad) %>% 
-  summarise(regalias_se = sum(regalias_se, na.rm = T))  %>% 
-  # full_join(regalias_fr, by  = "anio") %>% 
-  full_join(renta_hidrocarburos_fr %>% 
-              mutate(regalias =  (regalias*ipc_18)*10^6) %>% 
-              select(anio, regalias_fr = regalias ), by  = "anio") %>% 
-  mutate(regalias_total = case_when(anio <1991 ~  0,# regalias_fr,
-                                    anio >= 1991 ~regalias_se)) %>% 
-  arrange(anio)
-
-regalias_usd <- regalias %>%
-  left_join(tcp_anual_b %>% select(anio, tcc)) %>%
-  mutate(regalias = regalias_total /tcc,
-         unidad = "USD") %>%
-  select(-c(regalias_total, tcc))
-
-
-```
-
-## Subsidios
-```{r}
-# CEFIP cont et al. Subsidios como % del PBI
-subsidios_cefip <- read_excel("../data/cefip/subsidios.xlsx") %>% 
-  gather(key = anio,
-         value = subsidios_porcentaje_pbi,
-         2:ncol(.)) %>% 
-  filter(sector %in% c( "Plan Gas",
-                       # "ENARSA","CAMMESA", 
-                       "Subsidios FF GN y GLP")) %>% 
-  mutate(anio = as.double(anio)) %>% 
-  left_join(ganancia_y_pbi %>% 
-              select(anio, pbi)) %>%
-  mutate(subsidios_porcentaje_pbi=as.double(subsidios_porcentaje_pbi),
-         subsidios_cefip = subsidios_porcentaje_pbi/100 * pbi * 10^6) %>% 
-  group_by(anio) %>% 
-  summarise(unidad = "Pesos corrientes",
-            subsidios_cefip=sum(subsidios_cefip, na.rm = T))
-
-#ejes 
-subsidios_ejes <- read_excel("../data/ejes/subsidios.xlsx" ) %>% 
-  rename(subsidios_usd = subsidios_hidrocarburos) %>% 
-  right_join(tcp_anual_b %>% 
-               select(anio, tcc), by = "anio") %>%
-  group_by(anio) %>% 
-  summarise(unidad = "Pesos corrientes",
-         subsidios_ejes = subsidios_usd*tcc*10^6)
-
-subsidios_hidrocarburos <- subsidios_ejes%>% 
-  select(anio, unidad, subsidios_ejes) %>% 
-  full_join(subsidios_cefip, by =c("anio", "unidad")) %>% 
-  arrange(-anio) %>% 
-  mutate(unidad = "Pesos corrientes")
-         # x = subsidios_cefip/subsidios_ejes)
-subsidios_hidrocarburos  
-```
-
-
-
 # Valor total de la producción  
-
-
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 #MIP 97
 # coeficientes de requerimientos directos
@@ -2544,9 +2365,6 @@ var((read_csv("../data/balances/balances_arg.csv",
   filter(empresa == "YPF") %>% 
   group_by(fecha) %>%
   summarise(tasa_depreciacion = mean(depreciaciones/ppye)))$tasa_depreciacion)
-
-
-
 ```
 
 
@@ -2867,12 +2685,7 @@ write.csv( valor_total_produccion, file = "../resultados/data_viz/valor_total_pr
 
 
 
-# Tasa de Ganancia
-
-
-$$TG_{hidrocarburos} = \frac{PV_{hidrocarburífera}}{KTA_{hidrocarburífero}}$$
-
-
+# Tasa de ganancia y renta apropiada por las empresas
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 #levanto data sets de otro R markdown
 balances_arg <- read_csv("../data/balances/balances_arg.csv", 
@@ -2886,8 +2699,7 @@ ypf_segmentos <- read_csv("../data/ypf/ypf_segmentos.csv",
 
 ```
 
-##Total rama
-
+## Rentabilidad total de la rama
 ```{r echo=FALSE, message=FALSE, warning=FALSE   ,fig.width=10, fig.height=5}
 
 tasa_ganancia_rama <- empalme_ccnn %>%
@@ -2949,24 +2761,8 @@ graf_tg_rama_2
 
 ```
 
+
 ## Renta apropiada por las empresas de la rama
-
-La renta apropiada por las empresas de la rama se calcula por medio del diferencial de tasas de ganancia entre el sector hidrocarburífero que surge a partir de los balances y la rentabilidad normal de la economía.
-
-$$Renta\_empresas = KTA_{hidrocarburífero} * (TG_{hidrocarburífera} - TG_{referencia})$$
-$$TG_{hidrocarburífera} = \frac{Gcia_{hidrocarburos}}{KTA_{hidrocarburífero}}$$ 
-Por lo cual, la renta apropiada por las empresas de la rama sería equivalente a:
-
-$$Renta\_empresas = Gcia_{hidrocarburos} - KTA_{hidrocarburífero} *  TG_{referencia}$$
-
-Donde:
-
-* $KTA_{hidrocarburífero}$ = Stock de capital adelantado de empresas hidrocarburíferas
-* $TG_{hidrocarburífera}$ = Tasa de ganancia de empresas hidrocarburíferas
-* $TG_{referencia}$ = Tasa de ganancia de referencia
-* $Gcia_{hidrocarburos}$ = Ganancia de empresas hidrocarburíferas
-
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
   
 tg_industrial <- read_delim("../data/ccnn/tg_industrial.csv", 
@@ -2985,21 +2781,7 @@ renta_tg <-  tasa_ganancia_rama %>%
          renta_con_tg_union = ppye *(tg_hidrocarburos - union_tg)) %>% 
   distinct()
 
-# graf_tg_rama <- renta_tg %>%
-#   filter(!is.na(stock_seleccionado)) %>% 
-#   gather(key = tipo_renta,
-#          value = renta,
-#          c(renta_con_tg_jic, renta_con_tg_em,renta_con_tg_union )) %>% 
-#   filter(anio >1960) %>% 
-#   left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
-#   mutate(renta = renta/ipc_18) %>% 
-#   ggplot(aes(anio, renta, fill = tipo_renta))+ 
-#   geom_col(position ="dodge")+
-#   # geom_point()+
-#   labs(title = "Renta hidrocarburífera por diferencial de tasas de ganancia",
-#        y = "Millones de pesos de 2018")+
-#   theme(axis.text.x = element_text(angle = 90))+  facet_wrap(~stock_seleccionado, ncol = 1)
-# ggplotly(graf_tg_rama, width = 600, height = 400)
+
 ```
 
 
@@ -3024,10 +2806,10 @@ renta_produccion_balances <-  renta_empresas_balances %>%
   select(anio, everything(.), -fecha)
 
 # graf_renta_emp <- renta_empresas_balances %>%
-#   filter(sector != "distribucion") %>% 
+#   filter(sector != "distribucion") %>%
 #   filter(!is.na(renta_desp_p18),
-#          !(empresa %in% c("chevron_global", "petrobras_global" ))) %>% 
-#   ggplot(aes(fecha, renta_desp_p18, fill = empresa)) + 
+#          !(empresa %in% c("chevron_global", "petrobras_global" ))) %>%
+#   ggplot(aes(fecha, renta_desp_p18, fill = empresa)) +
 #   geom_col(position = "stack")+
 #   labs(title = "Renta hidrocarburífera por empresa",
 #        subtitle = "Millones de pesos corrientes")+
@@ -3055,7 +2837,7 @@ ejercicio <- valor_total_produccion %>%
               # filter(fuente_activos == "Bolsar"))%>%
   mutate(relacion = valor_activos/valor) %>% 
   filter(anio > 1990, !(is.na(activos)))
-ejercicio            
+          
   
 # graf_relacion <- ejercicio %>% 
 #   # ggplot( aes(anio, relacion, color = rama))+
@@ -3075,29 +2857,6 @@ ejercicio
 
 
 # Renta por el diferencial de precios entre el mercado interno y las referencias internacionales 
-
-Renta apropiada mediante el abaratamiento en el consumo interno por efecto del diferencial de precios interno/externo, sobrevaluación de la moneda y retenciones a la exportación
-
-
-### Criterio de cómputo de JK (variable 'renta_dif_precios')
-
-$$RDP= ProdInt * Pext * TCP - ProdInt * PMI * TCC$$
-
-Donde:
-
-* $RDP$ = Renta apropiada por efecto diferencial de precios interno/externo y sobrevaluación
-* $MdoInt$ = Producción destinada al Mercado Interno: Producción - Exportaciones - Existencias (barriles de petróleo ó MMBTU)
-* $Pext$ = Precio de referencia del mercado externo (USD)
-* $PMI$ = Precio de venta del mercado interno (USD)
-* $TCP$ = Tipo de Cambio de Paridad
-* $TCC$ = Tipo de Cambio Comercial
-
-### Criterio de cómputo de JIC y cia (variable 'renta_abaratamiento_sobrevaluacion')
-$$RDP = MdoInt * PMI * (\frac{TCP}{TCC}  - 1)$$  
-
-
-
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 renta_dif_precios_crudo <- prod_merge_crudo %>% 
@@ -3128,29 +2887,6 @@ renta_dif_precios_crudo <- prod_merge_crudo %>%
           tcc, tcp, unidad_renta, 
          # renta_abaratamiento_sobrevaluacion_crudo = renta_abaratamiento_sobrevaluacion,
          renta_dif_precios_crudo, renta_dif_precios_brent) 
-
-
-
-
-# graf_dif_crudo <- renta_dif_precios_crudo %>%
-#   left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-#   mutate(renta_dif_precios_crudo = renta_dif_precios_crudo/ipc_18,
-#          renta_dif_precios_brent = renta_dif_precios_brent/ipc_18) %>%
-#   filter(anio >1960) %>%
-#   select(anio, 12:ncol(.) ) %>%
-#   gather(key = tipo_renta,
-#          value = valor,
-#          3:4) %>%
-#   mutate(valor = valor / 10^6) %>%
-#   ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
-#   geom_col(position = "dodge")+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta petrolera por diferencial de precios interno y externo",
-#        y = "MM de pesos de 2018")
-# graf_dif_crudo
-
-
-
 ```
 
 
@@ -3179,41 +2915,9 @@ renta_diferencial_precios_gas <- prod_merge_gas_MMBTU %>%
 renta_diferencial_precios_gas
 
 
-
-# graf_dif_gas <- renta_diferencial_precios_gas %>%
-#   left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-#   mutate(renta_dif_precios_gas = renta_dif_precios_gas/ipc_18,
-#          renta_abaratamiento_sobrevaluacion_gas =
-#            renta_abaratamiento_sobrevaluacion_gas/ipc_18) %>%
-#     select(anio, 11:ncol(.) ) %>%
-#   gather(key = tipo_renta,
-#          value = valor,
-#          3:4) %>%
-#   mutate(valor = valor / 10^6) %>%
-#   ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
-#   geom_col(position = "dodge")+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta gasífera por diferencial de precios interno y externo",
-#        y = "MM de pesos de 2018")+
-#   xlim(1960, 2021)
-# graf_dif_gas
-
-
-
 ```
 
 # Renta apropiada por sobrevaluación cambiaria
-
-
-$$Rsobrevaluacion = Expo * Pext * (TCP - TCC)$$ 
-
-Donde:
-* $Rsobrevaluacion$ = Renta apropiada por exportaciones con tipo de cambio sobrevaluado
-* $Expo$ = Exportaciones  (barriles de petróleo ó MMBTU)
-* $Pext$ = Precio de referencia del mercado externo (USD)
-* $TCP$ = Tipo de Cambio de Paridad
-* $TCC$ = Tipo de Cambio Comercial
-
 ```{r echo=FALSE}
 
 renta_tcp_crudo <-  renta_dif_precios_crudo %>%
@@ -3243,113 +2947,17 @@ renta_tcp_gas <-  renta_diferencial_precios_gas %>%
 ```
 
 
-
 # Renta apropiada por el Estado mediante impuestos específicos
-
 ```{r echo=FALSE}
-
-retenciones_campodonico <- read_excel("../data/afip/retenciones.xlsx" , 
-    sheet = "usd") %>% 
-  left_join(tcp_anual %>% select(-TCP)) %>% 
-  mutate(retenciones_hc = retenciones_hg * TCC * 1000000,
-         unidad = "ars") %>% 
-  select(anio, unidad, retenciones_hc)
-
-retenciones_crudo <- read_excel( "../data/afip/retenciones.xlsx" ) %>%
-  rename(retenciones_crudo_jk = retenciones_jk,
-         retenciones_crudo_bfr = "retenciones_bfr_M$2008") %>% 
-  mutate(retenciones_crudo_bfr = retenciones_crudo_bfr * ipc08_bfr * 1000 ,
-         unidad = "ars") %>% 
-  select(-ipc08_bfr) %>% 
-  left_join(retenciones_campodonico)
-
-
 retenciones_regalias <- regalias %>% 
   left_join(retenciones_crudo %>% select(-c(retenciones_crudo_bfr, retenciones_hc))) 
 
-
-
-retenciones_crudo
-
-
 ```
-
-
-
-
-$$Rimp = RE + Reg$$
-
-Donde:
-
-* $Rimp$ = Renta apropiada por el Estado mediante impuestos específicos
-* $RE$ = Retenciones
-* $Reg$ = Regalias
-
-# Renta apropiada por consumidores y refinerías y procesadoras
-
-### Criterio de cómputo de Ramón (2019)
-
-#### Refinerías y procesadoras
-
-$$RR = (PI - PRMi) * CrudoP$$
-
-
-
-* $RR$ = Renta apropiada por las Refinadoras 
-* $PI$ = promedio ponderado de Precios Internacionales 
-* $PRMi$ = Precio ponderado a Refinerías del Mercado Interno
-* $CrudoP$ = barriles de Crudo Procesado por las refinadoras
-
-#### Consumidores
-
-$$RC = (PI - PRMi - MR) * CrudoP $$
-
-* $RC$ = Renta apropiada por los Consumidores
-* $MR$ = Margen de Refinerías
-
-Esto resulta equivalente a plantear:
-
-$$RC = PCMi * CrudoP$$
-
-* $PCMi$ = Precio ponderado a Consumidores del Mercado Interno.
-
-
-## Combustibles
-```{r}
-
-```
-
-
 
 
 
 # Renta Hidrocarburífera Total. En precios constantes, sobre Plusvalía Total y PBI
-
-Existen dos caminos para llegar al monto total de renta de la tierra hidrocarburífera: uno es descontando la ganancia normal de las empresas a la plusvalía total del sector y el otro es por medio de la suma de mecanismos de apropiación.
-
-$$Renta\_hidrocarburífera = PV_{hidrocarburífera} - Gcia\_Normal_{hidrocarburífera}$$
-Donde:
-
-* $Gcia\_Normal_{hidrocarburífera}$ = Ganancia Normal del sector hidrocarburífero
-* $PV_{hidrocarburífera}$ = Plusvalía del sector hidrocarburífero  
-
-$$Gcia\_Normal_{hidrocarburífera} = KTA_{hidrocarburífero} * TG_{referencia}$$
-
-
-Donde:
-
-* $KTA_{hidrocarburos}$ = Stock de capital adelantado del sector hidrocarburífero 
-* $TG_{referencia}$ = Tasa de ganancia normal de referencia.
-
-En este caso, seleccionamos la tasa de ganancia del sector industrial como parámetro para diferenciar la renta de la ganancia. A su vez, para el capital total adelantado de las empresas hidrocarburíferas, seleccionamos unicamente el valor resultante de la estimación de la PPyE de Bolsar a partir del indice de flujo de pozos (variable "ppye_bolsar_flujo"), por lo que le faltan los inventarios y salarios adelantados.
-
-El cálculo de renta total hidrocarburífera que se obtiene por medio de descontar la ganancia normal a la plusvalía total del sector, debe ser igual a la renta obtenida por medio de la agregación de los distintos mecanismos de apropiación. Es decir:
-
-$$Renta\_hidrocarburífera = Renta\_diferencial\_precios + Renta\_sobrevaluación + Renta\_empresas + Impuestos\_netos\_específicos $$
-$$Impuestos\_netos\_específicos = Retenciones + Regalías - Subsidios$$
-
 ## Método directo (a partir de descuentos sobre el VBP)
-
 ```{r echo=FALSE}
 # knitr::opts_chunk$set(echo= TRUE,fig.width = 120,fig.height = 400)
 renta_directo <- renta_tg %>% 
@@ -3384,26 +2992,6 @@ renta_directo_pbi <- renta_directo %>%
          renta_pbi =(renta_total*ipc_18 )/pbi )
 
 
-# graf_renta_directo_pbi <- renta_directo_pbi %>%
-#   select(anio, renta_pv,renta_pbi ) %>%
-#   # filter(anio >= 1962, fuente_gcia == "Propia") %>%
-#   filter(anio >= 1962) %>%
-#   gather(key = tipo_renta,
-#          value = valor,
-#          2:3) %>%
-#   ggplot(aes(anio, valor))+
-#   # geom_col(position = "dodge")+
-#   geom_line()+
-#   theme(legend.position = "bottom",
-#         axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+
-#   labs(title = "Renta hidrocarburífera total sobre PBI y Ganancias Totales",
-#        subtitle = "A partir de estimación propia del VBP",
-#        y = "%")+
-#   scale_y_continuous(labels=scales::percent_format(accuracy = 2))+
-#   facet_grid(~tipo_renta )
-
-# graf_renta_directo_pbi
-# ggplotly(graf_renta_directo_pbi, height = 400, width = 600)
 
 
 
@@ -3411,7 +2999,6 @@ renta_directo_pbi <- renta_directo %>%
 
 
 ## Método indirecto (suma de mecanismos)
-
 ```{r echo=FALSE}
 renta_indirecto <- renta_dif_precios_crudo %>% 
   # select(anio,renta_dif_precios_crudo, renta_dif_precios_brent ) %>%
@@ -3467,186 +3054,11 @@ renta_indirecto <- renta_dif_precios_crudo %>%
   # select(-renta_dif_precios_brent) %>% 
   distinct() %>% 
   filter(anio > 1960)
-
-# 
-# #Renta total
-graf_renta_total <- renta_indirecto %>%
-  filter(anio >1960) %>%
-  mutate(subsidios = subsidios*-1) %>%
-  select(-c(unidad, ipc_18, renta_total, tcc, tcp,
-             proporcion_subsidios)) %>%
-  pivot_longer(cols = c(renta_diferencial_precios_gas, renta_diferencial_precios_crudo ,
-           renta_expo_sobrevaluada_crudo , renta_expo_sobrevaluada_gas ,
-           renta_empresas, regalias_total ,  retenciones, subsidios),
-           names_to = "tipo_renta", values_to = "valor") %>% 
-  # gather(key = tipo_renta,
-  #        value = valor,
-  #        2:8) %>%
-  ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
-  geom_col(position = "stack")+
-  theme(legend.position = "bottom")+
-  labs(title = "Renta de la tierra hidrocarburífera",
-       subtitle = "Cursos de apropiación. Millones pesos de 2018",
-       y = "Millones de pesos 2018")+
-  scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
-  scale_x_continuous(breaks = seq(1960, 2020, 5))+
-  theme_classic()
-graf_renta_total = plot_theme(graf_renta_total)
-graf_renta_total
-ggsave("../resultados/argentina/renta_mecanismos.png",graf_renta_total)
-# # ggplotly(graf_renta_total, width = 600, height = 400)
-# 
-# 
-# 
-# ###### proporcion subsidios
-# # renta_indirecto[,c("anio","proporcion_subsidios")] %>% arrange(-anio)
-# renta_directo %>%
-#   mutate(peso_subsidios = subsidios/renta_total,
-#          metodo = "Directo") %>%
-#          select(anio, metodo, peso_subsidios, renta_total) %>%
-#   rbind(renta_indirecto %>%
-#           mutate(peso_subsidios = subsidios/renta_total,
-#                  metodo = "Indirecto") %>%
-#           select(anio,metodo,  peso_subsidios, renta_total)) %>%
-#   filter(anio > 2004) %>%
-#   reshape2::melt(id.vars = c("anio", "metodo")) %>%
-#   ggplot(aes(anio, value, color = metodo))+
-#   geom_line()+
-# facet_wrap(~variable,scales= "free")
-
-
-
-
 ```
 
 
-```{r echo=FALSE}
-#Renta tcp y tcc
-# graf_renta_total_usd <- renta_indirecto %>%
-#   select(c(anio, renta_usd_tcc, renta_usd_tcp)) %>%
-#   filter(anio > 1962) %>%
-#   gather(key = tipo_renta,
-#          value = valor,
-#          2:3) %>%
-#   ggplot(aes(anio, valor, color = tipo_renta) )+
-#   geom_line()+
-#   geom_point()+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta hidrocarburífera total (petróleo y gas)",
-#        subtitle = "Millones de USD",
-#        y = "Millones de USD")+
-#   theme_classic()+
-#   scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
-# ggplotly(graf_renta_total_usd, width = 600, height = 400)
-# ggsave()
-
-
-#comparacion con FR
-# graf_comparacion_rentas <- renta_indirecto %>%
-#   mutate(fuente = "Propia via suma de mecanismos") %>%
-#   select(anio, unidad,fuente,  renta_total ) %>%
-#   # bind_rows(renta_directo_pbi %>%
-#   #               mutate(fuente = "Propia via descuentos sobre VBP") %>%
-#   #              select(anio,fuente,  renta_total ) ) %>%
-#   bind_rows(renta_hidrocarburos_fr %>%
-#               mutate(fuente = "FR y B") %>%
-#               select(anio, unidad, fuente,  renta_total)) %>%
-#   bind_rows(renta_hidrocarburos_jk %>%
-#         select(anio, renta_total) %>%
-#         left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-#         mutate(renta_total = renta_total/(10^6)/ipc_18,
-#                fuente = "JK",
-#                unidad = "Millones de pesos 2018") ) %>%
-#   bind_rows(renta_fd %>%
-#                left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
-#               mutate(renta_total = (renta_total/1000)/ipc_18,
-#               # mutate(renta_total = (pv_neta/1000)/ipc_18,
-#                      fuente = "FD",
-#                unidad = "Millones de pesos 2018") ) %>%
-#   filter(anio >= 1962) %>%
-#   ggplot(aes(anio, renta_total, color = fuente))+
-#   geom_line()+
-#   # geom_point(alpha = 0.35)+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta hidrocarburífera total (petróleo y gas)",
-#        subtitle = "Comparación de estimaciones. Millones pesos de 2018",
-#        y = "Millones de pesos 2018")+
-#   theme_classic()
-# graf_comparacion_rentas
-
-
-
-
-#v pbi y pv
-# graf_renta_total_pv <- renta_indirecto %>%
-#   select(anio, renta_pv,renta_pbi ) %>%
-#   filter(anio >= 1962) %>%
-#   gather(key = tipo_renta,
-#          value = valor,
-#          2:3) %>%
-#   ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
-#   geom_col(position = "dodge")+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta hidrocarburífera total sobre PBI y Ganancias Totales",
-#        subtitle = "Suma de mecanismos",
-#        y = "%")+
-#   scale_y_continuous(labels=scales::percent)
-# ggplotly(graf_renta_total_pv, width = 600, height = 400)
-
-```
-
-
-
-```{r echo=FALSE}
-
-
-#solo renta empresas
-# renta_indirecto %>%
-#   filter(anio > 1960) %>% 
-#   mutate(renta_empresas_pv = renta_empresas*ipc_18/ganancia,
-#          renta_empresas_pbi = renta_empresas*ipc_18/pbi) %>% 
-#   select(anio, renta_empresas_pv, renta_empresas_pbi) %>% 
-#   gather(key = variable, value = valor, 2:3 ) %>% 
-#   ggplot(aes(anio, valor, fill = variable))+
-#   geom_col(position = "dodge")+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta hidrocarburífera apropiada por empresas sobre PBI y Ganancias Totales",
-#        y = "%")+
-#   scale_y_continuous(labels=scales::percent)
-
-  
-```
-
-
-```{r}
-#################### solo gas
-# Gas
-# renta_gas_pbi_pv <- renta_diferencial_precios_gas %>% 
-#   select(anio,renta_diferencial_precios_gas, renta_abaratamiento_sobrevaluacion_gas ) %>% 
-#   group_by(anio ) %>% 
-#   mutate_all(function(x) {x / 10^6}) %>% 
-#   left_join(ganancia_y_pbi) %>% 
-#   mutate(renta_dif_precios_gas_pv = renta_dif_precios_gas/ganancia,
-#          renta_dif_precios_gas_pbi = renta_dif_precios_gas/pbi,
-#          renta_abaratamiento_sobrevaluacion_gas_pv = renta_abaratamiento_sobrevaluacion_gas/ganancia,
-#          renta_abaratamiento_sobrevaluacion_gas_pbi = renta_abaratamiento_sobrevaluacion_gas/pbi,
-#          unidad = "Millones de Pesos corrientes")
-# 
-# graf_renta_gas_pv <- renta_gas_pbi_pv %>% 
-#   select(anio, 7:ncol(.) ) %>% 
-#   gather(key = tipo_renta,
-#          value = valor,
-#          2:ncol(.)) %>% 
-#   ggplot(aes(anio, valor, color = tipo_renta, fill = tipo_renta))+
-#   geom_col(position = "dodge")+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Renta petrolera por diferencial de precios interno y externo sobre PBI y Ganancias Totales",
-#        y = "%")
-# plotly::ggplotly(graf_renta_gas_pv)
-```
 
 ## Costos
-
 ```{r}
 #estimacion costos propia
 costos <- produccion_total %>% 
@@ -3696,9 +3108,7 @@ costos <- produccion_total %>%
 ```
 
 # Comparación con estimación de otros autores
-
 ```{r}
-
 #renta usd vs autores
 #falta agregar renta_hidrocarburos_jk
 renta_comparacion <- renta_indirecto %>% 
@@ -3735,64 +3145,10 @@ renta_comparacion <- renta_indirecto %>%
   left_join(tcp_anual_b) %>% 
   left_join(ipc_us) %>% 
   mutate(valor = ((valor*tcc)/tcp)/ipc_us_20)
-#####
-  
-
-#grafico comparacion con otros autores
-graf_tipos_renta <- renta_comparacion  %>% 
-  filter(!(tipo_de_renta%in% c("renta_total",
-                               "renta_diferencial_precios",
-                               "renta_estado_total"))) %>%
-  filter(anio > 1990) %>% 
-  ggplot(aes(anio, valor, color = autor))+
-  geom_line()+
-  geom_point(size = 0.5)+
-  facet_wrap(~tipo_de_renta, scales = "free_y")+
-  labs(title = "Renta hidrocarburífera",
-       subtitle = "Comparación de estimaciones. Millones USD TCp de 2020",
-       y = "Millones USD TCp de 2020")+
-  theme_classic()+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-# # # ggplotly(graf_tipos_renta, width = 800, height = 600)
-graf_tipos_renta = plot_theme(graf_tipos_renta)+theme(,
-  strip.text = element_text(12), legend.title = element_blank() )
-ggsave("../resultados/argentina/comparacion_autores_tipo_renta.png", 
-       graf_tipos_renta, width = 16, height = 8)
-
-graf_renta_total_comparacion <- renta_comparacion %>%
-  # filter(!(autor == "Propia" & tipo_de_renta == "renta_total")) %>%
-  # mutate(tipo_de_renta= case_when(tipo_de_renta =="renta_diferencial_precios" &
-  #                                   autor == "Propia" ~ "renta_total",
-  #                                 T ~ tipo_de_renta)) %>%
-  filter(tipo_de_renta == "renta_total", anio > 1990) %>%
-  ggplot(aes(anio, valor, color = autor))+
-  geom_line()+
-  # geom_point()+
-  theme(legend.position = "bottom")+
-  labs(title = "Renta de la tierra hidrocarburífera total de Argentina",
-       subtitle = "Comparación con otras estimaciones a tipo de cambio de paridad",
-       y = "Millones de USD TCp de 2020", x="",
-       caption = "Nota: en la estimación propia se utilizó la renta por mecanismos")+
-  theme_classic()+
-  scale_x_continuous(breaks = seq(1960, 2020, 5))+
-  scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
-graf_renta_total_comparacion =plot_theme( graf_renta_total_comparacion)+theme(
-  legend.title = element_blank())
-graf_renta_total_comparacion
-
-ggsave("../resultados/argentina/comparacion_autores.png", graf_renta_total_comparacion,
-         width = 10, height = 5)
-# ggplotly(graf_renta_total_comparacion, width = 600, height = 400)
-# ggplotly(graf_renta_total_comparacion_b)
-
-t1  <- Sys.time()
-print(t1-t0)
 ```
 
 
-
 # Exportacion de resultados
-
 ```{r}
 
 t1 <- Sys.time()

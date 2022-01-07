@@ -1,0 +1,154 @@
+---
+title: "Costos, inversiones y rentabilidad"
+output: html_notebook
+---
+
+
+# Costos
+
+$$Q\_total = Q_{petróleo} + Q_{gas} $$
+Donde:
+  
+  * $Q\_total$ = Cantidades producidas de petróleo y gas en Barriles Equivalentes de Petróleo
+  * $Q_{petróleo}$ = Cantidades producidas de petróleo crudo en barriles equivalentes de petróleo (BOE)
+  * $Q_{gas}$ = Cantidades producidas de gas natural en barriles equivalentes de petróleo (BOE)
+  
+
+$$ Costos\_totales =  CI + MS + ConKfijo$$
+
+Donde:
+
+* $Costos\_totales$ = Costos totales hidrocarburíferos
+* $CI$ = Consumo Intermedio, distintas estimaciones
+* $MS$ = Masa Salarial, distintas estimaciones
+* $ConKfijo$ = Consumo de Capital Fijo
+
+
+$$Costos\_totales\_con\_Gcia = Costos\_totales + Gcia\_Normal_{hidrocarburífera} $$
+Donde:
+
+* $Costos\_totales\_con\_Gcia$ = Costos totales hidrocarburíferos con ganancia normal 
+* $Gcia\_Normal_{hidrocarburífera}$ = Ganancia normal del sector hidrocarburífero
+
+$$ Precio\_costo = \frac{Costos\_totales}{Q\_total}   $$
+Donde:
+* $Precio\_costo$ = Precio de costo en BOE
+
+A partir de esto se puede calcular un costo recuperable del petróleo y del gas
+
+$$Costo\_crudo = Q_{petróleo} * Precio\_costo$$
+$$Costo\_gas = Q_{gas} * Precio\_costo$$
+
+
+$$Precio\_produccion = \frac{Costos\_totales\_con\_Gcia}{Q\_total}$$
+
+$$Precio\_vta\_potencial =  \frac{Q\_total*Pext_{petróleo} - Costos\_totales}{Q\_total} $$
+
+
+Donde:
+* $Precio\_produccion$= Precio de produccion
+* $Precio_vta_potencial$ = Precio de venta potencial
+* $Pext_{petróleo}$ = Precio de exportación/referencia internacional del petróleo crudo
+
+```{r}
+costos <- read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "costos_pg_ccnn") 
+
+costos %>%
+           filter(anio > 1997) %>%
+  ggplot(aes(anio, Pcost, color = fuente))+
+  geom_line(alpha = 0.5, size = 1.4)+
+    labs(title = "Precio de costo",
+         subtitle= "Estimacion propia a partir de CCNN y reestimacion de VBP con criterio CCNN",
+         y = "USD/BOE", x = "Año")
+
+```
+
+# Inversiones
+
+## Inversiones comprometidas
+
+## Metros y pozos perforados
+
+# Stock invertido
+## Activos
+Pasar datos de bs de uso en yacimientos para armar relación activo yacimeinto/total
+
+Fuentes:
+
+* Balances de Bolsar (unicamente empresas que cotizan en la bolsa de valores argentina). Revisar el stock del sector distribución porque se presenta demasiado grande con respecto al de los demás. Falta pasar los datos del activo de casi todas las empresas
+* AFIP. Con esta fuente no tenemos calculo de renta, sino que solo usamos la TG como parámetro. Nota: "_c" significa casos presentados de la variable correspondiente
+* Memorias de YPF. La década de los 80 presenta picos que hay que revisar
+
+
+* Calculo del Capital Total Adelantado (KTA) 
+
+  + Bolsar: Es equivalente a la suma de Propiedad, Planta y Equipos Neta (descontando los terrenos y obras en curso) y los Inventarios. Cuando los datos lo habilitan, se le agregó los salarios adelantados (salarios y cargas consumidos sobre rotación). Luego, cuando no se presentaron datos de Propiedad, Planta y Equipos, se tomó el activo no corriente.
+  + AFIP: Es equivalente a la suma de Bienes de Uso, Bienes de Cambio, Inventarios y Disponibilidades.
+  + Memoria YPF: Suma de Bienes de Uso y Bienes de Cambio
+
+```{r}
+# write.csv(stock_rama, file ="/Archivos/Datos/Stock/stock_hidrocarburos.csv")
+```
+
+
+### Stock de segmentos de YPF y Petrobras
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# graf_stock_segmentos <- union_segmentos %>% 
+#   ggplot(aes(anio, valor, color = sector))+
+#   geom_line()+
+#   theme(legend.position = "bottom")+
+#   labs(title = "Stock de capital de segmentos",
+#        subtitle = "YPF y Petrobras Argentina",
+#        y = "Millones de pesos de 2018")+
+#   theme_classic()+
+#   facet_wrap(variable ~ empresa )
+# 
+# ggplotly(graf_stock_segmentos, width = 700, height = 500)
+
+
+```
+
+### Stock por empresas
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# graf_stock_emp <- stock_balances_empresas %>%
+#   filter(
+#     # variable %in% c("KTA", "activo"),
+#          sector != "distribucion") %>% 
+#   ggplot(aes(anio, valor, color = empresa))+ 
+#   geom_line()+
+#   geom_point()+
+#   labs(title = "Stock de capital por empresa",
+#         y = "Millones de pesos de 2018")+
+#   facet_wrap(~variable)
+# ggplotly(graf_stock_emp, width = 700, height = 500)
+
+
+```
+
+### YPF largo plazo
+Comparación entre la Memoria YPF (recopilado por BFR) y los balances extríados de Bolsar
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# graf_stock_ypf <-  stock_ypf %>% 
+#   ggplot(aes(anio, valor, color = sector))+ 
+#   geom_line()+
+#   geom_point()+
+#   labs(title = "Stock de capital de YPF",
+#         y = "Millones de pesos de 2018")+
+#   facet_wrap(~variable)
+# ggplotly(graf_stock_ypf, width = 700, height = 500)
+
+```
+
+# Rentabilidad
+$$TG_{hidrocarburos} = \frac{PV_{hidrocarburífera}}{KTA_{hidrocarburífero}}$$
+```{r}
+
+```
+
+
+
+
+

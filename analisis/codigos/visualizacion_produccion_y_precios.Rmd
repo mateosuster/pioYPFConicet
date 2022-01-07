@@ -14,7 +14,7 @@ Se presentan a continuación una breve descripción de las variables referidas a
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 #limpieza de memoria
-# rm(list =ls())
+rm(list =ls())
 gc()
 
 # configuración de impresión
@@ -28,7 +28,7 @@ library(kableExtra)
 library(ggplot2)
 library(plotly)
 library(readxl)
-source("functions_hidrocarburos.R")
+source("functiones_hidrocarburos.R")
 
 # parámetros para los graficos
 alpha_n = 0.7
@@ -36,7 +36,14 @@ alpha_n = 0.7
 
 # Datos
 
-Las variables presentadas son el resultado del script [preprocesamiento](https://github.com/mateosuster/pioYPFConicet/blob/main/analisis/codigos/preprocesamiento.Rmd), disponible en nuestro [repositorio de GitHub](https://github.com/mateosuster/pioYPFConicet). Allí se incluyen todas las bases necesarias para los cómputos, así como los resultados obtenidos. Además, la base de datos con nuestros resultados también se encuentra publicada en [Harvard Datverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/UTKSOE).
+Las variables presentadas son el resultado del script [preprocesamiento.R](https://github.com/mateosuster/pioYPFConicet/blob/main/analisis/codigos/preprocesamiento.Rmd), disponible en nuestro [repositorio de GitHub](https://github.com/mateosuster/pioYPFConicet). Allí se incluyen todas las bases necesarias para los cómputos, así como los resultados obtenidos. Además, la base de datos con nuestros resultados también se encuentra publicada en [Harvard Datverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/UTKSOE).
+
+Para realizar conversiones de las distintas unidades de medida de las que provenian los datos originales, se definieron distintas funciones que se encuentran en el script [funciones_hidrocarburos.R](https://github.com/mateosuster/pioYPFConicet/blob/main/analisis/codigos/functiones_hidrocarburos.R). Las fuentes de los factores de conversión son los siguientes:
+
+* [Canada – National Energy Board. Energy Conversion Tables](https://apps.cer-rec.gc.ca/Conversion/conversion-tables.aspx?GoCTemplateCulture=en-CA#2-3)
+* [BP](https://www.bp.com/content/dam/bp/business-sites/en/global/corporate/pdfs/energy-economics/statistical-review/bp-stats-review-2019-approximate-conversion-factors.pdf)
+* [EIA](https://www.eia.gov/kids/what-is-energy/energy-calculators.php#natgascalc)
+
 
 ```{r}
 # datos 
@@ -304,7 +311,7 @@ plot_ggplotly(precio_crudo_plt,
 
 #### Gas natural
 
-Los precios del mercado interno del gas natural poseen un comportamiento estable hasta fines de los '70, momento en el cual aumentan drásticamente. En 1980, en línea con el aumento del crudo, el precio del gas supera USD 1/MMBTU, aunque cae en los años subsiguientes; mientras que en la década de 1990 se mantiene estable y cae con la devaluación del 2002. A partir de ahí, presentó una clara tendencia ascendente hasta 2017, la cual se detuvo en el interregno 2011-2015. Es llamativo el nivel del precio resultante de los balances de YPF: mientras que en el crudo parece acoplarse a IDEE, en el gas natural es extremadamente bajo.
+Los precios del mercado interno del gas natural poseen un comportamiento estable hasta fines de los '70, momento en el cual aumentan drásticamente. En 1980, en línea con el aumento del crudo, el precio del gas supera USD 1/MMBTU, aunque cae en los años subsiguientes; mientras que en la década de 1990 se mantiene estable y cae con la devaluación del 2002. A partir de ahí, presentó una clara tendencia ascendente hasta 2017, la cual se detuvo en el interregno 2011-2015. Es llamativo el nivel del precio resultante de los balances de YPF: mientras que en el crudo parece acoplarse a IDEE, en el gas natural es extremadamente bajo. El precio de IDEE se presentaba originalmente en precios constantes de 1970, por lo cual fue indexado para presentarse en precios corrientes.
 
 ```{r}
 precio_gas_plt <-  ggplot(data[ variable == variables[8], ],
