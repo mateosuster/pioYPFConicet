@@ -112,6 +112,7 @@ plot_theme <- function(x){
 }
 
 plot_ggplotly = function(x, titulo, subtitulo = FALSE){
+  
   ggplotly(theme_propio(x))  %>%
     layout( legend = list( orientation = "h", x = 0.1, y = -0.2) ,
             title = list(text = ifelse(subtitulo == F, 
@@ -122,4 +123,6 @@ plot_ggplotly = function(x, titulo, subtitulo = FALSE){
                            # ,l= 80, r=80
                            )
             )
+  
+  
 }

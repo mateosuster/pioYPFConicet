@@ -10,6 +10,13 @@ output:
     toc_depth: 5
 ---
 
+
+<br>
+<br>
+
+<center> <h1></h1> </center> 
+<div style="text-align: justify "> 
+
 Se presentan a continuación una breve descripción de las variables referidas a precios y producción del mercado hidrocarburífero argentino de largo plazo. Las mismas son el núcleo con el que se calcula el valor total de la producción y sus componentes: salario, ganancia y renta de la tierra. Los resultados aquí presentados, son parte del Proyecto de Investigación Orientada (PIO) Conicet-YPF "La apropiación de la renta petrolera diferencial por distintos sujetos sociales en Argentina comparado con Venezuela y Brasil (2002 a la actualidad)".
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
@@ -51,7 +58,6 @@ data = fread("../resultados/argentina/variables.csv")
 glimpse(data)
 
 #variables
-cat("\n")
 variables = unique(data$variable)
 variables
 
@@ -446,9 +452,9 @@ plot_ggplotly(precio_impo_gas_plt, "Gráfico N°18. Precios de importación del 
 
 
 # Bibliografía
-
 + Grilli, E. y Yang, M. (1988). "Primary Commodity Prices, Manufactured Goods Prices, and the Terms of Trade of Developing Countries: What the Long Run Shows". The World Bank Economic Review 2.
 + [IAPG (2009). "El abecé del Petróleo y del Gas". 3ra edición](https://www.iapg.org.ar/web_iapg/publicaciones/libros-de-interes-general/el-abece-del-petroleo-y-del-gas)
 + Lewinger, A. (2015). "Determinantes generales de los precios de las materia primas en el último ciclo largo (1971-2014)". Trabajo final de maestría. Maestría en relaciones y negociaciones internacionales.
 + [Scheimberg, S (2007). "Experiencia reciente y desafíos para la generación de renta petrolera 'aguas arriba' en la Argentina". Documento de proyecto. Comisión Económica para América Latina y el Caribe (CEPAL)](https://www.cepal.org/sites/default/files/publication/files/3576/S2007324_es.pdf)
 
+</div>

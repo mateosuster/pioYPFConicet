@@ -1,7 +1,16 @@
 ---
 title: "Valor total de la producción: masa salarial, ganancia y renta de la tierra"
-output: html_notebook
+author:
+- affiliation: UNGS/CONICET
+  name: Mateo Suster
+output: 
+  html_document:
+    toc: yes
+    toc_float: true
+    toc_depth: 5
 ---
+
+<div style="text-align: justify "> 
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 #limpieza de memoria
@@ -19,10 +28,11 @@ library(kableExtra)
 library(ggplot2)
 library(plotly)
 library(readxl)
-source("functions_hidrocarburos.R")
+source("functiones_hidrocarburos.R")
 
 # parámetros para los graficos
 alpha_n = 0.7
+n_plot = 0
 ```
 
 # Datos auxiliares
@@ -31,6 +41,9 @@ Para realizar conversiones a dolares de poder adquisitivo constante cargamos los
 #TC
 tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
 tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
+
+#IPC Arg
+ipc_arg <- as.data.table(read_csv("../data/indices/ipc_annual_avg.csv"))
 
 #CPI EEUU
 ipc_us <- as.data.table(read_csv("../data/bls/cpi.csv")) 
@@ -42,17 +55,31 @@ ipc_us[, ipc_us_20 := generar_indice(serie = ipc_us_20,
 tail(tcp_arg)
 ```
 
-# Empleo, remuneraciones y masa Salarial 
+# Empleo y remuneraciones  
 
 * Salario y empleo
   + MTEySS (Base Minería e Hidrocarburos de las Cuentas Nacionales) (1996-2013)
   + [Ministerio de Trabajo, Empleo y Seguridad Social - Observatorio de Empleo y Dinámica Empresarial (OEDE)](http://www.trabajo.gob.ar/estadisticas/oede/estadisticasnacionales.asp) (1996-2019)
-  + EPH ??
 <br>
 
 
 ```{r}
+data = fread("../resultados/argentina/variables.csv")
+glimpse(data)
 
+empleo_y_salario_plt <- data %>% 
+  filter(str_detect(codigo_variable, "Ocup|Rem")) %>% 
+  separate(variable, c("variable" ,"sector"), " - ") %>% 
+  left_join(ipc_arg %>% select(anio,IPC_18 )) %>% 
+  mutate(valor = case_when(variable == "Salario" ~ valor/IPC_18,
+                           T~ valor)) %>% 
+  ggplot(aes(anio, valor, color = fuente))+
+  geom_line(alpha = alpha_n)+
+  facet_wrap(variable~sector, scales = "free")
+
+
+n_plot = n_plot +1
+plot_ggplotly(empleo_y_salario_plt, paste0("Gráfico N°", n_plot, ". Remuneracion y ocupados en la industria hidrocarburífera"))
 ```
 
 # Valor total de la producción  
@@ -311,6 +338,9 @@ Donde:
 ```{r}
 valor_total_produccion = read.csv("../resultados/data_viz/valor_total_produccion.csv")
 graf_valor_produccion <- valor_total_produccion %>%
+  mutate(sector = case_when(str_detect(variable, "tot") ~"Total rama",
+                            str_detect(variable, "extr") ~"Extracción de petróleo y gas",
+                            T  ~ NA_character_)) %>% 
   filter(anio > 1960) %>%
   ggplot( aes(anio, valor, color = fuente))+
   geom_line(alpha = 0.7)+
@@ -320,7 +350,7 @@ graf_valor_produccion <- valor_total_produccion %>%
   labs(title = "Valor de la Producción hidrocarburífera",
        subtitle = "Valor total y componentes",
        y = "Millones de pesos de 2018")+
-  facet_wrap(~variable)
+  facet_wrap(variable ~ sector, ncol = 2)
 gp <- ggplotly(graf_valor_produccion)#, width = 750, height = 700)
 gp[['x']][['layout']][['annotations']][[2]][['x']] <- -0.11
 gp %>% layout(margin = list(l = 75))
@@ -889,3 +919,4 @@ ggsave("../resultados/argentina/comparacion_autores_tipo_renta_usd_tcp.png",
        graf_tipos_renta, width = 16, height = 10)
 ```
 
+</div>

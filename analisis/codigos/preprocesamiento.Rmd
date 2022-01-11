@@ -1840,7 +1840,7 @@ subsidios_hidrocarburos
 ```
 
 
-## Empleo, remuneraciones y masa Salarial
+## Empleo, remuneraciones y masa salarial
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #anuarios CEPAL
 cepal_1991 <- read_excel( "../data/cepal/cepal_1991.xlsx") %>% 
@@ -1966,6 +1966,42 @@ masa_salarial_hidrocarburos <- masa_salarial_ccnn %>%
   #                       anio >= 1996 ~masa_salarial_oede)) %>% 
   arrange(anio)
 masa_salarial_hidrocarburos  
+
+# empleo, remuneracion y masa salarial to export
+empleo_y_remuneraciones <-  masa_salarial_ccnn %>%
+  select(!contains("unidad")) %>%
+  melt(id.vars = c("anio"), value.name = "valor", variable.name = "var") %>% 
+  mutate(fuente = "CCNN") %>% 
+  rbind(
+        masa_salarial_oede %>%
+          select(!contains("unidad")) %>%
+        melt(id.vars = c("anio"), value.name = "valor", variable.name = "var") %>% 
+        mutate(fuente = "Ministerio de Trabajo - OEDE") ) %>%
+  mutate(
+  variable = case_when(
+    str_detect(var, "empleo") ~"Empleo",
+    str_detect(var, "masa_salarial") ~"Masa salarial",
+    str_detect(var, "remuneracion|salario") ~"Salario",
+    T ~NA_character_),
+  unidad = case_when(
+    str_detect(var, "empleo") ~"Puestos de trabajo",
+    str_detect(var, "masa_salarial") ~"Pesos corrientes",
+    str_detect(var, "remuneracion|salario") ~"Pesos corrientes",
+    T ~NA_character_), 
+  sector = case_when( 
+    str_detect(var, "servicios") ~ "Servicios de apoyo a la extracción",
+    str_detect(var, "extraccion") ~ "Extracción de petróleo y gas",
+    str_detect(var, "total") ~ "Total"),
+  codigo_variable = case_when(
+    str_detect(var, "empleo") ~"Ocup",
+    str_detect(var, "masa_salarial") ~"Kvc",
+    str_detect(var, "remuneracion|salario") ~"Rem",
+    T ~NA_character_),
+  valor = case_when(variable == "Masa salarial" ~ valor*1e6, 
+                    T ~ valor),
+  variable = paste(variable, sector , sep = " - ") ) %>% 
+  select(-c(sector, var))
+
 ```
 
 
@@ -2665,10 +2701,10 @@ filtro <- c("anio", "unidad", "fuente", "vbp_tot", "vbp_extr",
 
 valor_total_produccion_corr <- ccnn_oficial %>% 
   select(filtro) %>% 
-  # rbind(criterio_ccnn %>%select(filtro)) %>% 
+  rbind(criterio_ccnn %>%select(filtro)) %>%
   rbind(empalme_ccnn %>% select(filtro)) %>% 
   rbind(criterio_propio %>% select(filtro)) %>% 
-  gather(key = variable, value=valor, 4:12) 
+  gather(key = variable, value=valor, 4:13) 
 
 valor_total_produccion <-  valor_total_produccion_corr %>% 
   left_join(ipc_promedio %>% select(anio, ipc_18)) %>%
@@ -3806,7 +3842,8 @@ all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU,
                precio_mi_crudo, precio_interno_gas_mmbtu_usd, 
                precios_referencia_crudo, precios_exportacion_crudo, 
                precios_referencia_gas, precios_exportacion_gas,
-               regalias_to_vars, retenciones_pg, subsidios_pg),  use.names=TRUE)
+               regalias_to_vars, retenciones_pg, subsidios_pg,
+               empleo_y_remuneraciones),  use.names=TRUE)
 write.csv(all_raw_data, "../resultados/argentina/variables.csv", row.names = F)
 
 
@@ -3832,6 +3869,8 @@ print( delta)
 
 indice <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "indice")
 variables <-  read_excel("../resultados/argentina/metadata_arg.xlsx", sheet = "variables")
+
+write.csv(ipc_promedio, "../data/indices/ipc_annual_avg.csv", row.names = F)
 
 writexl::write_xlsx(list(indice = indice,
                          variables= variables ,
