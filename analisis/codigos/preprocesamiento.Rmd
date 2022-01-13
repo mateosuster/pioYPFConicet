@@ -1970,12 +1970,12 @@ masa_salarial_hidrocarburos
 # empleo, remuneracion y masa salarial to export
 empleo_y_remuneraciones <-  masa_salarial_ccnn %>%
   select(!contains("unidad")) %>%
-  melt(id.vars = c("anio"), value.name = "valor", variable.name = "var") %>% 
+  reshape2::melt(id.vars = c("anio"), value.name = "valor", variable.name = "var") %>% 
   mutate(fuente = "CCNN") %>% 
   rbind(
         masa_salarial_oede %>%
           select(!contains("unidad")) %>%
-        melt(id.vars = c("anio"), value.name = "valor", variable.name = "var") %>% 
+        reshape2::melt(id.vars = c("anio"), value.name = "valor", variable.name = "var") %>% 
         mutate(fuente = "Ministerio de Trabajo - OEDE") ) %>%
   mutate(
   variable = case_when(
@@ -2770,6 +2770,7 @@ tasa_ganancia_rama <- empalme_ccnn %>%
 ############
 
 # #el DF tasa_ganancia_rama_stock contiene las estimaciones distintas estimaciones de KTA con stock de pozos
+
 tasa_ganancia_rama_stock <- valor_total_produccion %>%
   # filter(variable == "excedente_bruto_explotacion" & fuente == "Criterio propio con VBP CCNN" ) %>%
   filter(variable == "ebe_tot" & fuente == "Criterio propio" ) %>%
@@ -2783,6 +2784,8 @@ tasa_ganancia_rama_stock <- valor_total_produccion %>%
               mutate(unidad = "Millones de pesos de 2018")) %>%
   mutate(tasa_ganancia = excedente_bruto_explotacion/ppye)
  
+
+
 graf_tg_rama_2 <- tasa_ganancia_rama_stock %>%
   filter(anio >1995) %>%
   ggplot(aes(anio, tasa_ganancia, color = stock_seleccionado))+
@@ -2923,6 +2926,9 @@ renta_dif_precios_crudo <- prod_merge_crudo %>%
           tcc, tcp, unidad_renta, 
          # renta_abaratamiento_sobrevaluacion_crudo = renta_abaratamiento_sobrevaluacion,
          renta_dif_precios_crudo, renta_dif_precios_brent) 
+
+
+
 ```
 
 
@@ -3192,6 +3198,10 @@ delta  <- as.numeric(  t1 - t0, units = "secs")  #calculo la diferencia de tiemp
 print( delta) 
 
 ```
+```{r}
+write.csv(tasa_ganancia_rama_stock , "../resultados/argentina/tasa_ganancia_rama_stock.csv",row.names=FALSE)
+```
+
 
 
 ```{r include=FALSE}
@@ -3612,8 +3622,8 @@ setcolorder(renta_directo_pbi, c("anio", "unidad", "RvsPV", "RvsPBI"))
 
 
 #
-crudo_sobrevaluacion = as.data.table(renta_tcp_crudo[,-c(12:13)])
-setnames(crudo_sobrevaluacion, "renta_sobrevaluacion_crudo", "Rsvx")
+crudo_sobrevaluacion = as.data.table(renta_tcp_crudo[, c("anio","renta_sobrevaluacion_crudo" )])
+setnames(crudo_sobrevaluacion, "renta_sobrevaluacion_crudo", "Rsvx_crudo")
 # crudo_sobrevaluacion = crudo_sobrevaluacion[(!is.na(Rsvx)) & (Rsvx != 0)  ,.(anio, Rsvx) ]
 
 #
@@ -3630,7 +3640,7 @@ crudo_dif_precios[X_crudo == 0, X_crudo := NA]
 
 
 #
-gas_sobrevaluacion = as.data.table(renta_tcp_gas)
+gas_sobrevaluacion = as.data.table(renta_tcp_gas[, c(c("anio","renta_sobrevaluacion_gas" ))])
 setnames(gas_sobrevaluacion, "renta_sobrevaluacion_gas", "Rsvx")
 # gas_sobrevaluacion = gas_sobrevaluacion[(!is.na(Rsvx)) & (Rsvx != 0)  ,.(anio, Rsvx) ]
 
