@@ -111,13 +111,13 @@ plot_theme <- function(x){
     ) 
 }
 
-plot_ggplotly = function(x, titulo, subtitulo = FALSE){
+plot_ggplotly = function(x, title, subtitle = FALSE){
   
   ggplotly(theme_propio(x))  %>%
     layout( legend = list( orientation = "h", x = 0.1, y = -0.2) ,
-            title = list(text = ifelse(subtitulo == F, 
-                                       paste0(titulo, '<br>', '<sup>'),
-                                       paste0(titulo, '<br>', '<sup>',  subtitulo, '</sup>'))
+            title = list(text = ifelse(subtitle == F, 
+                                       paste0(title, '<br>', '<sup>'),
+                                       paste0(title, '<br>', '<sup>',  subtitle, '</sup>'))
                          ),
             margin = list( t = 50, b = 50
                            # ,l= 80, r=80
