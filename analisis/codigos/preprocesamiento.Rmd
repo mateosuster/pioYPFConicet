@@ -2022,7 +2022,7 @@ petrobras_ar_seg <- read_delim("../data/balances/petrobras_arg_segmentos.csv",
     ",", escape_double = FALSE, trim_ws = TRUE)%>% 
   select(-"...1")
 
-union_segmentos <- ypf_seg %>% 
+stock_segmentos <- ypf_seg %>% 
   select(anio, empresa,sector, unidad, activo = activos) %>% 
   bind_rows(petrobras_ar_seg %>% 
               rename(anio = fecha) %>% 
@@ -2031,12 +2031,13 @@ union_segmentos <- ypf_seg %>%
   gather(key = variable,
          value = valor,
          5:ncol(.)) %>%
+  mutate(unidad = "Millones de pesos corrientes")
+
+union_segmentos <- stock_segmentos %>%
   left_join(ipc_promedio %>% select(anio, ipc_18)) %>% 
   mutate(valor =valor/ipc_18,
          unidad = "Millones de pesos 2018") %>% 
-  select(-ipc_18)
-
-stock_segmentos <- union_segmentos %>% 
+  select(-ipc_18) %>% 
   group_by(anio, sector, variable ,unidad ) %>% 
   summarise(valor = sum(valor, na.rm = T)) %>% 
   ungroup() %>% 
@@ -2066,10 +2067,11 @@ stock_balances_empresas <- read_csv("../data/balances/balances_arg.csv",
   summarise(valor = sum(valor, na.rm = T)) %>%
   filter(variable %in% c("KTA", "ppye", "ppye_neta" , "inventarios", "activo_no_corr", "activo"))
 
+
 ## Stock por rama
 stock_balances_rama <-  stock_balances_empresas %>%
   ungroup() %>% 
-  bind_rows(stock_segmentos %>% 
+  bind_rows(union_segmentos %>% 
               # filter(sector == "upstream" & variable == "activo") %>%
               filter(variable_sector == "activo upstream") %>%
               select(-variable_sector) %>%
@@ -2086,8 +2088,10 @@ stock_balances_rama <-  stock_balances_empresas %>%
   #        variable = "KTA") %>% 
   # rename(extraccion = produccion) %>% 
   # select(anio, variable, moneda, everything(.))
+```
 
 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 ####################################
 # Tasas de depreciacion
 #AFIP
@@ -3191,6 +3195,8 @@ renta_comparacion <- renta_indirecto %>%
 
 
 # Exportacion de resultados
+## Preprocesamiento
+
 ```{r}
 
 t1 <- Sys.time()
@@ -3843,7 +3849,11 @@ setnames(costos_pg_ccnn, c("produccion_total", "costos_totales",
                            "precio_referencia_externo", "costos_totales_sum_gcia_normal",
                            "precio_costo", "precio_produccion", "precio_venta_potencial"),
          c("Q_total", "KTc", "P_ext", "KTCGnorm", "Pcost", "Pp", "PvtaPot"))
+```
 
+
+## Exportación
+```{r include=FALSE}
 #concatenacion de all data
 all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU, 
                expo_q_crudo_dt , expo_usd_crudo, 
@@ -3857,14 +3867,6 @@ all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU,
 write.csv(all_raw_data, "../resultados/argentina/variables.csv", row.names = F)
 
 
-t2 <- Sys.time()
-delta  <- as.numeric(  t2 - t0, units = "secs")  #calculo la diferencia de tiempos
-print( delta) 
-
-```
-
-
-```{r include=FALSE}
 
 
 # coeficientes <- list("Proporción de los servicios sobre extraccion" = servicio_s_extraccion,
@@ -3900,7 +3902,7 @@ writexl::write_xlsx(list(indice = indice,
                          tg_pg_total =tg_pg_total,
                          # tg_pg_empresas = renta_empresas_balances,
                          # stock_pg_balances = stock_balances_empresas,
-                         # segmento_YPF_PetBR =union_segmentos,
+                         segmentos_YPF_PetBR =stock_segmentos,
                          
                          ccnn_pg = ccnn_pg,
                          criterio_ccnn_pg=criterio_ccnn_pg, 
@@ -3914,8 +3916,15 @@ writexl::write_xlsx(list(indice = indice,
                         ),
                     path = "../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx")
 
+write.csv(stock_segmentos, "../resultados/argentina/base_csv/stock_segmentos.csv", row.names = F)
+write.csv(stock_balances_empresas, "../resultados/argentina/base_csv/stock_balances_empresas.csv", row.names = F)
+write.csv(stock_ypf, "../resultados/argentina/base_csv/stock_ypf.csv", row.names = F)
 
 print("El código terminó de correr")
+
+t2 <- Sys.time()
+delta  <- as.numeric(  t2 - t0, units = "secs")  #calculo la diferencia de tiempos
+print( delta) 
 ```
 
 

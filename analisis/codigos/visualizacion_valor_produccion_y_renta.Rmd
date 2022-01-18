@@ -14,11 +14,12 @@ output:
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
 #limpieza de memoria
-# rm(list =ls())
+rm(list =ls())
 gc()
 
 # configuración de impresión
 knitr::opts_chunk$set(echo = TRUE)
+options(warn = -1, message = -1) 
 
 # bibliotecas
 library(data.table)
@@ -37,7 +38,7 @@ n_plot = 0
 
 # Datos auxiliares
 Para realizar conversiones a dolares de poder adquisitivo constante cargamos los datos del tipo de cambio de paridad (actualizado hasta 2018) y el índice de precios al consumidor de Estados Unidos. 
-```{r}
+```{r message=FALSE, warning=FALSE}
 #TC
 tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
 tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
@@ -70,7 +71,7 @@ glimpse(data)
 empleo_y_salario_plt <- data %>% 
   filter(str_detect(codigo_variable, "Ocup|Rem")) %>% 
   separate(variable, c("variable" ,"sector"), " - ") %>% 
-  left_join(ipc_arg %>% select(anio,IPC_18 )) %>% 
+  left_join(ipc_arg %>% select(anio,IPC_18 ), by = "anio") %>% 
   mutate(valor = case_when(variable == "Salario" ~ valor/IPC_18,
                            T~ valor)) %>% 
   ggplot(aes(anio, valor, color = fuente))+
@@ -468,7 +469,7 @@ renta_mecanismos = Reduce(merge_func,
 renta_mecanismos[, value := ((value/1e6)/TCp)/ipc_us_20]
 renta_mecanismos[, unidad := "Millones de USD TCp de 2020"]
 
-renta_mecanismos[anio ==2018,]
+
 ```
 
 

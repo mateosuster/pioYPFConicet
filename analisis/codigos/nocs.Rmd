@@ -23,6 +23,7 @@ library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(lubridate)
+source("functiones_hidrocarburos.R")
 options (scipen = 999)
   
 #cargo la base
@@ -195,6 +196,8 @@ nocs_df <- nocs_full %>%
 #   select(company, KTA, tg_aftertax)
 
 nocs_df
+write.csv(nocs_df, "../resultados/comparacion_paises/nocs.csv", row.names = F)
+
 
 nocs_df[sapply(nocs_df, is.infinite)] <- NA
 
@@ -568,16 +571,18 @@ plt_endeu <- nocs_df %>%
 plt_endeu = plot_theme(plt_endeu)
 ggsave(plot = plt_endeu, file = "../resultados/comparacion_paises/endeudamiento_ypf_pdvsa.png", 
        width = 10, height = 5)
+plt_endeu
 
 ggplot(nocs_df %>% filter(company == "YPF"))+
   geom_line( aes(year, ratio_endeudamiento, group = company))+
   labs(title = "Ratio de endeudamiento de YPF")
 
 nocs_df %>% 
-  ggplot(aes( ratio_endeudamiento ))+#,group = year))+
-  geom_density() +
-  labs(title = "Distribución de ratio de endeudamiento de NOC's")+
-  facet_wrap(~year(year), scales = "free")
+  ggplot(aes( x=ratio_endeudamiento , y = as.factor(year(year)) , fill = year)) +
+  ggridges::geom_density_ridges(alpha = 0.6, stat = "binline")+
+  # geom_density() +
+  labs(title = "Distribución de ratio de endeudamiento de NOC's")#+
+  # facet_wrap(~year(year), scales = "free")
 
 # tapply(nocs_df$ratio_endeudamiento, nocs_df$year, summary)
 
@@ -717,11 +722,6 @@ endeudamiento
 
 
 
-```{r}
-# writexl::write_xlsx(list(nocs_data = nocs_df ,
-#                          tg_nocs= tg_media), path =  "/Archivos/repos/hidrocarburos/analisis/resultados/argentina/NOC's.xlsx")
-
-```
 
 #cluster
 ```{r}

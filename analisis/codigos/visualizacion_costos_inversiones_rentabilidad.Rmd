@@ -3,6 +3,50 @@ title: "Costos, inversiones y rentabilidad"
 output: html_notebook
 ---
 
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+#limpieza de memoria
+rm(list =ls())
+gc()
+
+# configuración de impresión
+knitr::opts_chunk$set(echo = TRUE)
+options(warn = -1, message = -1) 
+
+
+# bibliotecas
+library(data.table)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(plotly)
+library(readxl)
+source("functiones_hidrocarburos.R")
+
+# parámetros para los graficos
+alpha_n = 0.7
+```
+
+
+
+# Datos auxiliares
+Para realizar conversiones a dolares de poder adquisitivo constante cargamos los datos del tipo de cambio de paridad (actualizado hasta 2018) y el índice de precios al consumidor de Estados Unidos. 
+```{r message=FALSE, warning=FALSE}
+#TC
+tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
+tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
+
+#IPC Arg
+ipc_arg <- as.data.table(read_csv("../data/indices/ipc_annual_avg.csv"))
+
+#CPI EEUU
+ipc_us <- as.data.table(read_csv("../data/bls/cpi.csv")) 
+setnames(ipc_us,"Year", "anio"  )
+ipc_us = ipc_us[, .(ipc_us_20 = mean(Value, na.rm=T)), by = anio]
+ipc_us[, ipc_us_20 := generar_indice(serie = ipc_us_20, 
+                                    fecha = anio, fecha_base = 2020)]
+```
+
 
 # Costos
 
@@ -74,7 +118,6 @@ costos %>%
 Pasar datos de bs de uso en yacimientos para armar relación activo yacimeinto/total
 
 Fuentes:
-
 * Balances de Bolsar (unicamente empresas que cotizan en la bolsa de valores argentina). Revisar el stock del sector distribución porque se presenta demasiado grande con respecto al de los demás. Falta pasar los datos del activo de casi todas las empresas
 * AFIP. Con esta fuente no tenemos calculo de renta, sino que solo usamos la TG como parámetro. Nota: "_c" significa casos presentados de la variable correspondiente
 * Memorias de YPF. La década de los 80 presenta picos que hay que revisar
@@ -93,62 +136,194 @@ Fuentes:
 
 ### Stock de segmentos de YPF y Petrobras
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# graf_stock_segmentos <- union_segmentos %>% 
-#   ggplot(aes(anio, valor, color = sector))+
-#   geom_line()+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Stock de capital de segmentos",
-#        subtitle = "YPF y Petrobras Argentina",
-#        y = "Millones de pesos de 2018")+
-#   theme_classic()+
-#   facet_wrap(variable ~ empresa )
-# 
-# ggplotly(graf_stock_segmentos, width = 700, height = 500)
+stock_segmentos = fread("../resultados/argentina/base_csv/stock_segmentos.csv")
+graf_stock_segmentos <- stock_segmentos %>%
+  left_join(tcp_arg, by= "anio") %>% 
+  ggplot(aes(anio, valor/TCc, color = sector))+
+  geom_line()+
+  theme(legend.position = "bottom")+
+  labs(y = "Millones de dólares corrientes")+
+  theme_classic()+
+  facet_wrap(variable ~ empresa , scales = "free")
 
-
+plot_ggplotly(graf_stock_segmentos,title = "Stock de capital de segmentos",
+       subtitle = "YPF y Petrobras Argentina")
 ```
 
 ### Stock por empresas
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+stock_balances_empresas = fread("../resultados/argentina/base_csv/stock_balances_empresas.csv")
+graf_stock_emp <- stock_balances_empresas %>%
+  filter(
+    # variable %in% c("KTA", "activo"),
+         sector != "distribucion") %>%
+  ggplot(aes(anio, valor, color = empresa))+
+  geom_line()+
+  geom_point()+
+  labs( y = "Millones de pesos de 2018")+
+  facet_wrap(~variable)
 
-# graf_stock_emp <- stock_balances_empresas %>%
-#   filter(
-#     # variable %in% c("KTA", "activo"),
-#          sector != "distribucion") %>% 
-#   ggplot(aes(anio, valor, color = empresa))+ 
-#   geom_line()+
-#   geom_point()+
-#   labs(title = "Stock de capital por empresa",
-#         y = "Millones de pesos de 2018")+
-#   facet_wrap(~variable)
-# ggplotly(graf_stock_emp, width = 700, height = 500)
-
+plot_ggplotly(graf_stock_emp, title = "Stock de capital por empresa")
 
 ```
 
 ### YPF largo plazo
 Comparación entre la Memoria YPF (recopilado por BFR) y los balances extríados de Bolsar
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-# graf_stock_ypf <-  stock_ypf %>% 
-#   ggplot(aes(anio, valor, color = sector))+ 
-#   geom_line()+
-#   geom_point()+
-#   labs(title = "Stock de capital de YPF",
-#         y = "Millones de pesos de 2018")+
-#   facet_wrap(~variable)
-# ggplotly(graf_stock_ypf, width = 700, height = 500)
+stock_ypf = fread( "../resultados/argentina/base_csv/stock_ypf.csv")
+graf_stock_ypf <-  stock_ypf %>%
+  ggplot(aes(anio, valor, color = sector))+
+  geom_line()+
+  geom_point()+
+  labs(y = "Millones de pesos de 2018")+
+  facet_wrap(~variable, ncol = 1, scales = "free")
+plot_ggplotly(graf_stock_ypf, title = "Stock de capital de YPF")
 
 ```
+```{r}
+
+# PENSAR ALGO ASI PERO MAS ACEPTABLE 
+# graf_stock_rama <- stock_rama %>%
+#   # mutate(valor = number_format(valor, big.mark = " " )) %>%
+#   filter(sector != "distribucion") %>%
+#   ggplot(aes(anio, valor, color = sector, shape = fuente))+
+#   geom_line()+
+#   geom_point(size = .8)+
+#   theme(legend.position = "bottom")+
+#   labs(title = "Stock de capital adelantado y activo de segmentos",
+#        subtitle = "Subsectores del sector hidrocarburífero",
+#        y = "Millones de pesos de 2018")+
+#   theme_classic()+
+#   facet_wrap(~ variable )
+# 
+# ggplotly(graf_stock_rama, width = 800, height = 400)
+```
+
+
+## Pasivos
+### Ratio de endeudamiento
+Extraído de la visualización de NOC's (ref)
+$$ Endeudamiento = \frac{Pasivo}{Patrimonio Neto} $$
+```{r}
+nocs_df = fread(  "../resultados/comparacion_paises/nocs.csv")
+plt_endeu <- nocs_df %>% 
+  ggplot(aes(year, ratio_endeudamiento ,group = year))+
+  geom_boxplot() +
+  # geom_point(aes(color = company))+
+  # geom_line(aes(group = company))+
+  geom_line(data = nocs_df %>% filter(company == "PDVSA"), 
+            aes(year, ratio_endeudamiento,color = "PDVSA", group = company), size = 1)+
+  geom_line(data = nocs_df %>% filter(company == "YPF"), 
+            aes(year, ratio_endeudamiento,color = "YPF", group = company), size = 1)+
+  scale_color_manual(name = "Empresa", 
+                     labels = c("PDVSA", "YPF"),
+                     values = c(  "brown4", "blue1"))+
+                     # values = c("PDVSA" =  "red", "YPF" = "blue"))+
+  theme(legend.position = "bottom")+
+  labs(title = "Ratio de endeudamiento de NOC's", x = "", y="",
+       subtitle = "YPF y PDVSA frente al resto de la distribución")+
+  ylim(-3, 5 )
+plt_endeu 
+```
+
 
 # Rentabilidad
 $$TG_{hidrocarburos} = \frac{PV_{hidrocarburífera}}{KTA_{hidrocarburífero}}$$
-```{r}
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+#levanto data sets de otro R markdown
+balances_arg <- read_csv("../data/balances/balances_arg.csv", 
+    col_types = cols(fecha = col_date(format = "%Y-%m-%d"), X1 = col_skip()))
+
+petrobras_arg_segmentos <- read_csv("../data/balances/petrobras_arg_segmentos.csv", 
+    col_types = cols(X1 = col_skip()))
+
+ypf_segmentos <- read_csv("../data/ypf/ypf_segmentos.csv", 
+    col_types = cols(X1 = col_skip()))
 
 ```
 
+## Total
+```{r}
+tasa_ganancia_rama_stock = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tg_pg_total")
+# tasa de ganancia
+graf_tg_rama_2 <- tasa_ganancia_rama_stock %>%
+  filter(anio >1995) %>%
+  ggplot(aes(anio, TG_pg, color = stock_seleccionado))+
+  geom_line(aes(anio, TG_manuf))+
+  geom_line(alpha = 0.5)+
+  geom_point()+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "bottom")
+
+plot_ggplotly(graf_tg_rama_2 , 
+              title = "Tasa de ganancia hidrocarburífera con PPyE a partir de stock de pozos (1960 - 2018)")
+```
 
 
+## Por subsector
+```{r}
+tg_x_sector = balances_arg %>%
+  # filter(unidad == "Millones de pesos") %>%
+  filter(unidad == "Millones de pesos") %>%
+  group_by(fecha, sector) %>%
+  summarise("TG antes de impuestos" = sum(gcia_ant,na.rm = T)/sum (KTA,na.rm = T),
+         "TG despues de impuestos" = sum(gcia_ant, impuesto_gcia, na.rm = T)/sum(KTA, na.rm = T ) ) %>%
+  gather(key = variable, value = valor, 3:4) %>%
+  filter(variable =="TG despues de impuestos") %>%
+  ggplot(aes(fecha, valor, color = sector))+
+  geom_line()+
+  geom_point()+
+  geom_hline(yintercept = 0)+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 90))+
+  facet_wrap(~variable)
 
+plot_ggplotly(tg_x_sector,title = "Tasa de ganancia empresas hidrocarburos",
+       subtitle =  "Antes y después de impuestos" )
+```
+### Segmentos YPF y Petrobras
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+graf_tg_ypf <- ypf_seg %>%
+  # filter(sector %in% c("quimica", "downstream", "upstream")) %>%
+  filter(sector != "adm_central") %>%
+  ggplot(aes(fecha, tg_activo, color = sector))+
+  geom_line()+
+  geom_point()+
+  # facet_wrap(~sector)+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 90))+
+  labs(title = "Tasa de ganancia de segmentos YPF")
+graf_tg_ypf
+```
+```{r}
+graf_tg_petrobras <- petrobras_ar_seg %>%
+  filter(sector %in% c("petroquimica", "downstream", "upstream", "gas_y_energia")) %>%
+  # filter(sector != "adm_central") %>%
+  ggplot(aes(fecha, tg, color = sector))+
+  geom_line()+
+  # facet_wrap(~sector)+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 90))+
+  labs(title = "Tasa de ganancia de segmentos Petrobras Argentina")
+graf_tg_petrobras
+```
+
+
+## Por empresa
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+graf_tg_emp <- balances_arg %>%
+  filter(tg_ant != Inf) %>%
+  ggplot(aes(fecha, tg_ant, color = empresa))+
+  geom_line()+
+  geom_point()+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 90))+
+  facet_wrap(~sector)
+
+plot_ggplotly(graf_tg_emp, title = "Tasa de ganancia empresas hidrocarburos",
+       subtitle =  "Antes de impuestos")
+```
 

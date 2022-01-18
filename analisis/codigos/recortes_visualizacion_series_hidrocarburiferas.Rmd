@@ -655,21 +655,6 @@ PIB Explotación Minas y Canteras en australes a precios de 1970. 1980-1990](htt
 ## Balances
 ```{r}
 
-# PENSAR ALGO ASI PERO MAS ACEPTABLE 
-# graf_stock_rama <- stock_rama %>%
-#   # mutate(valor = number_format(valor, big.mark = " " )) %>%
-#   filter(sector != "distribucion") %>%
-#   ggplot(aes(anio, valor, color = sector, shape = fuente))+
-#   geom_line()+
-#   geom_point(size = .8)+
-#   theme(legend.position = "bottom")+
-#   labs(title = "Stock de capital adelantado y activo de segmentos",
-#        subtitle = "Subsectores del sector hidrocarburífero",
-#        y = "Millones de pesos de 2018")+
-#   theme_classic()+
-#   facet_wrap(~ variable )
-# 
-# ggplotly(graf_stock_rama, width = 800, height = 400)
 ```
 
 
@@ -681,71 +666,8 @@ $$TG_{hidrocarburos} = \frac{PV_{hidrocarburífera}}{KTA_{hidrocarburífero}}$$
 Donde:
 
 
-```{r message=FALSE, warning=FALSE, include=FALSE}
-#levanto data sets de otro R markdown
-balances_arg <- read_csv("../data/balances/balances_arg.csv", 
-    col_types = cols(fecha = col_date(format = "%Y-%m-%d"), X1 = col_skip()))
-
-petrobras_arg_segmentos <- read_csv("../data/balances/petrobras_arg_segmentos.csv", 
-    col_types = cols(X1 = col_skip()))
-
-ypf_segmentos <- read_csv("../data/ypf/ypf_segmentos.csv", 
-    col_types = cols(X1 = col_skip()))
-
-```
-
-## Por empresa
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-graf_tg_emp <- balances_arg %>%
-  filter(tg_ant != Inf) %>%
-  ggplot(aes(fecha, tg_ant, color = empresa))+
-  geom_line()+
-  geom_point()+
-  scale_y_continuous(labels = scales::percent)+
-  labs(title = "Tasa de ganancia empresas hidrocarburos",
-       subtitle =  "Antes de impuestos")+
-  theme(axis.text.x = element_text(angle = 90))+
-  facet_wrap(~sector)
-
-ggplotly(graf_tg_emp, width = 600, height = 400)
-```
-
-## Por subsector
-
-```{r}
-balances_arg %>%
-  # filter(unidad == "Millones de pesos") %>%
-  filter(moneda == "MM_pesos") %>% # ARREGLAR !!
-  group_by(fecha, sector) %>%
-  summarise("TG antes de impuestos" = sum(gcia_ant,na.rm = T)/sum (KTA,na.rm = T),
-         "TG despues de impuestos" = sum(gcia_ant, impuesto_gcia, na.rm = T)/sum(KTA, na.rm = T ) ) %>%
-  gather(key = variable, value = valor, 3:4) %>%
-  filter(variable =="TG despues de impuestos") %>%
-  ggplot(aes(fecha, valor, color = sector))+
-  geom_line()+
-  geom_point()+
-  scale_y_continuous(labels = scales::percent)+
-  labs(title = "Tasa de ganancia empresas hidrocarburos",
-       subtitle =  "Antes y después de impuestos")+
-  theme(axis.text.x = element_text(angle = 90))+
-  facet_wrap(~variable)
-
-```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-graf_tg_ypf <- ypf_seg %>%
-  # filter(sector %in% c("quimica", "downstream", "upstream")) %>%
-  filter(sector != "adm_central") %>%
-  ggplot(aes(fecha, tg_activo, color = sector))+
-  geom_line()+
-  geom_point()+
-  # facet_wrap(~sector)+
-  scale_y_continuous(labels = scales::percent)+
-  theme(axis.text.x = element_text(angle = 90))+
-  labs(title = "Tasa de ganancia de segmentos YPF")
-graf_tg_ypf
-```
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}

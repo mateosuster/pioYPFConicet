@@ -26,6 +26,7 @@ gc()
 
 # configuración de impresión
 knitr::opts_chunk$set(echo = TRUE)
+options(warn = -1) 
 
 # bibliotecas
 library(data.table)
