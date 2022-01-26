@@ -453,9 +453,11 @@ plot_ggplotly(precio_impo_gas_plt, "Gráfico N°18. Precios de importación del 
 
 
 # Bibliografía
++ [Alterman, S (2012). "Natural Gas Price Volatility in the UK and North America"](https://www.europeangashub.com/wp-content/uploads/attach_132.pdf)
 + Grilli, E. y Yang, M. (1988). "Primary Commodity Prices, Manufactured Goods Prices, and the Terms of Trade of Developing Countries: What the Long Run Shows". The World Bank Economic Review 2.
 + [IAPG (2009). "El abecé del Petróleo y del Gas". 3ra edición](https://www.iapg.org.ar/web_iapg/publicaciones/libros-de-interes-general/el-abece-del-petroleo-y-del-gas)
 + Lewinger, A. (2015). "Determinantes generales de los precios de las materia primas en el último ciclo largo (1971-2014)". Trabajo final de maestría. Maestría en relaciones y negociaciones internacionales.
 + [Scheimberg, S (2007). "Experiencia reciente y desafíos para la generación de renta petrolera 'aguas arriba' en la Argentina". Documento de proyecto. Comisión Económica para América Latina y el Caribe (CEPAL)](https://www.cepal.org/sites/default/files/publication/files/3576/S2007324_es.pdf)
+
 
 </div>
