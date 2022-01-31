@@ -1,0 +1,28 @@
+---
+title: "Demanda de gas"
+output: html_notebook
+---
+
+https://datos.gob.ar/dataset/sspm-produccion-consumo-gas-natural/archivo/sspm_364.3
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+
+data = read_csv("../data/enargas/exportaciones-actividad-saldocomercial-rangos-exportacion-empresa-exportadora-mensual.csv")
+tail(data)
+```
+
+```{r}
+tipo_usuario <- c( "residencial", "comercial" , "entes_oficiales", "industria", "centrales_electricas", "sdb", "gnc" )
+plot1 = data %>% 
+  filter(lubridate::year(indice_tiempo) >=2011) %>% 
+  select(indice_tiempo, tipo_usuario ) %>% 
+  gather(key = "tipo_usuario", value= "valor", 2:ncol(.)) %>%
+  mutate(n_dias = days_in_month(indice_tiempo)) %>% 
+  ggplot(aes(indice_tiempo, valor/n_dias, color = tipo_usuario))+
+  geom_line()+
+  theme(legend.position = "bottom")
+plotly::ggplotly(plot1)
+```
+

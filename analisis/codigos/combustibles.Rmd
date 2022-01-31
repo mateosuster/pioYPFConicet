@@ -1,6 +1,8 @@
 ---
 title: "World Bank Energy Data"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r}
@@ -21,7 +23,7 @@ gallon_to_liter_p <- function(x) {x /3.78541}
 tc_bcra <- read.csv("../data/tcp/tc_bcra_anual.csv") %>% select(-X) %>% 
   mutate(tcp = NA)
 
-tcc_tcp_historico <- read_excel("C:/Archivos/Datos/TCP/tcc_tcp_historico.xlsx") %>% 
+tcc_tcp_historico <- read_excel("../data/tcp/tcc_tcp_historico.xlsx") %>% 
   select(anio, tcc = "TCC exportaciones", tcp = TCP) %>% 
   # filter(anio < 2002) %>% 
   mutate(anio = as.double(anio))
@@ -42,7 +44,7 @@ tc <-  rbind(tc_bcra %>%
 tc[is.na(tc$tcp),"tcp"] <- c(tcc_tcp_historico[tcc_tcp_historico$anio %in% c(2002:2018),]$tcp, NA, NA , NA) 
 
 # Tabla para convertir los cambios de moneda
-conversor_pesos <- read_excel("C:/Archivos/Datos/Hidrocarburos/pase de moneda.xlsx") %>% 
+conversor_pesos <- read_excel("../data/conversores/conversor_peso.xlsx") %>% #pase de moneda.xlsx 
   # mutate("m$n" = as.double(conversor_pesos$`m$n`)) %>% 
   mutate_all(., as.double) %>% 
   mutate(moneda = c("moneda nacional", "pesos ley", "peso argentino", "austral", "pesos")) %>% 
@@ -59,10 +61,10 @@ conversor_pesos <- read_excel("C:/Archivos/Datos/Hidrocarburos/pase de moneda.xl
 #country codes
 # iso_codes <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/world bank/iso_3digit_alpha_country_codes.xls", 
 #     skip = 2)
-iso_codes <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/world bank/country-and-continent-codes-list-csv.csv")
+iso_codes <- read_csv("../data/world bank/country-and-continent-codes-list-csv.csv")
 
 # all indicators
-wb_data <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/world bank/API_5_DS2_en_csv_v2_2454210.csv", 
+wb_data <- read_csv("../data/world bank/API_5_DS2_en_csv_v2_2454210.csv", 
     skip = 3) %>% 
   select(-c(`Indicator Code`) ) %>% 
   rename(indicator = `Indicator Name`, country = "Country Name", country_code = "Country Code") %>% 
