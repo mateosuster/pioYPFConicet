@@ -794,10 +794,12 @@ precio_mi_gas <- precio_regalias_mi_gas %>%
   #                                  anio > 1992 ~ precio_mi_regalias_gas),
   #        dif_ypf_idee = precio_mi_ypf_gas/precio_mi_idee_indexado-1 ) %>%
   mutate(variable = "Precio del mercado interno del gas natural según distintas fuentes",
-         precio_gas_mdoint = case_when(anio %in% 1963:1969|anio %in% 1989:1992 ~
-                                           precio_mi_ypf_gas, 
+         precio_gas_mdoint = case_when(
+                                        # anio %in% 1963:1969|anio %in% 1989:1992 ~
+                                        #     precio_mi_ypf_gas, 
                                          anio %in% 1970:1988 ~ precio_mi_idee_indexado,
-                                         anio > 1992 ~ precio_mi_regalias_gas) ) %>% 
+                                         anio > 1992 ~ precio_mi_regalias_gas,
+                                       T ~ NA_real_) ) %>% 
   arrange(anio) %>%
   select(anio, unidad,variable, precio_gas_mdoint, everything(.) ) %>% 
   rename(regalias = precio_mi_regalias_gas,
@@ -854,7 +856,7 @@ precio_interno_gas_mmbtu_usd <- precio_mi_gas_MMBTU %>%
 
 
 ## Precios de Referencia del Mercado Mundial
-#### Precios de Referencia del Crudo
+#### Petróleo crudo
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Base regalias
 precio_me_regalias_crudo <- read_delim("../data/secretaria_energia/regalias/precio_mercado_externo_crudo_regalias.csv", 
@@ -1047,7 +1049,7 @@ precios_referencia_y_expo_crudo <-  precio_expo_crudo  %>%
 
 ```
 
-#### Precios de Referencia del Gas
+#### Gas natural
 ##### Exportación Argentina
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 ### Precio de Exportación del Gas 

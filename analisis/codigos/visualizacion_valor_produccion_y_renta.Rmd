@@ -306,9 +306,9 @@ Donde:
   + 1993 - actualidad: MECON   
 
 * Precio del mercado interno del gas natural:
-  + 1963 - 1969 & 1989 - 1992: Anuario de YPF
   + 1970 - 1988:  Kozulj y Pistonesi - Revista IDEE
   + 1993 - actualidad: Secretaría de Energía - Base Regalías
+  + Datos falantes para los períodos 1963 - 1969 & 1989 - 1992 
 
 * Precio de referencial internacional del petróleo crudo:
   + 1962 - 1992 y 2002 - 2003: precio de exportación argentina de UN Comtrade (Clasificación HS as reported)
