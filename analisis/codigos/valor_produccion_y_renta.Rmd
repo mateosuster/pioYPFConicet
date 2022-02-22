@@ -1,0 +1,767 @@
+---
+title: "Valor total de la producción: masa salarial, ganancia y renta de la tierra"
+author:
+- affiliation: UNGS/CONICET
+  name: Mateo Suster
+output: 
+  html_document:
+    toc: yes
+    toc_float: true
+    toc_depth: 5
+---
+
+<div style="text-align: justify "> 
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+#limpieza de memoria
+rm(list =ls())
+gc()
+
+# configuración de impresión
+knitr::opts_chunk$set(echo = TRUE)
+options(warn = -1, message = -1) 
+
+# bibliotecas
+library(data.table)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(plotly)
+library(readxl)
+source("functiones_hidrocarburos.R")
+
+# parámetros para los graficos
+alpha_n = 0.7
+n_plot = 0
+```
+
+# Datos auxiliares
+Para realizar conversiones a dolares de poder adquisitivo constante cargamos los datos del tipo de cambio de paridad (actualizado hasta 2018) y el índice de precios al consumidor de Estados Unidos. 
+```{r message=FALSE, warning=FALSE}
+#TC
+tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
+tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
+
+#IPC Arg
+ipc_arg <- as.data.table(read_csv("../data/indices/ipc_annual_avg.csv"))
+
+#CPI EEUU
+ipc_us <- as.data.table(read_csv("../data/bls/cpi.csv")) 
+setnames(ipc_us,"Year", "anio"  )
+ipc_us = ipc_us[, .(ipc_us_20 = mean(Value, na.rm=T)), by = anio]
+ipc_us[, ipc_us_20 := generar_indice(serie = ipc_us_20, 
+                                    fecha = anio, fecha_base = 2020)]
+
+tail(tcp_arg)
+```
+
+# Empleo y remuneraciones  
+
+* Salario y empleo
+  + MTEySS (Base Minería e Hidrocarburos de las Cuentas Nacionales) (1996-2013)
+  + [Ministerio de Trabajo, Empleo y Seguridad Social - Observatorio de Empleo y Dinámica Empresarial (OEDE)](http://www.trabajo.gob.ar/estadisticas/oede/estadisticasnacionales.asp) (1996-2019)
+<br>
+
+
+```{r}
+data = fread("../resultados/argentina/variables.csv")
+glimpse(data)
+
+empleo_y_salario_plt <- data %>% 
+  filter(str_detect(codigo_variable, "Ocup|Rem")) %>% 
+  separate(variable, c("variable" ,"sector"), " - ") %>% 
+  left_join(ipc_arg %>% select(anio,IPC_18 ), by = "anio") %>% 
+  mutate(valor = case_when(variable == "Salario" ~ valor/IPC_18,
+                           T~ valor)) %>% 
+  ggplot(aes(anio, valor, color = fuente))+
+  geom_line(alpha = alpha_n)+
+  facet_wrap(variable~sector, scales = "free")
+
+
+n_plot = n_plot +1
+plot_ggplotly(empleo_y_salario_plt, paste0("Gráfico N°", n_plot, ". Remuneracion y ocupados en la industria hidrocarburífera"))
+```
+
+# Valor total de la producción  
+
+
+## Criterios metodológicos 
+Se presentan a continuación distintas estimaciones sobre la magnitud de riqueza presente en el sector hidrocarburífero: Valor Bruto y Agregado de Producción (VBP y VA), Consumo Interemedio (CI), Masa Salarial (MS) y Excedente Bruto de Explotación (EBE). El VBP surge de la valuación de la producción a sus precios correspondientes. El VA resulta de la diferencia entre el VBP y CI, el cual puede surgir originalmente de esta resta o a partir del coeficiente técnico de la Matriz Insumo Producto (MIP). El EBE constituye la plusvalía (PV) total de la rama, es decir, la suma de la renta de la tierra (RT) más la ganancia normal (Gnorm), y se obtiene luego de descontar la MS y los impuestos específicos (Imp) del VA. En todos los casos que se presentarán a continuación, los Imp se calcularon a partir de aplicar sobre el VBP un coeficiente  resultante del peso de los impuestos promedio de la  MIP de 1997. Lo mismo pasa con la estimación de la depreciación de capital o consumo de capital fijo (ConsKfijo), que se obtiene a partir de aplicar la tasa de depreciación promedio resultante de los balances de YPF (1998 - 2018) sobre el total de Propiedad, Planta y Equipo (PPyE) de la rama. Esta partida se aplica para obtener el Excedente Neto de Explotación. Se presentan distintas estimaciones para el VBP, CI y MS, que luego se observarán en la formulación matemática:
+
+
+
+### CCNN (*ccnn_oficial*)
+  + Valores contables oficiales de las Cuentas Nacionales (sólo disponible para el período 2004-2012). Dado que se presentan series de VBP y VA, se pudo estimar el CI como la diferencia de dichas cuentas. Se procedió a separar el VBP a partir del peso del VBP de los servicios de apoyo a la extracción sobre el VBP de extracción de petróleo y gas, presente en el Cuadro de Utilización de Oferta (COU) de 2004 de INDEC. Se descontó esta proporción (resultante del 10,7%) del VBP total para obtener un VBP sólo de extracción. Dado que se posee información del salario promedio del sector y el empleo, se pudo obtener la MS resultante, tanto para el total del sector (extracción y servicios relacionados) como para sólo extracción. A partir de estos datos se elaboró un coeficiente que refleja el promedio de la proporción de la MS sobre el VBP que se utilizará en cálculos posteriores de MS total y MS de extracción. 
+
+### Estimación propia con criterio CCNN (*vbp_va_ci_propia*)
+  + Estimación propia de los valores contables a partir de las fuentes recopiladas, siguiendo los criterios de las Cuentas Nacionales. Es decir, para obtener el VBP se valua la producción destinada al mercado interno (resultante a partir de la diferencia entre producción y exportaciones) con los precios internos y las exportaciones con los precios de exportación, valuados tipo de cambio comercial (TCC). Se procedió también a separar el VBP de extracción neto de los servicios tal como se explicó anteriormente. El CI se estimó a partir de aplicar el coeficiente técnico (ratio CI/VBP) resultante de la MIP de 1997 (equivalente a 0.272). De igual manera, para calcular la masa salarial se aplicó el coeficiente de MS mencionado anteriormente. Finalmente, como se mencionó anteriormente, el VA el EBE se calcularon a partir de las diferencias mencionadas anteriormente. 
+
+### Empalme CCNN (*vbp_ccnn*)
+  + Estimación que toma los valores oficiales de las cuentas nacionales para el período donde se presentan datos (2004 -2012) y que imputa los valores faltantes por medio de la evolución del índice del VBP propio con criterio CCNN explicado anteriormente. Asimismo, se utilizaron los valores oficiales de la MS cuando se encontraba disponible el dato (1996-2018), mientras que se utilizó el valor propio estimado con criterio de las CCNN para los restantes años. 
+  
+### Criterio Propio (*pv_hidrocarburos_propia*)
+  + Estimación propia que refleja con mayor precisión el valor de la riqueza total presente en el sector. El VBP se obtiene a paritr de valuar la totalidad de la producción a los precios externos o de referencia internacional y con el tipo de cambio de paridad (TCP), que mide la capacidad real de compra de la moneda nacional. Sin embargo, como el CI constituye intercambios de mercancías realizadas en el ámbito nacional, dicha partida se obtiene a partir de los valores obtenidos en la serie de empalme CCNN. De igual manera, se utilizó la MS resultante de esta última estimación. 
+
+
+
+
+## Formulación matemática de estimaciones
+
+Valor Bruto de Producción total, estimación con criterio propio
+$$VBP_{propia} = (Pext_{petróleo} * Q_{petróleo} + Pext_{gas} * Q_{gas}) * TCP$$
+
+Donde: 
+
+* $VBP_{propia}$ = Valor Bruto de la Producción total, estimación propia
+* $Pext_{petróleo}$ = Precio de exportación o referencia internacional del petróleo crudo (según corresponda)
+* $Pext_{gas}$ = Precio de exportación o referencia internacional del gas natural (según corresponda)
+* $Q_{petróleo}$ = Cantidades producidas totales de petróleo crudo
+* $Q_{gas}$ = Cantidades producidas totales de gas natural
+* $TCP$ = Tipo de Cambio de Paridad
+
+
+Valor Bruto de Producción total, estimación con criterio CCNN
+$$VBP_{CCNN} = (Pint_{petróleo} * QMInt_{petróleo} + Pext_{petróleo} * Expo_{petróleo} + Pint_{gas} * QMInt_{gas} + Pext_{gas} * Expo_{gas})* TCC$$
+
+Donde:
+
+* $VBP_{CCNN}$ = Valor Bruto de la Producción total,  estimación propia con criterio de las CCNN
+* $Pint_{petróleo}$ = Precio mercado interno del petróleo crudo
+* $Pint_{gas}$ = Precio mercado interno del gas natural
+* $QMInt_{petróleo}$ = cantidades vendidas al mercado interno de petróleo crudo
+* $QMInt_{gas}$ = cantidades vendidas al mercado interno del gas natural
+* $Expo_{petróleo}$ = exportaciones de petróleo crudo
+* $Expo_{gas}$ = exportaciones de gas natural
+* $TCC$ = Tipo de Cambio Comercial
+
+
+<br>
+
+Valor Bruto de Producción extracción, estimación con criterio CCNN
+
+$$VBP\_extr_{CCNN} = VBP_{CCNN} * (1-prop\_servicios)$$
+
+Donde:
+
+* $VBP\_extr_{CCNN}$ = Valor Bruto de la Producción extracción,  estimación propia con criterio de las CCNN
+* $prop\_extr$ = proporción del VBP de servicios de apoyo sobre VBP de extracción de petróleo y gas
+
+
+Proporción de los servicios de apoyo sobre la extracción de petróleo y gas
+<br>
+$$prop\_servicios = \frac{VBP\_servicios_{COU}}{VBP\_extr_{COU} + VBP\_servicios_{COU}}$$
+
+Donde:
+
+* $VBP\_servicios_{COU}$ = VBP de servicios de apoyo del Cuadro de Utilización de Oferta
+* $VBP\_extracción_{COU}$ = VBP de extracción de petróleo y gas del Cuadro de Utilización de Oferta
+
+
+
+<br>
+Consumo Intermedio, valores oficiales de las CCNN
+$$ CI_{CCNN} = VBP_{CCNN} -  VA_{CCNN} $$
+
+Donde:
+
+* $CI_{CCNN}$ = Consumo Intermedio total, estimación propia
+* $VA_{CCNN}$ = Valor Agregado, estimación de las CCNN 
+
+<br>
+Consumo Intermedio, estimación con criterio CCNN
+$$ CI_{CCNN} = VBP_{CCNN} *  Coef\_tec $$
+Donde:
+
+* $Coef\_tec$ = Coeficiente técnico de Matriz Insumo Producto
+
+<br>
+Consumo Intermedio de extracción, estimación con criterio CCNN
+
+$$ CI\_extr_{CCNN} = VBP\_extr_{CCNN} *  Coef\_tec $$
+
+Donde:
+
+* $ CI\_extr_{CCNN}$ = Consumo Intermedio de extracción, estimación criterio CCNN
+
+<br>
+Masa Salarial, valores oficiales de las CCNN
+$$MS = W * Emp * 13$$
+Donde: 
+
+* $MS$ = Masa Salarial 
+* $W$ =  Salario anual promedio
+* $Emp$ = Empleo
+
+<br>
+Masa Salarial, estimación con criterio CCNN
+$$MS =  VBP_{CCNN} *  Coef\_MS$$
+
+Donde: 
+
+* $Coef\_MS$ = Coeficiente de la proporción de MS sobre VBP
+
+<br>
+Masa Salarial de extracción, estimación con criterio CCNN
+$$MS\_extr =  VBP\_extr_{CCNN} *  Coef\_MS$$
+
+Donde: 
+
+  * $MS\_extr$ = Masa salarial del sector extracción
+
+<br>
+Valor agregado, estimación criterio CCNN
+$$VA_{CCNN}  = VBP_{CCNN} – CI_{CCNN} $$
+Donde:
+
+* $VA_{CCNN}$ = Valor Agregado, estimación propia con criterio CCNN
+
+<br>
+Valor agregado de extracción, estimación con criterio CCNN
+$$VA\_extr_{CCNN}  = VBP\_extr_{CCNN} – CI\_extr_{CCNN} $$
+
+Donde:
+
+* $VA\_extr_{CCNN}$ = Valor Agregado de extracción, estimación propia con criterio CCNN 
+
+
+<br>
+Valor agregado, estimación con criterio propio
+$$VA_{propia}  = VBP_{propia} – CI\_extr_{CCNN} $$
+
+Donde:
+
+* $VA_{propia}$ = Valor Agregado, estimación con criterio propio 
+
+
+<br>
+
+Excedente Bruto de Explotación, estimación con criterio CCNN
+$$EBE_{CCNN}  = VA_{CCNN} – MS   $$
+<br>
+
+Excedente Bruto de Explotación de extracción, estimación con criterio CCNN
+$$EBE\_extr_{CCNN}  = VA\_extr_{CCNN} – MS\_extr   $$
+
+<br>
+
+Excedente Bruto de Explotación, estimación con criterio propio
+$$EBE_{propia}  = VA_{propia} – MS\_extr   $$
+
+Donde:
+
+* $EBE$ = Excedente Bruto de Explotación
+* $CI\_extr_{CCNN}$ = Consumo intermedio del sector extracción, estimación con criterio CCNN
+
+
+<br>
+Consumo de Capital Fijo, estimación con criterio propio
+$$ConKfijo = PPyE *  prom(\frac{Dep}{PPyE}) $$
+
+Donde: 
+
+* $ConKfijo$ = Consumo de Capital Fijo
+* $PPyE$= Propiedad, Planta y Equipo neta
+* $prom(\frac{Dep}{PPyE}) $ =  tasa de depreciación promedio
+* $Dep$ = Depreciaciones (cuenta gastos por naturaleza)
+
+<br>
+
+Plusvalía (Excedente Neto de Explotación), estimación con criterio propio
+$$PV_{propia} = VA_{propia} - ConKfijo - Imp $$
+
+
+Donde:
+
+* $PV_{propia}$ = Plusvalía (*Excedente Neto de Explotación*)
+* $Imp$ = Impuestos normales
+
+
+
+# Fuentes para la construcción de series de largo plazo
+* Producción del petróleo crudo: 
+  + 1911 - 1950: Anuario de combustibles 
+  + 1950 - 2015: SESCO, serie histórica
+  + 2015 - actualidad: SESCO Downstream
+  
+* Producción del gas natural:
+  + 1911 - 1992: Anuario de combustibles 
+  + 1993 - actualidad: SESCO Downstream
+  
+* Exportaciones del petróleo crudo: 
+  + 1962 - 1993: UN Comtrade (clasificación SITC as reported)
+  + 1994 - actualidad: SESCO Downstream
+  + Datos faltantes para los años 1965, 1970-74, 1976-78, 1980-84
+
+* Exportaciones del gas natural: 
+  + 1962 - 1996: UN Comtrade,
+  + 1997 - actualidad: SESCO Downstream
+  + Datos faltantes para los años 1999 y 2000
+  
+* Precio del mercado interno del petróleo crudo: 
+  + 1963 - 1965: Kozulj y Pistonesi - Revista IDEE ajustado con la evolución del precio del Anuario de YPF (año base = 1972)
+  + 1966 - 1988: Kozulj y Pistonesi - Revista IDEE
+  + 1989 - 1991: Anuario de YPF
+  + 1992: MECON ajustado con la variación del Índice de precios internos al por mayor (IPIM) (año base = 1994)
+  + 1993 - actualidad: MECON   
+
+* Precio del mercado interno del gas natural:
+  + 1970 - 1988:  Kozulj y Pistonesi - Revista IDEE
+  + 1993 - actualidad: Secretaría de Energía - Base Regalías
+  + Datos falantes para los períodos 1963 - 1969 & 1989 - 1992 
+
+* Precio de referencial internacional del petróleo crudo:
+  + 1962 - 1992 y 2002 - 2003: precio de exportación argentina de UN Comtrade (Clasificación HS as reported)
+  + entre 1993-2001 y 2004-2014: precio de exportación argentina de MECON
+  + 2014 - actualidad: precio de exportación argentina de Secretaría de Energía (Regalías)
+  + Valores faltantes previos a 1992: Brent (con fuente Inflation Data)
+
+* Precio de referencia internacional del gas natural:
+  + 1964 - 1965: precio de importación del gas proveniente de Bolivia hacia Argentina de UN Comtrade
+  + 1966 - actualidad: precio de exportacion del gas desde Bolivia a Argentina de UN Comtrade
+  + Datos faltantes para los años previos a 1963 y período 1968-1971 
+
+* Valor Bruto de la Producción, Valor Agregado y Consumo Intermedio:
+  + INDEC - Dirección Nacional de Cuentas Nacionales (Base Minería e Hidrocarburos de las Cuentas Nacionales). Las variables "extraccion_y_servicios_hidrocarburos" refieren a "Extracción de petróleo crudo y gas natural. Actividades de servicios relacionadas con la extracción de petróleo y gas, excepto las actividades de prospección"
+  + Cálculo propio del VBP con datos datos de producción y precio internacional recopilados. Las fuentes son las siguientes (los criterios son los mismos para la utilización posterior en el cálculo de renta de la tierra hidrocarburífera por diferencial de precios, sobrevaluación cambiaria y otros mecanismos)
+
+* Salario y empleo
+  + 1960 - 1996: estimación a partir de aplicación del coeficiente de proporción de la masa salarial sobre el VBP
+  + 1996 - actualidad: Ministerio de Trabajo, Empleo y Seguridad Social - Observatorio de Empleo y Dinámica Empresarial (OEDE)
+
+* Consumo de capital fijo
+  + Coeficiente de depreciación estimado a partir de Estados Contables de YPF (1998-2018)
+<br>
+
+
+
+```{r}
+valor_total_produccion = read.csv("../resultados/data_viz/valor_total_produccion.csv")
+graf_valor_produccion <- valor_total_produccion %>%
+  mutate(sector = case_when(str_detect(variable, "tot") ~"Total rama",
+                            str_detect(variable, "extr") ~"Extracción de petróleo y gas",
+                            T  ~ NA_character_)) %>% 
+  filter(anio > 1960) %>%
+  arrange(sector) %>% 
+  ggplot( aes(anio, valor, color = fuente))+
+  geom_line(alpha = 0.7)+
+  geom_point(size = 0.435, alpha = 0.2)+
+  theme_classic()+
+  theme(legend.position = "bottom")+
+  labs(title = "Valor de la Producción hidrocarburífera",
+       subtitle = "Valor total y componentes",
+       y = "Millones de pesos de 2018")+
+  facet_wrap(  sector~ variable, ncol = 5, scales = "free")
+# gp <- ggplotly(graf_valor_produccion)#, width = 750, height = 700)
+gp <- plot_ggplotly(graf_valor_produccion, "Valor de la Producción hidrocarburífera")
+gp[['x']][['layout']][['annotations']][[2]][['x']] <- -0.11
+gp %>% layout(margin = list(l = 75))
+```
+
+
+# Renta de la tierra hidrocarburífera total. En precios constantes, sobre plusvalía total y PBI
+
+Existen dos caminos para llegar al monto total de renta de la tierra hidrocarburífera: uno es descontando la ganancia normal de las empresas a la plusvalía total del sector y el otro es por medio de la suma de mecanismos de apropiación.
+
+$$Renta\_hidrocarburífera = PV_{hidrocarburífera} - Gcia\_Normal_{hidrocarburífera}$$
+
+Donde:
+
+* $Gcia\_Normal_{hidrocarburífera}$ = Ganancia Normal del sector hidrocarburífero
+* $PV_{hidrocarburífera}$ = Plusvalía del sector hidrocarburífero  
+
+$$Gcia\_Normal_{hidrocarburífera} = KTA_{hidrocarburífero} * TG_{referencia}$$
+
+
+Donde:
+
+* $KTA_{hidrocarburos}$ = Stock de capital adelantado del sector hidrocarburífero 
+* $TG_{referencia}$ = Tasa de ganancia normal de referencia.
+
+En este caso, seleccionamos la tasa de ganancia del sector industrial como parámetro para diferenciar la renta de la ganancia. A su vez, para el capital total adelantado de las empresas hidrocarburíferas, seleccionamos unicamente el valor resultante de la estimación de la PPyE de Bolsar, por lo que le faltan los inventarios y salarios adelantados.
+
+El cálculo de renta total hidrocarburífera que se obtiene por medio de descontar la ganancia normal a la plusvalía total del sector, debe ser igual a la renta obtenida por medio de la agregación de los distintos mecanismos de apropiación. Es decir:
+
+$$Renta\_hidrocarburífera = Renta\_diferencial\_precios + Renta\_sobrevaluación + Renta\_empresas + Impuestos\_netos\_específicos $$
+$$Impuestos\_netos\_específicos = Retenciones + Regalías - Subsidios$$
+
+
+## Comparación de estimaciones propias
+
+```{r}
+renta_pextq = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ") %>% 
+  # select(anio ,unidad, valor = Rtt) %>%
+  mutate(var = "Renta por descuentos sobre plusvalía")%>% 
+  as.data.table()
+
+renta_mecanismos = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos") %>% 
+  # select(anio ,unidad, valor = Rtt) %>%
+  mutate(var = "Renta por suma de mecanismos") %>% 
+  as.data.table()
+
+renta_arg = rbind(renta_pextq[,c("anio" ,"unidad", "Rtt", "var")], 
+                                renta_mecanismos[,c("anio" ,"unidad", "Rtt", "var")])
+
+merge_func <- function(...) merge(..., all.x = T, by = "anio")
+
+renta_usd = Reduce(merge_func, list(renta_arg, tcp_arg, ipc_us))
+renta_usd[, Rtt := ((Rtt/1e6)/TCp)/ipc_us_20]
+renta_usd[, unidad := "Millones de USD TCp de 2020"]
+# renta_usd = merge(renta_usd, tcp_arg, by = "anio", all.x= T)
+
+renta_plot1 = ggplot(renta_usd[anio > 1960], aes(anio, Rtt, color = var))+
+  geom_line()+
+  labs(y = "Millones de USD TCp de 2020")+
+  # scale_y_continuous(breaks = seq(0, 60*1e4, 10*1e4))
+  scale_y_continuous(breaks = seq(0, 60000, 10000))
+renta_plot1 = plot_theme(renta_plot1)+theme(legend.title = element_blank(),
+                              axis.title.x = element_blank())
+
+ggsave( filename = "../resultados/argentina/renta_mecanismos_y_pxq_ARG.png",
+        renta_plot1, width = 12, height = 10)
+
+plot_ggplotly(renta_plot1, title = "Renta hidrocarburífera total de Argentina",
+       subtitle = "Comparación de estimaciones propias")
+```
+
+
+```{r}
+renta_pextq_pbi = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ_vs_pib") %>% 
+  mutate(var = "Renta por descuentos sobre plusvalía")
+
+renta_mecanismos_pbi = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos_vs_pib") %>% 
+  mutate(var = "Renta por suma de mecanismos")
+
+renta_pbi = as.data.table(rbind(renta_pextq_pbi, renta_mecanismos_pbi))
+renta_pbi = renta_pbi[, !"unidad", with=F]
+renta_pbi = melt(renta_pbi, id.vars = c("anio", "var"))
+
+renta_plot2 = ggplot(renta_pbi, aes(anio, value, color = var))+
+  geom_line()+
+  facet_wrap(~variable, ncol =1)+
+  scale_y_continuous(labels = scales::percent_format(accuracy = 2))+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
+  labs(y = "", x="")
+
+renta_plot2 = plot_theme(renta_plot2)+theme(legend.title = element_blank(),
+                              axis.title.x = element_blank(),
+                              axis.text.x = element_text(angle = 45,
+                                                         vjust= 0.7, hjust= 0.5),
+                              axis.title.y = element_blank())
+
+plot_ggplotly(renta_plot2,"Renta hidrocarburífera total de Argentina", 
+              "Sobre PBI y PV")
+```
+
+
+
+
+## Método indirecto: cálculo a partir de la suma de los mecanismos de apropiación
+### Diferencial de precios entre el mercado interno y las referencias internacionales 
+
+Renta apropiada mediante el abaratamiento en el consumo interno por efecto del diferencial de precios interno/externo, sobrevaluación de la moneda y retenciones a la exportación
+```{r}
+renta_mecanismos[, Subs := Subs * -1]
+renta_mecanismos = Reduce(merge_func, 
+                          list(melt(select(renta_mecanismos, -c("IPC_18", "unidad", "var", "Rtt")),
+                                    id.vars="anio") ,
+                               tcp_arg, ipc_us))
+renta_mecanismos[, value := ((value/1e6)/TCp)/ipc_us_20]
+renta_mecanismos[, unidad := "Millones de USD TCp de 2020"]
+
+
+```
+
+
+#### Criterio de cómputo de JK (variable 'renta_dif_precios')
+
+$$RDP= ProdInt * Pext * TCP - ProdInt * PMI * TCC$$
+
+Donde:
+
+* $RDP$ = Renta apropiada por efecto diferencial de precios interno/externo y sobrevaluación
+* $MdoInt$ = Producción destinada al Mercado Interno: Producción - Exportaciones - Existencias (barriles de petróleo ó MMBTU)
+* $Pext$ = Precio de referencia del mercado externo (USD)
+* $PMI$ = Precio de venta del mercado interno (USD)
+* $TCP$ = Tipo de Cambio de Paridad
+* $TCC$ = Tipo de Cambio Comercial
+
+#### Criterio de cómputo de JIC y cia (variable 'renta_abaratamiento_sobrevaluacion')
+$$RDP = MdoInt * PMI * (\frac{TCP}{TCC}  - 1)$$  
+
+
+
+```{r}
+renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rdifp", variable), ] ,
+                          aes(anio, value, color = variable))+
+  geom_line()+
+  labs(y = "Millones de USD TCp de 2020")
+
+plot_ggplotly(renta_difp_plot, 
+              "Renta por diferencial de precios interno y externo" ,
+              "Argentina (1960 - 2020)") 
+```
+
+
+###  Exportaciones con tipo de cambio sobrevaluado
+
+$$Rsobrevaluacion = Expo * Pext * (TCP - TCC)$$ 
+
+Donde:
+* $Rsobrevaluacion$ = Renta apropiada por exportaciones con tipo de cambio sobrevaluado
+* $Expo$ = Exportaciones  (barriles de petróleo ó MMBTU)
+* $Pext$ = Precio de referencia del mercado externo (USD)
+* $TCP$ = Tipo de Cambio de Paridad
+* $TCC$ = Tipo de Cambio Comercial
+
+
+```{r}
+renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rsvx", variable), ] ,
+                          aes(anio, value, color = variable))+
+  geom_line()+
+  labs(y = "Millones de USD TCp de 2020")
+
+plot_ggplotly(renta_difp_plot, 
+              "Renta por exportaciones sobrevaluadas" ,
+              "Argentina (1960 - 2020)") 
+```
+
+
+
+### Empresas de la rama 
+La renta apropiada por las empresas de la rama se calcula por medio del diferencial de tasas de ganancia entre el sector hidrocarburífero que surge a partir de los balances y la rentabilidad normal de la economía.
+
+$$Renta\_empresas = KTA_{hidrocarburífero} * (TG_{hidrocarburífera} - TG_{referencia})$$
+$$TG_{hidrocarburífera} = \frac{Gcia_{hidrocarburos}}{KTA_{hidrocarburífero}}$$ 
+Por lo cual, la renta apropiada por las empresas de la rama sería equivalente a:
+
+$$Renta\_empresas = Gcia_{hidrocarburos} - KTA_{hidrocarburífero} *  TG_{referencia}$$
+
+Donde:
+
+* $KTA_{hidrocarburífero}$ = Stock de capital adelantado de empresas hidrocarburíferas
+* $TG_{hidrocarburífera}$ = Tasa de ganancia de empresas hidrocarburíferas
+* $TG_{referencia}$ = Tasa de ganancia de referencia
+* $Gcia_{hidrocarburos}$ = Ganancia de empresas hidrocarburíferas
+
+```{r}
+tasa_ganancia_rama_stock = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tg_pg_total")
+# tasa de ganancia
+graf_tg_rama_2 <- tasa_ganancia_rama_stock %>%
+  filter(anio >1995) %>%
+  ggplot(aes(anio, TG_pg, color = stock_seleccionado))+
+  geom_line(aes(anio, TG_manuf))+
+  geom_line(alpha = 0.5)+
+  geom_point()+
+  scale_y_continuous(labels = scales::percent)+
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = "bottom")
+
+plot_ggplotly(graf_tg_rama_2 , 
+              title = "Tasa de ganancia hidrocarburífera con PPyE a partir de stock de pozos (1960 - 2018)")
+```
+
+```{r}
+renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rkindv", variable) & anio >1997, ] ,
+                          aes(anio, value, fill = variable))+
+  geom_col()+
+  labs(y = "Millones de USD TCp de 2020")
+
+plot_ggplotly(renta_difp_plot, 
+              "Renta apropiada por las empresas" ,
+              "Argentina (1997 - 2020)") 
+```
+
+
+
+### Impuestos específicos estatales
+
+$$Rimp = RE + Reg - Subs$$
+
+Donde:
+
+* $Rimp$ = Renta apropiada por el Estado mediante impuestos específicos
+* $RE$ = Retenciones
+* $Reg$ = Regalias
+* $Subs$ = Subsidios
+
+#### Regalias
+Fuentes: 
+* Secretaría de Energía (Base Regalías)
+
+#### Retenciones
+Fuentes:
+* AFIP
+* Campodónico
+* Farfaro Ruiz y Bil
+
+#### Subsidios
+Fuentes:
+* CEFIP
+* EJES
+
+```{r}
+renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rreg|Rret|Subs", variable) , ] ,
+                          aes(anio, value, fill = variable))+
+  geom_col()+
+  labs(y = "Millones de USD TCp de 2020")
+
+plot_ggplotly(renta_difp_plot, 
+              "Renta apropiada por medio de impuestos" ,
+              "Argentina (1997 - 2020)")
+
+```
+
+
+### Consumidores, refinerías y procesadoras
+
+#### Criterio de cómputo de Ramón (2019)
+
+##### Refinerías y procesadoras
+
+$$RR = (PI - PRMi) * CrudoP$$
+
+
+
+* $RR$ = Renta apropiada por las Refinadoras 
+* $PI$ = promedio ponderado de Precios Internacionales 
+* $PRMi$ = Precio ponderado a Refinerías del Mercado Interno
+* $CrudoP$ = barriles de Crudo Procesado por las refinadoras
+
+##### Consumidores a través de combustibles abaratados
+
+$$RC = (PI - PRMi - MR) * CrudoP $$
+
+* $RC$ = Renta apropiada por los Consumidores
+* $MR$ = Margen de Refinerías
+
+Esto resulta equivalente a plantear:
+
+$$RC = PCMi * CrudoP$$
+
+* $PCMi$ = Precio ponderado a Consumidores del Mercado Interno.
+
+
+
+
+
+
+### Suma total de los mecanismos de apropiación 
+```{r}
+# renta_mecanismos = renta_mecanismos[,!c("Rtt", "IPC_18", "unidad"), with = F] 
+# renta_mecanismos[, Subs := Subs *-1]
+# renta_mecanismos = melt(renta_mecanismos, id.vars = "anio",
+#                         variable.name = "tipo_renta",
+#                         value.name = "valor")
+# merge_func <- function(...) merge(..., all = TRUE, by='anio')
+# renta_mecanismos = Reduce(merge_func, list(renta_mecanismos, tcp_arg, ipc_us))
+# renta_mecanismos[, valor := ((valor/1e6)/TCp)/ipc_us_20]
+# renta_mecanismos[, unidad := "Millones de USD TCp de 2020"]
+renta_plot3 = ggplot(renta_mecanismos, aes(anio, value, 
+                             color = variable, fill = variable))+
+  geom_col(position = "stack")+
+  theme(legend.position = "bottom")+
+  labs(y = "Millones USD TCc de 2020")+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
+  scale_y_continuous(breaks = seq(0, 50000, 10000),
+                     labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+  theme_classic()
+# renta_plot3 = plot_theme(renta_plot3)+theme(legend.title = element_blank(),
+#                               axis.title.x = element_blank(),
+#                               axis.text.x = element_text(angle = 45,
+#                                                          vjust= 0.7, hjust= 0.5))
+plot_ggplotly(renta_plot3 , title = "Renta de la tierra hidrocarburífera",
+       subtitle = "Cursos de apropiación")
+# ggsave("../resultados/argentina/renta_mecanismos_tcp.png",renta_plot3)
+```
+
+
+
+
+# Comparación con estimación de otros autores
+```{r}
+#cargo renta autores
+renta_autores <- fread("../resultados/argentina/renta_autores.csv") 
+renta_autores = merge(renta_autores, ipc_us, all.x=T, by = "anio")
+renta_autores[, valor := valor /ipc_us_20]
+renta_autores[, unidad := "Millones de USD TCc de 2020"]
+renta_autores = renta_autores[,!"ipc_us_20", with=F]
+renta_autores = merge(renta_autores, tcp_arg, all.x= T, by = "anio")
+renta_autores[,valor := (valor*TCc)/TCp]
+renta_autores= renta_autores[, !c("TCc", "TCp"), with = F]
+
+#preproceso renta total
+renta_usd = renta_usd[, !c("TCc", "TCp", "ipc_us_20"), with = F]
+setnames(renta_usd, c("var","Rtt" ), c("tipo_de_renta","valor"))
+renta_usd[, autor := "Propia"]
+
+#preproceso renta mecanismos
+# renta_mecanismos = as.data.table(renta_mecanismos)
+renta_mecanismos[, autor := "Propia"]
+renta_mecanismos[, value := value*TCp/TCc]
+renta_mecanismos = renta_mecanismos[, !c("TCc", "TCp", "ipc_us_20"), with = F]
+
+
+# setnames(renta_mecanismos, "tipo_renta", "tipo_de_renta")
+renta_mecanismos = dcast(renta_mecanismos, anio+autor~variable, value.var = "value")
+renta_mecanismos[, `:=`(renta_diferencial_precios = rowSums(cbind(Rdifp_crudo, Rdifp_gas), na.rm=T),
+                        renta_estado_total = rowSums(cbind(Rret, Rreg), na.rm=T),
+                        renta_sobrevaluacion = rowSums(cbind(Rsvx_crudo, Rsvx_gas), na.rm=T) ,
+                        unidad = "Millones de USD TCc de 2020" )]
+
+
+renta_mecanismos= renta_mecanismos[, !c("Rdifp_crudo", "Rdifp_gas",
+                                        "Rsvx_crudo", "Rsvx_gas"), with=F]
+setnames(renta_mecanismos, c("Rkindv", "Subs", "Rret",  "Rreg"), 
+         c("renta_empresas", "subsidios", "retenciones", "regalias") )
+renta_mecanismos = melt(renta_mecanismos,id.vars = c("anio", "autor", "unidad"), variable.name = "tipo_de_renta",
+     value.name = "valor")
+#junto los datos
+renta_comparacion = rbind(renta_usd, renta_mecanismos, renta_autores)
+
+
+#grafico renta total
+graf_renta_total_comparacion = ggplot(data = renta_comparacion[str_detect(tipo_de_renta , "renta_total|Renta por suma de mecanismos") & anio > 1990], 
+       aes(anio, valor, color = autor))+
+  geom_line()+
+  geom_point()+
+  theme(legend.position = "bottom")+
+  labs(y = "Millones de USD TCp de 2020", x="",
+       caption = "Nota: en la estimación propia se utilizó la renta por por suma de mecanismos")+
+  theme_classic()+
+  scale_x_continuous(breaks = seq(1960, 2020, 5))+
+  scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
+graf_renta_total_comparacion =plot_theme( graf_renta_total_comparacion)+theme(
+  legend.title = element_blank())
+plot_ggplotly(graf_renta_total_comparacion, 
+              title = "Renta de la tierra hidrocarburífera total de Argentina",
+              subtitle = "Comparación con otras estimaciones")
+
+# ggsave("../resultados/argentina/comparacion_autores_usd_tcp.png", graf_renta_total_comparacion,
+#          width = 10, height = 5)
+```
+
+```{r}
+#grafico comparacion con otros autores
+graf_tipos_renta <- ggplot(data = renta_comparacion[!str_detect(tipo_de_renta, c("renta_total|Renta por descuentos sobre plusvalía|Renta por suma de mecanismos|renta_estado_total"
+                                 # "renta_diferencial_precios",
+                               ))& anio >1990],
+       aes(anio, valor, color = autor))+
+  geom_line()+
+  geom_point(size = 0.5)+
+  geom_hline(yintercept = 0)+
+  facet_wrap(~tipo_de_renta, scales = "free_y")+
+  labs(y = "Millones USD TCp de 2020")+
+  scale_x_continuous(breaks = seq(1990, 2020, 5))
+# # # ggplotly(graf_tipos_renta, width = 800, height = 600)
+graf_tipos_renta = plot_theme(graf_tipos_renta)+theme(
+  axis.text.x = element_text(angle = 45, hjust = 1),
+  strip.text = element_text(12), legend.title = element_blank() )
+
+plot_ggplotly(graf_tipos_renta, title = "Renta de la tierra hidrocarburífera",
+       subtitle = "Comparación de estimaciones")
+ggsave("../resultados/argentina/comparacion_autores_tipo_renta_usd_tcp.png",
+       graf_tipos_renta, width = 16, height = 10)
+```
+
+</div>

@@ -14,6 +14,7 @@ library(stringr)
 library(reshape2)
 library(zoo)
 library(lubridate)
+library(jpeg)
 
 #funciones
 liter_to_gallon_p <- function(x) {x /0.264172}
@@ -149,7 +150,7 @@ wb_arg_fuel <-  wb_data %>%
 ## Anuario de combustibles
 ```{r}
 # u$s litro
-anuario_comun <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/Fernando - precionafta.xls") %>% 
+anuario_comun <- read_excel("../data/fr_b_d/Fernando - precionafta.xls") %>% 
   select(anio = "...5", valor = "...9" ) %>% 
   filter(!is.na(anio) & (anio > 1948) ) %>% 
   mutate_all(as.double) %>% 
@@ -164,7 +165,7 @@ anuario_comun <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/F
 ## FR y B
 
 ```{r}
-anuario2 <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/NAFTAS con y sin imp 1963-2011.xlsx") %>% 
+anuario2 <- read_excel("../data/fr_b_d/NAFTAS con y sin imp 1963-2011.xlsx") %>% 
   select(fecha = "...1", comun_precio_c_imp = "Común...2", 
          comun_precio_s_imp = "...3", comun_gravamen ="...4",
          super_precio_c_imp = "Super", super_precio_s_imp = "...6", super_gravamen ="...7", 
@@ -201,13 +202,13 @@ anuario2 <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/NAFTAS
 
 # anuario2[(anuario2$anio %in% c(1970:1985)) & (anuario2$cod==4), "value"] <- NA
 
-ipc_08 <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/NAFTAS con y sin imp 1963-2011.xlsx", skip = 1) %>% 
+ipc_08 <- read_excel("../data/fr_b_d/NAFTAS con y sin imp 1963-2011.xlsx", skip = 1) %>% 
   select(anio = "...1", ipc08 = "IPC2008") %>% 
   mutate(anio = as.double(substr(anio, 1,4)))  %>% 
   group_by(anio) %>% 
   summarise(ipc08 =mean(ipc08))
   
-gasoil_frb <- read_excel("C:/Archivos/Datos/Hidrocarburos/Excels de Betania/NAFTAS con y sin imp 1963-2011.xlsx",  sheet = 2, skip = 2) %>% 
+gasoil_frb <- read_excel("../data/fr_b_d/NAFTAS con y sin imp 1963-2011.xlsx",  sheet = 2, skip = 2) %>% 
   select(anio = "...1", gasoil_precio_c_imp = "Gasoil $2008", gasoil_precio_s_imp = "...9") %>% 
   slice(-1) %>% 
   mutate_all(as.double) %>% 
@@ -255,7 +256,7 @@ anuario2 %>%
 ## SESCO
 ```{r}
 
-precios_localidad <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/secretaria_energia/sesco/PreciosDeVentaPorLocalidad.xls", 
+precios_localidad <- read_excel("../data/secretaria_energia/sesco/PreciosDeVentaPorLocalidad.xls", 
     sheet = "Precio de venta por localidad", 
     skip = 9) %>% 
   rename(anio = "Año")
@@ -328,7 +329,7 @@ res_1104 %>%
 # ypf F20
 # Average prive per unit /m3
 
-ypf_f20  <- read_excel("C:/Archivos/Datos/Hidrocarburos/pio ypf dropbox/PIO YPF/Artículo Measuring oil ground rent Argentina/Fuente de los gráficos/diferencia de precios 20F YPF.xlsx", 
+ypf_f20  <- read_excel("../data/ypf/diferencia de precios 20F YPF.xlsx", 
     skip = 2) %>% select(anio = "...1", diesel = "...5", gasoline = "...7") %>% 
   filter(!is.na(anio)) %>% 
   mutate_all(as.double) %>% 
@@ -415,7 +416,7 @@ Este es el unico excel donde esta midgrade y diesel
 
 Para mas detalles metodológicos, revisar: https://www.eia.gov/totalenergy/data/monthly/pdf/sec9.pdf
 ```{r}
-usa_price <- read_csv("C:/Archivos/repos/hidrocarburos/analisis/data/EIA/MER_T09_04.csv")
+usa_price <- read_csv("../data/EIA/MER_T09_04.csv")
 
 usa_price <- add_column(usa_price, fecha = "", year="", month="", .after = 2)
 usa_price <- usa_price %>%
@@ -494,7 +495,7 @@ names(us_fuel_price)
 ```{r}
 
 # cents/liter
-gasoline_tax <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/fhwa/mf205.xls", 
+gasoline_tax <- read_excel("../data/fhwa/mf205.xls", 
     sheet = "GASOLINE", skip = 6) %>% 
   gather(key = "anio", value = "tax", 2:ncol(.)) %>% 
   mutate(anio = gsub( "\\.*", "",anio), 
@@ -505,7 +506,7 @@ gasoline_tax <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/fhwa/m
   mutate(item = "gasoline_tax", tax_code = 1, tax = gallon_to_liter_p(tax/100))
 
 
-diesel_tax <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/fhwa/mf205.xls", 
+diesel_tax <- read_excel("../data/fhwa/mf205.xls", 
     sheet = "DIESEL", skip = 6)%>% 
   gather(key = "anio", value = "tax", 2:ncol(.)) %>% 
   mutate(anio = gsub( "\\.*", "",anio), 
@@ -529,7 +530,7 @@ weight_anual_tax <- rbind(diesel_tax, gasoline_tax) %>%
 
 ## U.S. Gulf Coast Conventional Gasoline Regular Spot Price FOB (Dollars per Gallon)
 ```{r}
-gc_gasoline_spot <- read_excel("C:/Archivos/repos/hidrocarburos/analisis/data/EIA/EER_EPMRU_PF4_RGC_DPGm.xls", 
+gc_gasoline_spot <- read_excel("../data/EIA/EER_EPMRU_PF4_RGC_DPGm.xls", 
     sheet = "Data 1", skip = 2) 
 names(gc_gasoline_spot) <- c("date", "gulfcoast_gasoline_fob")
 
@@ -616,7 +617,7 @@ serie_larga_filtrada <- precios_sesco %>%
 
 # Precios ARG
 etiquetas <- c("1" = "Nafta Normal", "2"= "Nafta Super", "3"="Nafta Premium", "4"="Diesel grado 2")  
-png("../resultados/comparacion_paises/precios_con_impuestos_ARG.png")
+# png("../resultados/comparacion_paises/precios_con_impuestos_ARG.png")
 serie_larga %>%
 # serie_larga_filtrada %>% 
   # filter(cod ==1) %>% 
@@ -625,7 +626,7 @@ serie_larga %>%
   facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
   labs(y = "USD/litro", title = "Precios de combustibles con impuestos de Argentina", 
        subtitle = "Distintas estimaciones con TCC")
-dev.off()
+# dev.off()
 
 #Comparacion con EEUU
 precios_eeuu <- eia_1 %>% 
@@ -638,8 +639,7 @@ precios_eeuu <- eia_1 %>%
   arrange(anio)
 
 
-library(jpeg)
-png("../resultados/comparacion_paises/precios_con_impuestos_tcc.png")
+# png("../resultados/comparacion_paises/precios_con_impuestos_tcc.png")
 serie_larga_filtrada %>%
   left_join(tcc_tcp_historico, by = "anio") %>%
   mutate(valor = valor*(tcc/tcp)) %>%
@@ -651,9 +651,9 @@ serie_larga_filtrada %>%
   facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
   labs(y = "USD/litro", title = "Precios de combustibles con impuestos de Argentina y EEUU",
        subtitle =  "Tipo de cambio de paridad", x = "Año")
-dev.off()
+# dev.off()
 
-png("../resultados/comparacion_paises/precios_con_impuestos_tcp.png")
+# png("../resultados/comparacion_paises/precios_con_impuestos_tcp.png")
 serie_larga_filtrada %>%
   rbind(precios_eeuu) %>%
   filter(anio >1975) %>% 
@@ -662,7 +662,7 @@ serie_larga_filtrada %>%
   facet_wrap(~cod, ncol = 2, labeller = labeller(cod = etiquetas), scales = "free" )+
   labs(y = "USD/litro", title = "Precios de combustibles con impuestos de Argentina y EEUU",
        subtitle =  "Tipo de cambio comercial", x = "Año")
-dev.off()
+# dev.off()
 
 ```
 
