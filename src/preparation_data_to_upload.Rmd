@@ -1,0 +1,35 @@
+---
+title: "Preparation data to upload"
+output: html_notebook
+---
+
+
+
+```{r}
+require(tidyverse)
+require(readxl)
+
+renta_hid_arg <- read_excel('../results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx',
+                            sheet = 'raw_data') %>% 
+  arrange(anio) %>% 
+  mutate(row = row_number()) %>% 
+  select(row, anio, variable, valor) %>% 
+  filter(!is.na(valor)) %>% 
+  pivot_wider( names_from = variable, values_from = valor) %>% 
+  select(-row)
+
+ipc_arg <- read_excel('../results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx',
+                            sheet = 'ipc') %>% 
+  select(anio, IPC_18)
+tc_arg <- read_excel('../results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx',
+                            sheet = 'tipo_cambio') %>% 
+  select(anio, TCc)
+
+df_join <- renta_hid_arg %>% 
+  left_join(ipc_arg) %>% 
+  left_join(tc_arg) %>% 
+  mutate('PBI hidrocarburifero' = `Producción de petróleo crudo` *`Precio del mercado interno del petróleo crudo` )
+
+head(df_join)
+write.csv(df_join, '../results/argentina/data_renta_hidrocarburifera_arg_para_carga.csv', row.names = F)
+```

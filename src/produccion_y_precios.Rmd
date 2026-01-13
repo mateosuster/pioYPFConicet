@@ -55,7 +55,7 @@ Para realizar conversiones de las distintas unidades de medida de las que proven
 
 ```{r}
 # datos 
-data = fread("../resultados/argentina/variables.csv")
+data = fread("../results/argentina/variables.csv")
 glimpse(data)
 
 #variables
@@ -392,9 +392,9 @@ plot_ggplotly(precio_expo_crudo_plt, "Gráfico N°15. Precios de exportacion de 
 La diferencia marcada en el nivel anterior se puede observar en el siguiente gráfico, donde se presenta el precio de exportación de Argentina frente al precio del mercado interno, salvo por el período de acople al precio internacional de la década de 1990 y el breve interregno de 2015-2017. Para un detalle de las fuentes seleccionadas, veáse el anexo metodológico. 
 ```{r}
 # visualizacion diferencial de precio mdo interno
-# ggsave("../resultados/argentina/precio_interno_vs_externo.jpg")
+# ggsave("../results/argentina/precio_interno_vs_externo.jpg")
 
-data_dif_precios = as.data.table(readxl::read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx",
+data_dif_precios = as.data.table(readxl::read_excel("../results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx",
                               sheet ="crudo_dif_pre_y_sv")) 
 
 brecha_precio_crudo_plt <-  ggplot(melt(
