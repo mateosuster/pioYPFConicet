@@ -3866,7 +3866,8 @@ all_raw_data = rbindlist(list(prod_merge_crudo ,prod_merge_gas_MMBTU,
                precios_referencia_gas, precios_exportacion_gas,
                regalias_to_vars, retenciones_pg, subsidios_pg,
                empleo_y_remuneraciones),  use.names=TRUE)
-write.csv(all_raw_data, "../resultados/argentina/variables.csv", row.names = F)
+write.csv(all_raw_data, "../resultados/argentina/variables.csv", row.names = F,
+          fileEncoding = "UTF-8")
 
 
 
