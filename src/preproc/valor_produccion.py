@@ -123,14 +123,14 @@ def _load_ccnn_indec(masa_salarial_hidrocarburos: pd.DataFrame,
     """Load INDEC-based national accounts (2004-2020). Final ccnn_oficial."""
     # Sheet 3 (0-indexed: 2): VBP
     vbp_raw = pd.read_excel(
-        DATA / "indec/sh_VBP_VAB_03_21.xls", sheet_name=2, skiprows=3, header=0
+        DATA / "indec/sh_VBP_VAB_03_26.xls", sheet_name=2, skiprows=3, header=0
     ).dropna(how="all")
     vbp_raw.columns = ["sector"] + list(range(2004, 2004 + len(vbp_raw.columns) - 1))
     vbp_long = vbp_raw.melt(id_vars="sector", var_name="anio", value_name="vbp_tot")
 
     # Sheet 5 (0-indexed: 4): VA, select only "Total" columns
     va_raw = pd.read_excel(
-        DATA / "indec/sh_VBP_VAB_03_21.xls", sheet_name=4, skiprows=4, header=0
+        DATA / "indec/sh_VBP_VAB_03_26.xls", sheet_name=4, skiprows=4, header=0
     )
     total_cols = [c for c in va_raw.columns if "Total" in str(c) or "total" in str(c)]
     va_raw = va_raw.iloc[:, [0] + [va_raw.columns.get_loc(c) for c in total_cols]].dropna(how="all")
@@ -350,10 +350,12 @@ def build_empalme_ccnn(
     consumo_k_fijo_ypf: float,
     imp_prom_97: float,
     mean_coef_ms: dict,
+    stock_source: str = "Bolsar",
 ) -> pd.DataFrame:
     """Splice CCNN series: pre-2004 extrapolated via criterio_ccnn index; 2004+ from INDEC."""
-    # Build index from criterio_ccnn
+    # Build index from criterio_ccnn; collapse 4-row price-ref duplicates first
     idx_df = criterio_ccnn[["anio", "vbp_tot"]].copy()
+    idx_df = idx_df.groupby("anio", as_index=False)["vbp_tot"].mean()
     idx_df = idx_df[idx_df["vbp_tot"].notna() & (idx_df["anio"] >= 1960)]
     if 2004 in idx_df["anio"].values:
         idx_df["vbp_criterio_ccnn_04"] = generar_indice(
@@ -402,10 +404,8 @@ def build_empalme_ccnn(
     emp["unidad"] = "Millones de pesos corrientes"
 
     # Add capital consumption (depreciation)
-    ipc_map = ipc.set_index("anio")["ipc_18"]
-    stock_bolsar = stock_estimado[stock_estimado["fuente_ppye"] == "Bolsar"].copy()
-    stock_bolsar["ipc_18"] = stock_bolsar["anio"].map(ipc_map)
-    stock_bolsar["consumo_k_fijo"] = stock_bolsar["valor"] * stock_bolsar["ipc_18"] * consumo_k_fijo_ypf
+    stock_bolsar = stock_estimado[stock_estimado["fuente_ppye"] == stock_source].copy()
+    stock_bolsar["consumo_k_fijo"] = stock_bolsar["valor"] * consumo_k_fijo_ypf
     ck = stock_bolsar[["anio", "consumo_k_fijo"]]
     emp = emp.merge(ck, on="anio", how="left")
     emp["pv"] = emp["ebe_extr"] - emp["consumo_k_fijo"] - (emp["vbp_tot"] * imp_prom_97)
@@ -419,26 +419,25 @@ def build_criterio_propio(
     ipc: pd.DataFrame,
     consumo_k_fijo_ypf: float,
     imp_prom_97: float,
+    stock_source: str = "Bolsar",
 ) -> pd.DataFrame:
     """Estimate VBP/VA/EBE using world prices (criterio propio)."""
     ci_ms = empalme_ccnn[["anio", "unidad", "ci_tot", "ci_extr", "ms_tot", "ms_extr"]].copy()
     df = precios_y_cantidades.merge(ci_ms, on="anio", how="left")
 
-    ipc_map = ipc.set_index("anio")["ipc_18"]
-    stock_bolsar = stock_estimado[stock_estimado["fuente_ppye"] == "Bolsar"].copy()
-    stock_bolsar["ipc_18"] = stock_bolsar["anio"].map(ipc_map)
-    stock_bolsar["consumo_k_fijo"] = stock_bolsar["valor"] * stock_bolsar["ipc_18"] * consumo_k_fijo_ypf
+    stock_bolsar = stock_estimado[stock_estimado["fuente_ppye"] == stock_source].copy()
+    stock_bolsar["consumo_k_fijo"] = stock_bolsar["valor"] * consumo_k_fijo_ypf
     df = df.merge(stock_bolsar[["anio", "consumo_k_fijo"]], on="anio", how="left")
 
     df["vbp_tot"] = ((df["prod_crudo"] * df["precio_me_crudo"] + df["prod_gas"] * df["precio_externo_gas"]) * df["tcp"]) / 1e6
-    df["va_tot"] = df["vbp_tot"] - df["ci_extr"]
-    df["ebe_tot"] = df["va_tot"] - df["ms_extr"]
+    df["va_tot"] = df["vbp_tot"] - df["ci_tot"]
+    df["ebe_tot"] = df["va_tot"] - df["ms_tot"]
     df["vbp_extr"] = np.nan
     df["ebe_extr"] = np.nan
     df["va_extr"] = np.nan
     df["fuente"] = "Criterio propio"
     df["unidad"] = "Millones de pesos corrientes"
-    df["pv"] = df["ebe_tot"] - df["consumo_k_fijo"] - (df["vbp_tot"] * imp_prom_97)
+    df["pv"] = df["ebe_tot"] - df["consumo_k_fijo"]  - (df["vbp_tot"] * imp_prom_97)
     return df
 
 
@@ -449,7 +448,7 @@ def build_valor_total_produccion(
     criterio_propio: pd.DataFrame,
     ipc: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Combine all fuentes into a long-form 2018-peso table and write to CSV."""
+    """Combine all fuentes into a long-form current-peso table and write to CSV."""
     filtro = ["anio", "unidad", "fuente", "vbp_tot", "vbp_extr",
               "ci_tot", "ci_extr", "ms_tot", "ms_extr",
               "va_tot", "va_extr", "ebe_tot", "ebe_extr"]
@@ -472,10 +471,8 @@ def build_valor_total_produccion(
         value_name="valor",
     )
 
-    ipc_map = ipc[["anio", "ipc_18"]].dropna()
-    valor = valor_corr.merge(ipc_map, on="anio", how="left")
-    valor["valor"] = valor["valor"] / valor["ipc_18"]
-    valor["unidad"] = "Millones de pesos de 2018"
+    valor = valor_corr.copy()
+    valor["unidad"] = "Millones de pesos corrientes"
     return valor[["anio", "fuente", "variable", "unidad", "valor"]].copy()
 
 
@@ -493,11 +490,14 @@ def run(
     precios_referencia_crudo: pd.DataFrame,
     tcp_anual: pd.DataFrame,
     ipc: pd.DataFrame,
+    stock_estimado: pd.DataFrame = None,
+    stock_source: str = "Bolsar",
 ) -> dict:
     imp_prom_97 = _load_imp_prom_97()
     servicio_s_extraccion = _load_servicio_s_extraccion()
     consumo_k_fijo_ypf = _load_consumo_k_fijo_ypf()
-    stock_estimado = _load_stock_estimado()
+    if stock_estimado is None:
+        stock_estimado = _load_stock_estimado()
 
     # Load MECON ccnn first (used only for mean_coef_ms)
     ccnn_mecon = _load_ccnn_mecon(masa_salarial_hidrocarburos, servicio_s_extraccion)
@@ -520,10 +520,11 @@ def run(
     criterio_ccnn = build_criterio_ccnn(pqc, coef_ci, servicio_s_extraccion, mean_coef_ms)
     empalme_ccnn = build_empalme_ccnn(
         ccnn_oficial, criterio_ccnn, coef_ci, stock_estimado, ipc,
-        consumo_k_fijo_ypf, imp_prom_97, mean_coef_ms,
+        consumo_k_fijo_ypf, imp_prom_97, mean_coef_ms, stock_source=stock_source,
     )
     criterio_propio = build_criterio_propio(
-        pqc, empalme_ccnn, stock_estimado, ipc, consumo_k_fijo_ypf, imp_prom_97
+        pqc, empalme_ccnn, stock_estimado, ipc, consumo_k_fijo_ypf, imp_prom_97,
+        stock_source=stock_source,
     )
     valor_total_produccion = build_valor_total_produccion(
         ccnn_oficial, criterio_ccnn, empalme_ccnn, criterio_propio, ipc
