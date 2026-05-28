@@ -17,3 +17,5 @@ produccin-de-pozos-de-gas-y-petrleo-2021.csv
 .venv/*
 .venv/
 __pycache__/
+
+*.zip

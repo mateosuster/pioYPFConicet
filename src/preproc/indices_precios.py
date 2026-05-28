@@ -122,7 +122,8 @@ def load_ipc() -> pd.DataFrame:
     ipc["fecha"] = pd.to_datetime(ipc["anio"].astype(int).astype(str) + "-01-01")
     ipc["ipc_70"] = generar_indice(ipc["ipc_03"], ipc["fecha"], pd.Timestamp("1970-01-01"))
     ipc["ipc_18"] = generar_indice(ipc["ipc_03"], ipc["fecha"], pd.Timestamp("2018-01-01"))
-    return ipc[["anio", "fecha", "ipc_03", "ipc_70", "ipc_18"]]
+    ipc["ipc_24"] = generar_indice(ipc["ipc_03"], ipc["fecha"], pd.Timestamp("2024-01-01"))
+    return ipc[["anio", "fecha", "ipc_03", "ipc_70", "ipc_18", "ipc_24"]]
 
 
 def load_ipim() -> pd.DataFrame:
@@ -199,8 +200,9 @@ def run() -> dict:
     ipc_us = load_ipc_us()
     ganancia_pbi = load_ganancia_pbi()
 
-    # Convenience: ipc_18 series keyed by anio (used by many downstream modules)
+    # Convenience series keyed by anio (used by downstream modules)
     ipc_18 = ipc.set_index("anio")["ipc_18"]
+    ipc_24 = ipc.set_index("anio")["ipc_24"]
     ipc_us_20 = ipc_us.set_index("anio")["ipc_us_20"]
 
     return dict(
@@ -209,6 +211,7 @@ def run() -> dict:
         tcc_dic=tcc_dic,
         ipc=ipc,
         ipc_18=ipc_18,
+        ipc_24=ipc_24,
         ipim=ipim,
         ipc_us=ipc_us,
         ipc_us_20=ipc_us_20,

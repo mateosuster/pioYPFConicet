@@ -7,6 +7,7 @@ Outputs:
   results/argentina/base_csv/stock_*.csv
 """
 
+from datetime import datetime
 from pathlib import Path
 import pandas as pd
 
@@ -178,6 +179,43 @@ def assemble_variables(
     return variables
 
 
+def build_renta_sv_sheet(
+    renta_tcp_crudo: pd.DataFrame,
+    renta_tcp_gas: pd.DataFrame,
+    renta_tcp_indec: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Merge SESCO and INDEC overvaluation rent calculations for side-by-side comparison.
+    Result is in pesos corrientes (absolute, pre-division by 1e6).
+    """
+    crudo_cols = ["anio", "tcc", "tcp", "unidad_renta",
+                  "expo_crudo", "unidad_cantidad", "precio_externo_crudo",
+                  "renta_sobrevaluacion_crudo", "renta_sobrevaluacion_crudo_valor"]
+    gas_cols = ["anio", "expo_gas", "precio_externo_gas", "renta_sobrevaluacion_gas"]
+
+    df = renta_tcp_crudo[[c for c in crudo_cols if c in renta_tcp_crudo.columns]].merge(
+        renta_tcp_gas[[c for c in gas_cols if c in renta_tcp_gas.columns]],
+        on="anio", how="outer",
+    )
+    df["renta_sv_sesco_total"] = (
+        df["renta_sobrevaluacion_crudo"].fillna(0)
+        + df["renta_sobrevaluacion_gas"].fillna(0)
+    )
+
+    if renta_tcp_indec is not None:
+        indec_cols = ["anio",
+                      "expo_petroleo_usd_indec", "expo_gas_usd_indec", "expo_petgas_usd_indec",
+                      "renta_sobrevaluacion_petroleo_indec",
+                      "renta_sobrevaluacion_gas_indec",
+                      "renta_sobrevaluacion_petgas_indec"]
+        df = df.merge(
+            renta_tcp_indec[[c for c in indec_cols if c in renta_tcp_indec.columns]],
+            on="anio", how="outer",
+        )
+
+    return df.sort_values("anio").reset_index(drop=True)
+
+
 def write_outputs(
     variables: pd.DataFrame,
     ipc: pd.DataFrame,
@@ -185,11 +223,19 @@ def write_outputs(
     prod_crudo: pd.DataFrame,
     prod_gas_mmbtu: pd.DataFrame,
     precio_crudo_mi: pd.DataFrame,
+    precio_gas_mi_mmbtu: pd.DataFrame,
+    expo_crudo: pd.DataFrame,
+    expo_usd_crudo: pd.DataFrame,
+    expo_gas: pd.DataFrame,
+    expo_usd_gas: pd.DataFrame,
+    precios_referencia_crudo: pd.DataFrame,
+    precio_mdomundial_gas: pd.DataFrame,
     renta_crudo_dif: pd.DataFrame,
     renta_gas_dif: pd.DataFrame,
     stock_balances_empresas: pd.DataFrame,
     stock_segmentos: pd.DataFrame,
     stock_ypf: pd.DataFrame,
+    stock_petroarg: pd.DataFrame = None,
     # New rent calculus outputs (optional — skipped if None)
     renta_indirecto: pd.DataFrame = None,
     renta_directo: pd.DataFrame = None,
@@ -198,6 +244,12 @@ def write_outputs(
     empalme_ccnn: pd.DataFrame = None,
     costos: pd.DataFrame = None,
     renta_comparacion: pd.DataFrame = None,
+    criterio_propio: pd.DataFrame = None,
+    criterio_ccnn: pd.DataFrame = None,
+    renta_sv_crudo_gas: pd.DataFrame = None,
+    renta_empresas: pd.DataFrame = None,
+    stock_source: str = "",
+    renta_sv_source: str = "sesco",
 ) -> None:
     """Write all output files."""
     RESULTS.mkdir(parents=True, exist_ok=True)
@@ -208,42 +260,104 @@ def write_outputs(
     print(f"  variables.csv: {variables.shape}")
 
     # Stock CSVs
-    stock_balances_empresas.to_csv(BASE_CSV / "stock_balances_empresas.csv", index=False)
+    keep_vars = ["KTA", "activo", "activo_no_corr", "inventarios", "ppye", "ppye_neta",
+                 "gcia_ant", "gcia_desp", "tg_ant", "tg_desp"]
+    if stock_petroarg is not None:
+        stock_ciq = stock_petroarg[stock_petroarg["variable"].isin(keep_vars)].copy()
+        stock_empresas_sheet = pd.concat(
+            [stock_balances_empresas, stock_ciq], ignore_index=True
+        )
+    else:
+        stock_empresas_sheet = stock_balances_empresas
+    stock_empresas_sheet.to_csv(BASE_CSV / "stock_balances_empresas.csv", index=False)
     stock_segmentos.to_csv(BASE_CSV / "stock_segmentos.csv", index=False)
     stock_ypf.to_csv(BASE_CSV / "stock_ypf.csv", index=False)
 
+    # Collapse 4-row/year price-ref combinations in criterio_propio to 1/year
+    if criterio_propio is not None:
+        criterio_propio_out = criterio_propio.groupby(
+            ["anio", "unidad", "fuente"], as_index=False
+        ).mean(numeric_only=True)
+        criterio_propio_out["fuente"] = "Criterio propio"
+    else:
+        criterio_propio_out = None
+
     # Build sheet list for index
     sheet_names = [
+        "notas",
         "variables", "tipo_cambio", "ipc", "produccion_crudo",
-        "produccion_gas", "precios_mi", "renta_dif_crudo", "renta_dif_gas",
+        "produccion_gas", "precios_mi_crudo", "precios_mi_gas",
+        "exportaciones_crudo_q", "exportaciones_crudo_v",
+        "exportaciones_gas_q", "exportaciones_gas_v",
+        "precios_me_crudo", "precios_me_gas",
+        "renta_dif_crudo", "renta_dif_gas",
         "stock_empresas", "stock_segmentos",
     ]
     optional_sheets = {
         "RTPG_mecanismos": renta_indirecto,
+        "renta_empresas": renta_empresas,
         "RTPG_PextQ": renta_directo,
         "tg_pg_total": tasa_ganancia_rama_stock,
         "ccnn_pg": ccnn_oficial,
+        "criterio_ccnn_pg": criterio_ccnn,
         "empalme_ccnn_pg": empalme_ccnn,
+        "VBPextTcp": criterio_propio_out,
         "costos_pg": costos,
         "RTPG_comparacion": renta_comparacion,
+        "renta_sv_crudo&gas": renta_sv_crudo_gas,
     }
     for name, df in optional_sheets.items():
         if df is not None:
             sheet_names.append(name)
 
+    # Notes sheet
+    renta_sv_descripciones = {
+        "sesco": (
+            "SESCO: expo_q × precio_externo × (tcp - tcc), crudo y gas por separado"
+        ),
+        "indec": (
+            "INDEC Complejos Exportadores: expo_USD × (tcp - tcc), 2002+ con split "
+            "petróleo/gas; pre-2002 valor combinado en columna petróleo; pre-1993 fallback a SESCO"
+        ),
+    }
+    notas_df = pd.DataFrame([
+        {"clave": "fecha_generacion", "valor": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+        {"clave": "stock_source_seleccionado", "valor": stock_source},
+        {
+            "clave": "stock_source_descripcion",
+            "valor": "Fuente de capital utilizada para consumo_k_fijo, tg_rama y renta_empresas",
+        },
+        {"clave": "renta_sv_source_seleccionado", "valor": renta_sv_source},
+        {
+            "clave": "renta_sv_source_descripcion",
+            "valor": renta_sv_descripciones.get(
+                renta_sv_source,
+                f"Fuente no documentada: {renta_sv_source}",
+            ),
+        },
+    ])
+
     # Master Excel workbook
     xlsx_path = RESULTS / "renta_de_la_tierra_hidrocarburifera_arg.xlsx"
     with pd.ExcelWriter(xlsx_path, engine="openpyxl") as writer:
         pd.DataFrame({"sheet": sheet_names}).to_excel(writer, sheet_name="indice", index=False)
+        notas_df.to_excel(writer, sheet_name="notas", index=False)
         variables.to_excel(writer, sheet_name="variables", index=False)
         tcp_anual.to_excel(writer, sheet_name="tipo_cambio", index=False)
         ipc.to_excel(writer, sheet_name="ipc", index=False)
         prod_crudo.to_excel(writer, sheet_name="produccion_crudo", index=False)
         prod_gas_mmbtu.to_excel(writer, sheet_name="produccion_gas", index=False)
-        precio_crudo_mi.to_excel(writer, sheet_name="precios_mi", index=False)
+        precio_crudo_mi.to_excel(writer, sheet_name="precios_mi_crudo", index=False)
+        precio_gas_mi_mmbtu.to_excel(writer, sheet_name="precios_mi_gas", index=False)
+        expo_crudo.to_excel(writer, sheet_name="exportaciones_crudo_q", index=False)
+        expo_usd_crudo.to_excel(writer, sheet_name="exportaciones_crudo_v", index=False)
+        expo_gas.to_excel(writer, sheet_name="exportaciones_gas_q", index=False)
+        expo_usd_gas.to_excel(writer, sheet_name="exportaciones_gas_v", index=False)
+        precios_referencia_crudo.to_excel(writer, sheet_name="precios_me_crudo", index=False)
+        precio_mdomundial_gas.to_excel(writer, sheet_name="precios_me_gas", index=False)
         renta_crudo_dif.to_excel(writer, sheet_name="renta_dif_crudo", index=False)
         renta_gas_dif.to_excel(writer, sheet_name="renta_dif_gas", index=False)
-        stock_balances_empresas.to_excel(writer, sheet_name="stock_empresas", index=False)
+        stock_empresas_sheet.to_excel(writer, sheet_name="stock_empresas", index=False)
         stock_segmentos.to_excel(writer, sheet_name="stock_segmentos", index=False)
         for name, df in optional_sheets.items():
             if df is not None:
@@ -252,7 +366,7 @@ def write_outputs(
     print(f"  {xlsx_path.name}: {n_sheets} sheets")
 
 
-def run(data: dict) -> pd.DataFrame:
+def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> pd.DataFrame:
     """
     Run final assembly given a dict of all preprocessed DataFrames.
     Returns the assembled variables DataFrame.
@@ -286,17 +400,35 @@ def run(data: dict) -> pd.DataFrame:
         prod_crudo=data["prod_crudo"],
         prod_gas_mmbtu=data["prod_gas_mmbtu"],
         precio_crudo_mi=data["precio_crudo_mi"],
+        precio_gas_mi_mmbtu=data["precio_gas_mi_mmbtu"],
+        expo_crudo=data["expo_crudo"],
+        expo_usd_crudo=data["expo_usd_crudo"],
+        expo_gas=data["expo_gas"],
+        expo_usd_gas=data["expo_usd_gas"],
+        precios_referencia_crudo=data["precios_referencia_crudo"],
+        precio_mdomundial_gas=data["precio_mdomundial_gas_MMBTU"],
         renta_crudo_dif=data["renta_crudo_dif"],
         renta_gas_dif=data["renta_gas_dif"],
         stock_balances_empresas=data["stock_balances_empresas"],
         stock_segmentos=data["stock_segmentos"],
         stock_ypf=data["stock_ypf"],
+        stock_petroarg=data.get("stock_petroarg"),
         renta_indirecto=data.get("renta_indirecto"),
+        renta_empresas=data.get("renta_empresas"),
         renta_directo=data.get("renta_directo"),
         tasa_ganancia_rama_stock=data.get("tasa_ganancia_rama_stock"),
         ccnn_oficial=data.get("ccnn_oficial"),
         empalme_ccnn=data.get("empalme_ccnn"),
         costos=data.get("costos"),
         renta_comparacion=data.get("renta_comparacion"),
+        criterio_propio=data.get("criterio_propio"),
+        criterio_ccnn=data.get("criterio_ccnn"),
+        renta_sv_crudo_gas=build_renta_sv_sheet(
+            renta_tcp_crudo=data.get("renta_tcp_crudo"),
+            renta_tcp_gas=data.get("renta_tcp_gas"),
+            renta_tcp_indec=data.get("renta_tcp_indec"),
+        ),
+        stock_source=stock_source,
+        renta_sv_source=renta_sv_source,
     )
     return variables

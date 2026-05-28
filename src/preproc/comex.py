@@ -109,13 +109,80 @@ def _load_comtrade_crudo() -> pd.DataFrame:
     return df
 
 
+def _load_comex_sesco_new() -> pd.DataFrame:
+    """
+    Load new-format SESCO comex files (2010+, long format, comma-sep, UTF-8 BOM).
+    Both files share an identical 13-column schema.
+    """
+    files = [
+        SESCO / "importaciones-exportaciones.csv",
+        SESCO / "importaciones-exportaciones-a-partir-del-2016-.csv",
+    ]
+    frames = []
+    for f in files:
+        if f.exists():
+            frames.append(pd.read_csv(f, encoding="utf-8-sig"))
+    if not frames:
+        return pd.DataFrame()
+    df = pd.concat(frames, ignore_index=True).drop_duplicates()
+    df["anio"] = pd.to_numeric(df["anio"], errors="coerce")
+    df["cantidad"] = pd.to_numeric(df["cantidad"], errors="coerce")
+    df["monto"] = pd.to_numeric(df["monto"], errors="coerce")
+    return df
+
+
+def _extract_crudo_new(sn: pd.DataFrame) -> pd.DataFrame:
+    """Annual crude export qty (barrels) + monto (USD) from new SESCO format."""
+    if sn.empty:
+        return pd.DataFrame(columns=["anio", "expo_crudo_sesco_new", "expo_crudo_usd_sesco_new"])
+    mask = (
+        sn["tipodecomercializacion"].str.contains("Exportaci", na=False)
+        & sn["producto"].str.contains("Cuenca", na=False)
+        & (sn["unidad"] == "(m3)")
+    )
+    agg = sn[mask].groupby("anio")[["cantidad", "monto"]].sum().reset_index()
+    agg["expo_crudo_sesco_new"] = m3_to_bbl_q(agg["cantidad"])
+    return agg.rename(columns={"monto": "expo_crudo_usd_sesco_new"})[
+        ["anio", "expo_crudo_sesco_new", "expo_crudo_usd_sesco_new"]
+    ]
+
+
+def _extract_gas_new(sn: pd.DataFrame) -> pd.DataFrame:
+    """Annual gas export qty (MMBTU) + monto (USD) from new SESCO format."""
+    if sn.empty:
+        return pd.DataFrame(columns=["anio", "expo_gas_sesco_new", "expo_gas_usd_sesco_new"])
+    mask = (
+        sn["tipodecomercializacion"].str.contains("Exportaci", na=False)
+        & sn["producto"].str.startswith("Gas Natural(", na=False)
+        & (sn["unidad"] == "(miles/m3)")
+    )
+    gas = sn[mask].copy()
+
+    # Detect rows where cantidad was entered in m3 instead of miles/m3:
+    # their implied price (monto/cantidad) will be ~1000× below the median.
+    # Correct by dividing cantidad by 1000 to restore the proper unit.
+    pos = gas["cantidad"] > 0
+    implied = gas.loc[pos, "monto"] / gas.loc[pos, "cantidad"]
+    threshold = implied.median() / 100
+    unit_error = pos & ((gas["monto"] / gas["cantidad"].replace(0, np.nan)) < threshold)
+    gas.loc[unit_error, "cantidad"] = gas.loc[unit_error, "cantidad"] / 1000
+
+    agg = gas.groupby("anio")[["cantidad", "monto"]].sum().reset_index()
+    # miles/m3 × 1000 → m3 → MMBTU
+    agg["expo_gas_sesco_new"] = m3_to_mmbtu_q(agg["cantidad"] * 1000)
+    return agg.rename(columns={"monto": "expo_gas_usd_sesco_new"})[
+        ["anio", "expo_gas_sesco_new", "expo_gas_usd_sesco_new"]
+    ]
+
+
 # ===== CRUDE =====
 
 def build_expo_crudo(sesco: pd.DataFrame, mecon: pd.DataFrame,
-                     indec_q: pd.DataFrame, comtrade: pd.DataFrame) -> pd.DataFrame:
+                     indec_q: pd.DataFrame, comtrade: pd.DataFrame,
+                     sesco_new: pd.DataFrame = None) -> pd.DataFrame:
     """
     Annual crude export quantities (barrels).
-    Primary: Comtrade pre-1999, SESCO post-1999.
+    Priority: new SESCO (2010+) → old SESCO (1999+) → Comtrade (pre-1999).
     """
     crudo_sesco = (
         sesco[
@@ -141,9 +208,15 @@ def build_expo_crudo(sesco: pd.DataFrame, mecon: pd.DataFrame,
     df = df.merge(comtrade[["anio", "expo_bbl"]].rename(
         columns={"expo_bbl": "expo_comtrade_crudo"}), on="anio", how="outer")
 
-    df["expo_crudo"] = np.where(df["anio"] < 1999,
-                                df.get("expo_comtrade_crudo", np.nan),
-                                df.get("expo_sesco_crudo", np.nan))
+    crudo_new = _extract_crudo_new(sesco_new if sesco_new is not None else pd.DataFrame())
+    df = df.merge(crudo_new[["anio", "expo_crudo_sesco_new"]], on="anio", how="outer")
+
+    # Priority: new SESCO → old SESCO → comtrade (pre-1999)
+    df["expo_crudo"] = np.where(
+        df["anio"] < 1999,
+        df.get("expo_comtrade_crudo", np.nan),
+        df["expo_crudo_sesco_new"].fillna(df.get("expo_sesco_crudo", np.nan)),
+    )
     df["unidad"] = "barriles"
     return df.sort_values("anio").reset_index(drop=True)
 
@@ -179,8 +252,12 @@ def build_impo_crudo(sesco: pd.DataFrame, mecon: pd.DataFrame) -> pd.DataFrame:
 
 # ===== GAS =====
 
-def build_expo_gas(sesco: pd.DataFrame, mecon: pd.DataFrame) -> pd.DataFrame:
-    """Annual gas export quantities in MMBTU."""
+def build_expo_gas(sesco: pd.DataFrame, mecon: pd.DataFrame,
+                   sesco_new: pd.DataFrame = None) -> pd.DataFrame:
+    """
+    Annual gas export quantities in MMBTU.
+    Priority: new SESCO (2010+) → old SESCO → MECON.
+    """
     gas_sesco = (
         sesco[
             sesco["producto"].str.contains("GAS|gas", na=False)
@@ -203,7 +280,16 @@ def build_expo_gas(sesco: pd.DataFrame, mecon: pd.DataFrame) -> pd.DataFrame:
         mecon[["anio", "expo_mmbtu_gas"]].rename(columns={"expo_mmbtu_gas": "expo_mecon_gas"}),
         on="anio", how="outer",
     )
-    df["expo_gas"] = df.get("expo_sesco_gas", np.nan).fillna(df.get("expo_mecon_gas", np.nan))
+
+    gas_new = _extract_gas_new(sesco_new if sesco_new is not None else pd.DataFrame())
+    df = df.merge(gas_new[["anio", "expo_gas_sesco_new"]], on="anio", how="outer")
+
+    # Priority: new SESCO → old SESCO → MECON
+    df["expo_gas"] = (
+        df["expo_gas_sesco_new"]
+        .fillna(df.get("expo_sesco_gas", np.nan))
+        .fillna(df.get("expo_mecon_gas", np.nan))
+    )
     df["unidad"] = "MMBTU"
     return df.sort_values("anio").reset_index(drop=True)
 
@@ -237,10 +323,11 @@ def build_impo_gas(sesco: pd.DataFrame, mecon: pd.DataFrame) -> pd.DataFrame:
     return df.sort_values("anio").reset_index(drop=True)
 
 
-def build_expo_usd_crudo(sesco: pd.DataFrame, indec_v: pd.DataFrame) -> pd.DataFrame:
+def build_expo_usd_crudo(sesco: pd.DataFrame, indec_v: pd.DataFrame,
+                         sesco_new: pd.DataFrame = None) -> pd.DataFrame:
     """
     Annual crude export value (USD).
-    Primary: SESCO USD; fallback INDEC.
+    Priority: new SESCO → old SESCO → INDEC.
     Used to cross-check overvaluation rent calculation.
     """
     crudo_sesco_usd = (
@@ -261,7 +348,54 @@ def build_expo_usd_crudo(sesco: pd.DataFrame, indec_v: pd.DataFrame) -> pd.DataF
         ),
         on="anio", how="outer",
     )
-    df["expo_crudo_usd"] = df["expo_crudo_sesco_usd"].fillna(df["expo_crudo_indec_usd"])
+
+    crudo_new = _extract_crudo_new(sesco_new if sesco_new is not None else pd.DataFrame())
+    df = df.merge(crudo_new[["anio", "expo_crudo_usd_sesco_new"]], on="anio", how="outer")
+
+    # Priority: new SESCO → old SESCO → INDEC
+    df["expo_crudo_usd"] = (
+        df["expo_crudo_usd_sesco_new"]
+        .fillna(df.get("expo_crudo_sesco_usd", np.nan))
+        .fillna(df.get("expo_crudo_indec_usd", np.nan))
+    )
+    df["unidad"] = "USD"
+    return df.sort_values("anio").reset_index(drop=True)
+
+
+def build_expo_usd_gas(sesco: pd.DataFrame, indec_v: pd.DataFrame,
+                       sesco_new: pd.DataFrame = None) -> pd.DataFrame:
+    """
+    Annual gas export value (USD).
+    Priority: new SESCO → old SESCO → INDEC.
+    """
+    gas_sesco_usd = (
+        sesco[
+            sesco["producto"].str.contains("GAS|gas", na=False)
+            & (sesco["variable"] == "exportacion")
+            & (sesco["unidad"] == "USD")
+        ]
+        .copy()
+    )
+    gas_sesco_usd = gas_sesco_usd.groupby("anio")["valor"].sum().reset_index()
+    gas_sesco_usd["anio"] = pd.to_numeric(gas_sesco_usd["anio"], errors="coerce")
+    gas_sesco_usd = gas_sesco_usd.rename(columns={"valor": "expo_gas_sesco_usd"})
+
+    df = gas_sesco_usd.merge(
+        indec_v[["anio", "expo_indec_gas"]].dropna().rename(
+            columns={"expo_indec_gas": "expo_gas_indec_usd"}
+        ),
+        on="anio", how="outer",
+    )
+
+    gas_new = _extract_gas_new(sesco_new if sesco_new is not None else pd.DataFrame())
+    df = df.merge(gas_new[["anio", "expo_gas_usd_sesco_new"]], on="anio", how="outer")
+
+    # Priority: new SESCO → old SESCO → INDEC
+    df["expo_gas_usd"] = (
+        df["expo_gas_usd_sesco_new"]
+        .fillna(df.get("expo_gas_sesco_usd", np.nan))
+        .fillna(df.get("expo_gas_indec_usd", np.nan))
+    )
     df["unidad"] = "USD"
     return df.sort_values("anio").reset_index(drop=True)
 
@@ -271,12 +405,14 @@ def run() -> dict:
     mecon = _load_comex_mecon()
     indec_q, indec_v = _load_indec()
     comtrade = _load_comtrade_crudo()
+    sesco_new = _load_comex_sesco_new()
 
-    expo_crudo = build_expo_crudo(sesco, mecon, indec_q, comtrade)
+    expo_crudo = build_expo_crudo(sesco, mecon, indec_q, comtrade, sesco_new)
     impo_crudo = build_impo_crudo(sesco, mecon)
-    expo_gas = build_expo_gas(sesco, mecon)
+    expo_gas = build_expo_gas(sesco, mecon, sesco_new)
     impo_gas = build_impo_gas(sesco, mecon)
-    expo_usd_crudo = build_expo_usd_crudo(sesco, indec_v)
+    expo_usd_crudo = build_expo_usd_crudo(sesco, indec_v, sesco_new)
+    expo_usd_gas = build_expo_usd_gas(sesco, indec_v, sesco_new)
 
     return dict(
         expo_crudo=expo_crudo,
@@ -285,6 +421,7 @@ def run() -> dict:
         impo_gas=impo_gas,
         indec_expo_valor=indec_v,
         expo_usd_crudo=expo_usd_crudo,
+        expo_usd_gas=expo_usd_gas,
     )
 
 

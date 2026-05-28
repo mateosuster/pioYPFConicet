@@ -1,28 +1,3 @@
----
-title: "Preprocesamiento de datos"
-author:
-- affiliation: UNGS/CONICET
-  name: Mateo Suster y Juan Kornblihtt
-output:
-  pdf_document: 
-    toc: yes
-    keep_tex: yes
-  html_document:
-    df_print: paged
-    toc: yes
-  html_notebook:
-    toc: yes
-    toc_float: yes
----
-
-<br>
-<br>
-
-<center> <h1></h1> </center> 
-
-# Inicio
-  
-```{r message=FALSE, warning=FALSE, include=FALSE}
 rm(list = ls())
 gc()
 
@@ -42,14 +17,11 @@ source("src/functiones_hidrocarburos.R")
 options(scipen = 9999999)
 
 # ---- PARÁMETROS DE SERIES ----
-YEAR_SEC_ENERGIA_UPPER <- 2015 # hasta cuándo usar Sec. Energía vs SESCO para crudo
-YEAR_EMPLEO_CORTE <- 2025 # fin de datos anuales existentes de empleo/remuneraciones
-YEAR_LAST <- 2025 # último año con datos completos
-```
+YEAR_SEC_ENERGIA_UPPER <- 2015   # hasta cuándo usar Sec. Energía vs SESCO para crudo
+YEAR_EMPLEO_CORTE      <- 2019   # fin de datos anuales existentes de empleo/remuneraciones
+YEAR_LAST              <- 2025   # último año con datos completos
 
-## IPC y TCP
 
-```{r message=FALSE, warning=FALSE, include=FALSE}
 ## Datos Auxiliares
 # Tabla para convertir los cambios de moneda
 conversor_pesos <- read_excel(here("data/conversores/conversor_peso.xlsx")) %>%
@@ -64,7 +36,7 @@ tcp_anual <- read_excel(here("data/tcp/tcp_anual.xlsx"),
 ) %>%
   rename(anio = fecha)
 
-tcp_anual_b_hist <- read_excel(here("data/tcp/tcc_tcp_historico.xlsx")) %>%
+tcp_anual_b <- read_excel(here("data/tcp/tcc_tcp_historico.xlsx")) %>%
   rename(
     tcc = `TCC exportaciones`, sobrevaluacion = `Sobrevaluación (TCP/ TCC) 1952-1972=1`,
     tcp = "TCP"
@@ -74,14 +46,6 @@ tcp_anual_b_hist <- read_excel(here("data/tcp/tcc_tcp_historico.xlsx")) %>%
     T ~ anio
   )) %>%
   select(anio, tcc, tcp, sobrevaluacion)
-
-tcp_anual_b <- tcp_anual_b_hist %>%
-  filter(anio < 1991) %>%
-  bind_rows(
-    tcp_anual %>%
-      rename(tcc = TCC, tcp = TCP) %>%
-      mutate(sobrevaluacion = tcp / tcc)
-  )
 
 
 tcc_dic_63 <- read_excel(here("data/tcp/tcc_dic_63.xlsx"))
@@ -114,33 +78,9 @@ ipc <- read_excel(here("data/indices/ipc_mensual_1963_2018.xlsx")) %>%
 
 
 
-ipc_promedio_hist <- ipc %>%
+ipc_promedio <- ipc %>%
   group_by(anio) %>%
-  summarise(ipc_03 = mean(ipc_0703))
-
-# Extend IPC beyond 2018 using ARG IPC 2004=1 from TCP_me col H (Propia sheet)
-# n_max=35 reads annual rows 1990-2024; rows after that are monthly 2025 data
-ipc_tcp <- read_excel(
-  here("update/TCP_me (2).xlsx"),
-  sheet = "Propia", col_names = FALSE, skip = 4, n_max = 35
-) %>%
-  select(anio = 1, ipc_tcp = 8) %>%
-  mutate(anio = as.integer(anio))
-
-ipc_03_en_2018 <- ipc_promedio_hist %>%
-  filter(anio == 2018) %>%
-  pull(ipc_03)
-ipc_tcp_en_2018 <- ipc_tcp %>%
-  filter(anio == 2018) %>%
-  pull(ipc_tcp)
-
-ipc_extension <- ipc_tcp %>%
-  filter(anio > 2018, anio <= YEAR_LAST) %>%
-  mutate(ipc_03 = ipc_03_en_2018 * (ipc_tcp / ipc_tcp_en_2018)) %>%
-  select(anio, ipc_03)
-
-ipc_promedio <- ipc_promedio_hist %>%
-  bind_rows(ipc_extension) %>%
+  summarise(ipc_03 = mean(ipc_0703)) %>%
   mutate(
     fecha = as.Date(parse_date_time(anio, orders = "y")),
     ipc_70 = generar_indice(
@@ -190,12 +130,10 @@ ipim_base94 <- sipm_serie56_95 %>%
 
 
 # ipc us
-# ipc_us <- read_csv(here("data/bls/cpi.csv")) %>%
-ipc_us <- read_csv(here("data/bls/CPIAUCSL.csv")) %>%
-  # extract the year from the date and calculate the average annual CPI
-  mutate(anio = year(as.Date(observation_date))) %>%
+ipc_us <- read_csv(here("data/bls/cpi.csv")) %>%
+  rename(anio = Year) %>%
   group_by(anio) %>%
-  summarise(ipc_us_20 = mean(CPIAUCSL, na.rm = T)) %>%
+  summarise(ipc_us_20 = mean(Value, na.rm = T)) %>%
   mutate(ipc_us_20 = generar_indice(
     serie = ipc_us_20,
     fecha = anio, fecha_base = 2020
@@ -203,25 +141,11 @@ ipc_us <- read_csv(here("data/bls/CPIAUCSL.csv")) %>%
 
 
 # Ganancia y pbi pesos corrientes (fuente: JIC/EM continuacion JIC)
-ganancia_y_pbi_hist <- read_excel(here("data/ccnn/ganancia y pbi.xlsx"))
-
-ganancia_y_pbi_ext <- read_excel(
-  here("update/TG General. 1993 - 2021. 18102022 (5).xlsx"),
-  sheet = "TG", col_names = FALSE, skip = 7, n_max = 29
-) %>%
-  select(anio = 1, pbi = 2, ganancia = 6) %>%
-  mutate(anio = as.integer(anio)) %>%
-  filter(anio > max(ganancia_y_pbi_hist$anio))
-
-ganancia_y_pbi <- ganancia_y_pbi_hist %>%
-  bind_rows(ganancia_y_pbi_ext) %>%
+ganancia_y_pbi <- read_excel(here("data/ccnn/ganancia y pbi.xlsx")) %>%
   mutate(unidad = "Millones de pesos corrientes") %>%
   select(anio, unidad, everything(.))
-```
 
 
-## Estimaciones de otros autores 
-```{r message=FALSE, warning=FALSE, include=FALSE}
 # Estimacion de otros autores
 # **Estimación JK**
 renta_hidrocarburos_jk <- read_excel(here("data/otros autores/renta_hidrocarburos_jk.xls"),
@@ -371,13 +295,8 @@ renta_autores <- read_csv(here("data/otros autores/renta_autores.csv"),
   )
 
 # data.table::fwrite(renta_autores, file = here("results/argentina/renta_autores.csv"))
-```
 
 
-# Variables
-## Producción
-### Petróleo crudo
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Anuario de combustibles
 prod_anuario <- read_excel(here("data/anuario_de_combustibles/Produccion_Desde_1911.xls")) %>%
   rename(
@@ -577,12 +496,8 @@ existencias_petroleo <- read_excel(here("data/secretaria_energia/existencias_cru
     existencias_crudo = conversor_m3bbl_q(existencias_crudo),
     unidad = "barriles"
   )
-```
 
 
-
-### Gas natural
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Base MECON
 prod_mecon_gas <- hidrocarburos_base_mecon %>%
   filter(
@@ -707,27 +622,18 @@ prod_merge_gas_bep <- prod_merge_gas_MMBTU %>%
   mutate_all(conversor_MMBTUbep_q) %>%
   ungroup() %>%
   mutate(unidad = "BEP")
-```
 
 
-### Produccion total, en barriles equivalentes de petróleo
-```{r}
 produccion_total <- prod_merge_gas_bep %>%
   select(anio, unidad, prod_gas) %>%
   left_join(prod_merge_crudo %>%
     select(anio, unidad, prod_crudo) %>% mutate(unidad = "BEP")) %>%
   mutate(produccion_total_bep = prod_crudo + prod_gas)
-```
 
 
-```{r message=FALSE, warning=FALSE, include=FALSE}
 ## Crudo procesado
-```
 
 
-## Precio del mercado interno
-###  Petróleo crudo
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Memorias de YPF
 vtas_precio_memo_ypf_crudo <- read_excel(here("data/ypf/vtas_valor_cantidad_precio_crudo.xlsx")) %>%
   rename(
@@ -747,7 +653,7 @@ vtas_precio_memo_ypf_crudo <- read_excel(here("data/ypf/vtas_valor_cantidad_prec
   )
 
 # Base MECON
-precio_mi_mecon_crudo_hist <- hidrocarburos_base_mecon %>%
+precio_mi_mecon_crudo <- hidrocarburos_base_mecon %>%
   filter(
     indicador == lista_filtro[2],
     actividad_producto_nombre == "Petróleo crudo",
@@ -757,23 +663,6 @@ precio_mi_mecon_crudo_hist <- hidrocarburos_base_mecon %>%
   group_by(anio) %>%
   summarise(precio_mi_mecon_crudo = mean(valor)) %>%
   mutate(unidad = "USD/m3")
-
-precio_mi_mecon_crudo <- precio_mi_mecon_crudo_hist %>%
-  bind_rows(
-    read_csv(here("update/hidrocarburos.csv"),
-      locale = locale(encoding = "ISO-8859-1")
-    ) %>%
-      filter(
-        indicador == "Precio interno_promedios ponderados por volumen de venta",
-        actividad_producto_nombre == "Petróleo crudo",
-        alcance_tipo == "PAIS"
-      ) %>%
-      mutate(anio = year(as.Date(indice_tiempo))) %>%
-      filter(anio > max(precio_mi_mecon_crudo_hist$anio)) %>%
-      group_by(anio) %>%
-      summarise(precio_mi_mecon_crudo = mean(as.double(valor))) %>%
-      mutate(unidad = "USD/m3")
-  )
 
 
 # MECON / CUENTAS NACIONALES
@@ -901,12 +790,8 @@ precio_mi_crudo <- precio_mi_crudo %>%
     -c(ipim_nivel_gral_94, idee_estimado, mecon_estimado, indice_ypf_72, idee_estimado)
   ) %>%
   filter(anio <= YEAR_LAST)
-```
 
 
-
-### Gas natural
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Anuario YPF
 vtas_precio_memo_ypf_gas <- read_excel(here("data/ypf/vtas_valor_cantidad_precio_gas.xlsx")) %>%
   rename(cant_vendidad = "m3", valor_vendido = "$", moneda = "Moneda") %>%
@@ -942,7 +827,7 @@ anuario_de_combustible <- read_excel(here("data/anuario_de_combustibles/anuario 
   )
 
 # Base MECON
-precios_internos_mecon_gas_hist <- hidrocarburos_base_mecon %>%
+precios_internos_mecon_gas <- hidrocarburos_base_mecon %>%
   filter(
     indicador == lista_filtro[2],
     actividad_producto_nombre == "Gas natural",
@@ -952,23 +837,6 @@ precios_internos_mecon_gas_hist <- hidrocarburos_base_mecon %>%
   group_by(anio) %>%
   summarise(precio_mi_mecon_gas = mean(valor)) %>%
   mutate(unidad = "ars/Miles de m3")
-
-precios_internos_mecon_gas <- precios_internos_mecon_gas_hist %>%
-  bind_rows(
-    read_csv(here("update/hidrocarburos.csv"),
-      locale = locale(encoding = "ISO-8859-1")
-    ) %>%
-      filter(
-        indicador == "Precio interno_promedios ponderados por volumen de venta",
-        actividad_producto_nombre == "Gas natural",
-        alcance_tipo == "PAIS"
-      ) %>%
-      mutate(anio = year(as.Date(indice_tiempo))) %>%
-      filter(anio > max(precios_internos_mecon_gas_hist$anio)) %>%
-      group_by(anio) %>%
-      summarise(precio_mi_mecon_gas = mean(as.double(valor))) %>%
-      mutate(unidad = "ars/Miles de m3")
-  )
 
 
 ## Base regalias
@@ -1040,7 +908,7 @@ precio_mi_idee_gas <- read_excel(here("data/idee/Precios del gas natural y deriv
 # Merge
 precio_mi_gas <- precio_regalias_mi_gas %>%
   select(anio, unidad, precio_mi_regalias_gas) %>%
-  right_join(precios_internos_mecon_gas) %>%
+  left_join(precios_internos_mecon_gas) %>%
   full_join(vtas_precio_memo_ypf_gas %>%
     select(anio, unidad, precio_mi_ypf_gas)) %>%
   left_join(precio_mi_idee_gas %>%
@@ -1061,8 +929,7 @@ precio_mi_gas <- precio_regalias_mi_gas %>%
       # anio %in% 1963:1969|anio %in% 1989:1992 ~
       #     precio_mi_ypf_gas,
       anio %in% 1970:1988 ~ precio_mi_idee_indexado,
-      anio %in% 1992:2021 ~ precio_mi_regalias_gas,
-      anio > 2021 ~ precio_mi_mecon_gas,
+      anio > 1992 ~ precio_mi_regalias_gas,
       T ~ NA_real_
     )
   ) %>%
@@ -1128,23 +995,31 @@ precio_interno_gas_mmbtu_usd <- precio_mi_gas_MMBTU %>%
 #   ggplot(aes(anio, valor, color = variable))+
 #   geom_line()
 # graf_mi_gas
-```
 
 
-## Precios de Referencia del Mercado Mundial
-#### Petróleo crudo
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Base regalias
-precio_me_regalias_crudo <- read_excel(
-  here("update/Regalias_CRUDO/Informe Regalias CRUDO.xlsx"),
-  sheet = "Tabla precios",
-  skip = 12
+precio_me_regalias_crudo <- read_delim(here("data/secretaria_energia/regalias/precio_mercado_externo_crudo_regalias.csv"),
+  ";",
+  escape_double = FALSE, trim_ws = TRUE
 ) %>%
-  rename(anio = "AÑO", mes = MES, total_tipo_crudo = "TOTAL PROVINCIA") %>%
-  fill(anio) %>%
-  filter(!is.na(total_tipo_crudo), total_tipo_crudo != 0) %>%
-  group_by(anio) %>%
-  summarise(precio_total_tipo_crudo = mean(total_tipo_crudo, na.rm = TRUE)) %>%
+  rename(
+    anio = "AÑO",
+    mes = "MES",
+    total_tipo_crudo = "TOTAL TIPO DE CRUDO"
+  ) %>%
+  mutate(
+    unidad = "USD/m3",
+    anio = na.locf(anio)
+  ) %>%
+  select(anio, mes, unidad, total_tipo_crudo, everything(.), -c(BRENT, WTI)) %>%
+  gather(.,
+    key = "tipo_crudo",
+    value = "valor",
+    5:ncol(.)
+  ) %>%
+  group_by(anio, unidad) %>%
+  summarise(precio_total_tipo_crudo = mean(total_tipo_crudo)) %>%
+  # precio_promedio_tipo_crudo = mean(valor))%>%
   mutate(
     tipo_precio = "mercado externo",
     precio_total_tipo_crudo = conversor_m3bbl_p(precio_total_tipo_crudo),
@@ -1159,13 +1034,13 @@ precio_exportacion_crudo <- read_excel(here("data/mecon/precio-exportacion-crudo
 
 # INDEC ComEx
 precio_expo_indec <- read_csv(here("data/indec/precio_anual_promedio_expo_hidro_indec.csv"), col_types = cols(X1 = col_skip())) %>%
-  left_join(tcp_anual_b %>% select(-tcp)) %>%
+  left_join(tcp_anual %>% select(-TCP)) %>%
   mutate(
-    precio_expo_gas_indec = (precio_expo_gas_indec) * tcc,
+    precio_expo_gas_indec = (precio_expo_gas_indec) * TCC,
     unidad_gas = "ars/Miles de m3"
   ) %>%
   filter(anio %in% c(2002:2004), unidad == "ars/Miles de m3")
-# mutate(precio_expo_gas_indec = precio_expo_gas_indec * tcc,
+# mutate(precio_expo_gas_indec = precio_expo_gas_indec * TCC,
 #        unidad = case_when(unidad == "USD/Miles de m3" ~ "ars/Miles de m3",
 #                           T ~ unidad))
 
@@ -1223,22 +1098,20 @@ expo_crudo_sitc <- read_csv(here("data/un_comtrade/expo_crudo_sitc.csv")) %>%
 # Merge bases
 precio_expo_crudo <- expo_crudo_sitc %>%
   select(anio, unidad = unidad_precio, precio_expo_comtrade_sitc_crudo) %>%
-  right_join(precio_me_regalias_crudo %>%
+  left_join(precio_me_regalias_crudo %>%
     rename(precio_expo_regalias_crudo = precio_total_tipo_crudo) %>%
     select(-tipo_precio)) %>%
   left_join(precios_mecon %>%
     select(anio, precio_expo_mecon_crudo = precio_crudo_me_usd_bbl)) %>%
   left_join(precio_expo_indec %>%
     select(-c(precio_expo_gas_indec, unidad_gas))) %>%
-  right_join(expo_crudo_uncomtrade_hs %>%
+  left_join(expo_crudo_uncomtrade_hs %>%
     select(anio, unidad = unidad_precio, precio_expo_comtrade_hs_crudo)) %>%
   arrange(anio) %>%
-  select(anio, unidad, everything(.), -tcc)
-tail(precio_expo_crudo)
-```
+  select(anio, unidad, everything(.), -TCC)
+precio_expo_crudo
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 ### Precio Referencia Mercado Externo Crudo
 # Brent
 brent_a <- read_excel(here("data/precios_mundiales/brent.xlsx"),
@@ -1340,10 +1213,8 @@ brent_rentencion_14 <- brent_daily %>%
     brent_spot = mean(brent_spot),
     retencion = mean(retencion)
   )
-```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Precio de exportacion y referencia. Merge de bases
 precios_referencia_y_expo_crudo <- precio_expo_crudo %>%
   full_join(brent) %>% # select(-dif)) %>%
@@ -1363,29 +1234,41 @@ precios_referencia_y_expo_crudo <- precio_expo_crudo %>%
     )
   ) %>%
   select(anio, unidad, precio_me_crudo, everything(.)) %>%
-  arrange(anio)
-tail(precios_referencia_y_expo_crudo)
-summary(precios_referencia_y_expo_crudo)
-```
+  arrange(anio) %>%
+  filter(anio <= YEAR_LAST)
 
-#### Gas natural
-##### Exportación Argentina
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+
 ### Precio de Exportación del Gas
 # regalias
-precio_expo_regalias_gas <- read_excel(
-  here("update/Regalias_GAS/Informe Regalias GAS.xlsx"),
-  sheet = "Tabla precios",
-  skip = 12
+precio_expo_regalias_gas <- read_delim(here("data/secretaria_energia/regalias/precio_mercado_externo_gas_regalias.csv"),
+  ";",
+  escape_double = FALSE, trim_ws = TRUE
 ) %>%
-  rename(anio = `AÑO`, mes = MES, total_cuenca = `TOTAL PROVINCIA`) %>%
-  fill(anio) %>%
-  filter(!is.na(total_cuenca), total_cuenca != 0) %>%
-  group_by(anio) %>%
-  summarise(precio_expo_gas_regalias = mean(total_cuenca, na.rm = TRUE)) %>%
-  mutate(unidad = "ars/Miles de m3") %>%
+  rename(
+    anio = "AÑO",
+    mes = "MES",
+    total_cuenca = "TOTAL CUENCA"
+  ) %>%
+  mutate(
+    unidad = "ars/Miles de m3",
+    anio = na.locf(anio)
+  ) %>%
+  select(anio, mes, unidad, everything(.)) %>%
+  gather(.,
+    key = "cuenca",
+    value = "valor",
+    4:ncol(.)
+  ) %>%
+  group_by(anio, unidad, cuenca) %>%
+  mutate(
+    valor = gsub(",", "", valor),
+    valor = as.double(valor)
+  ) %>%
+  summarise(precio_expo_gas_regalias = mean(valor, na.rm = T)) %>%
+  mutate(tipo_precio = "mercado externo") %>%
+  filter(cuenca == "total_cuenca") %>%
   arrange(anio)
-tail(precio_expo_regalias_gas)
+
 # comtrade
 expo_gas_comtrade <- read_csv(here("data/un_comtrade/expo_gas_sitc.csv")) %>%
   left_join(tcp_anual_b %>% select(anio, tcc)) %>%
@@ -1401,9 +1284,9 @@ precio_expo_gas <- expo_gas_comtrade %>%
   mutate(unidad = "ars/Miles de m3") %>%
   select(anio, unidad, precio_expo_gas_comtrade = expo_precio_Mm3_ars) %>%
   filter(anio %in% c(1970, 1979)) %>%
-  # full_join(precio_expo_regalias_gas) %>%
-  right_join(precio_expo_regalias_gas) %>%
-  left_join(precio_expo_indec %>%
+  full_join(precio_expo_regalias_gas %>%
+    select(-c(cuenca, tipo_precio))) %>%
+  full_join(precio_expo_indec %>%
     select(anio, unidad = unidad_gas, precio_expo_gas_indec) %>%
     filter(!(is.na(precio_expo_gas_indec)))) %>%
   full_join(precios_mecon %>%
@@ -1413,29 +1296,25 @@ precio_expo_gas <- expo_gas_comtrade %>%
 # precios en dolares
 precio_expo_gas_usd <- expo_gas_comtrade %>%
   select(anio, precio_expo_gas_comtrade = expo_precio_MMBTU) %>%
-  right_join(precio_expo_gas %>% select(-c(precio_expo_gas_comtrade, unidad)), by = "anio") %>%
-  left_join(tcp_anual_b %>% select(-tcp)) %>%
+  left_join(precio_expo_gas %>% select(-c(precio_expo_gas_comtrade, unidad)), by = "anio") %>%
+  left_join(tcp_anual %>% select(-TCP)) %>%
   mutate(
-    precio_expo_gas_regalias = (precio_expo_gas_regalias / 1000) / tcc,
-    precio_expo_gas_indec = (precio_expo_gas_indec) / tcc,
-    precio_expo_gas_mecon = (precio_expo_gas_mecon / 1000) / tcc,
+    precio_expo_gas_regalias = (precio_expo_gas_regalias / 1000) / TCC,
+    precio_expo_gas_indec = (precio_expo_gas_indec) / TCC,
+    precio_expo_gas_mecon = (precio_expo_gas_mecon / 1000) / TCC,
     unidad = "USD/MMBTU"
   ) %>%
   mutate_at(
     .vars = c("precio_expo_gas_regalias", "precio_expo_gas_indec", "precio_expo_gas_mecon"),
     .funs = conversor_m3MMBTU_p
   ) %>%
-  select(anio, unidad, everything(.), -tcc)
-tail(precio_expo_gas_usd)
-```
+  select(anio, unidad, everything(.), -TCC)
 
-##### Referencias mundiales
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+
 ### Precio Referencia Mercado Externo Gas
 #### Precios Mundiales
 # henry_hub EIA
-# henry_hub <- read_excel(here("data/eia/RNGWHHDd.xls"),
-henry_hub <- read_excel(here("update/RNGWHHDd.xls"),
+henry_hub <- read_excel(here("data/eia/RNGWHHDd.xls"),
   sheet = "Data 1", skip = 2
 ) %>%
   rename(
@@ -1450,9 +1329,10 @@ henry_hub <- read_excel(here("update/RNGWHHDd.xls"),
   summarise(eia_henry_hub_spot = mean(henry_hub_spot, na.rm = T))
 
 henry_hub_ars <- henry_hub %>%
-  left_join(tcp_anual_b %>% select(anio, tcc)) %>%
+  left_join(tcp_anual %>%
+    select(anio, TCC)) %>%
   mutate(
-    henry_hub_spot = conversor_MMBTUm3gas_p(eia_henry_hub_spot * 1000 * tcc),
+    henry_hub_spot = conversor_MMBTUm3gas_p(eia_henry_hub_spot * 1000 * TCC),
     unidad = "ars/Miles de m3"
   )
 
@@ -1574,11 +1454,8 @@ fmi_gas_price <- fmi_prices %>%
     fmi_natural_gas_eu = fmi_natural_gas_eu * bp_gas_2016$bp_gas_netherlands_ttf,
     unidad = "USD/MMBTU"
   )
-```
 
 
-##### Bolivia
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 #### Precio de importación de Bolivia
 # Precio impo bolivia revista IDEE
 # precio bolivia vs precios internos
@@ -1678,10 +1555,8 @@ gas_expo_bolivia_comtrade <- gas_expo_bolivia_comtrade_usd %>%
     precio_expo_gas_bolivia = precio_expo_gas_bolivia * tcc,
     unidad_precio = "ars/Miles de m3"
   )
-```
 
-##### Todos los precios
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+
 # Precio de exportacion y referencia de Gas. Merge de bases
 
 # precios en usd
@@ -1697,12 +1572,11 @@ precio_mdomundial_gas_MMBTU <- price_eeuu_MMBTU %>%
       precio_expo_gas_bolivia_arg_comtrade = precio_expo_gas_bolivia_arg_MMBTU_comtrade
     )) %>%
   left_join(precio_idee_impo_gas %>% select(anio, precio_gas_bolivia_usd_idee)) %>%
-  right_join(precio_expo_gas_usd) %>%
+  left_join(precio_expo_gas_usd) %>%
   mutate(
     precio_impo_gas_bolivia_idee = conversor_m3MMBTU_p(precio_gas_bolivia_usd_idee / 1000), # ok
     precio_externo_gas = case_when(
-      anio %in% 1966:2019 ~ precio_impo_gas_arg_bolivia_comtrade,
-      anio > 2019 ~ precio_expo_gas_regalias,
+      anio < 1966 ~ precio_impo_gas_arg_bolivia_comtrade,
       T ~ precio_expo_gas_bolivia_arg_comtrade
     ),
     precio_exportacion_gas_ar = case_when(
@@ -1763,11 +1637,8 @@ comparacion_precios <- precio_mdomundial_gas_MMBTU %>%
   select(anio, unidad, precio_externo_gas) %>%
   left_join(precio_interno_gas_mmbtu_usd %>%
     select(anio, unidad, precio_gas_mdoint))
-```
 
 
-
-```{r}
 precio_crudo_vs_gas <- precio_mdomundial_gas_bep %>%
   select(anio, unidad, precio_externo_gas) %>%
   left_join(precios_referencia_y_expo_crudo %>%
@@ -1793,13 +1664,8 @@ precio_crudo_vs_gas
 
 # ggplotly(graf, width = 800, length=600)
 # graf
-```
 
 
-
-## Comercio exterior
-#### Exportaciones de crudo
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 ### SESCO
 # cantidades. post 2010 (hasta 2019)
 importaciones_exportaciones <- read_csv(here("data/secretaria_energia/sesco/importaciones-exportaciones.csv"))
@@ -2033,10 +1899,8 @@ expo_usd_crudo <- comex_crudo_sesco %>%
   arrange(anio) %>%
   group_by(anio, unidad) # %>%
 # mutate_all(function(x) {x/10^6})
-```
 
-#### Importaciones de crudo
-```{r}
+
 impo_crudo <- comex_crudo_sesco %>%
   filter(variable == "importacion", unidad != "ton") %>%
   mutate(
@@ -2065,12 +1929,8 @@ impo_crudo <- comex_crudo_sesco %>%
       fuente = "MECON",
       variable = "Importación de petróleo crudo", producto = "crudo", unidad = "barriles"
     ))
-```
 
 
-
-#### Exportaciones de gas natural
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # SESCO
 comex_gas <- comercio_exterior %>%
   filter(
@@ -2170,10 +2030,8 @@ expo_usd_gas <- expo_sesco_usd_gas %>%
   )) %>%
   select(anio, unidad, expo_gas, everything(.)) %>%
   arrange(anio)
-```
 
-#### Importaciones de gas natural
-```{r}
+
 impo_gas <- comex_gas %>%
   filter(variable == "importacion", unidad != "ton") %>%
   mutate(
@@ -2203,11 +2061,8 @@ impo_gas <- comex_gas %>%
       fuente = "MECON", valor = valor * 1e6,
       variable = "Importación de gas natural", producto = "gas", unidad = "m3"
     ))
-```
 
 
-## Retenciones
-```{r echo=FALSE}
 retenciones_campodonico <- read_excel(here("data/afip/retenciones.xlsx"),
   sheet = "usd"
 ) %>%
@@ -2229,12 +2084,8 @@ retenciones_crudo <- read_excel(here("data/afip/retenciones.xlsx")) %>%
   ) %>%
   select(-ipc08_bfr) %>%
   left_join(retenciones_campodonico)
-```
 
 
-
-## Regalías
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # regalias Sec de Energia
 # filtro con productos
 productos <- list("crudo", "gas", "gasolina", "glp")
@@ -2326,10 +2177,8 @@ regalias_usd <- regalias %>%
     unidad = "USD"
   ) %>%
   select(-c(regalias_total, tcc))
-```
 
-## Subsidios
-```{r}
+
 # CEFIP cont et al. Subsidios como % del PBI
 subsidios_cefip <- read_excel(here("data/cefip/subsidios.xlsx")) %>%
   gather(
@@ -2373,11 +2222,8 @@ subsidios_hidrocarburos <- subsidios_ejes %>%
   mutate(unidad = "Pesos corrientes")
 # x = subsidios_cefip/subsidios_ejes)
 subsidios_hidrocarburos
-```
 
 
-## Empleo, remuneraciones y masa salarial
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # anuarios CEPAL
 cepal_1991 <- read_excel(here("data/cepal/cepal_1991.xlsx")) %>%
   mutate(
@@ -2648,13 +2494,8 @@ empleo_y_remuneraciones <- masa_salarial_ccnn %>%
     variable = paste(variable, sector, sep = " - ")
   ) %>%
   select(-c(sector, var))
-```
 
 
-
-
-## Activos
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # BOLSAR
 # segmentos de YPF y Petrobras
 ypf_seg <- read_delim(here("data/ypf/ypf_segmentos.csv"),
@@ -2760,10 +2601,8 @@ stock_balances_rama <- stock_balances_empresas %>%
 #        variable = "KTA") %>%
 # rename(extraccion = produccion) %>%
 # select(anio, variable, moneda, everything(.))
-```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 ####################################
 # Tasas de depreciacion
 # AFIP
@@ -2901,19 +2740,13 @@ stock_ypf <- balance_ypf %>%
       sector == "YPF",
       variable %in% c("KTA", "activo", "ppye")
     ))
-```
 
-### Stock total de la rama 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+
 # Stock de la rama
 stock_rama <- stock_afip %>%
   bind_rows(stock_balances_rama)
-```
 
 
-
-##### YPF
-```{r}
 # metros perforados
 metros_perforados_posterior_al_2009 <- read_csv(here("data/secretaria_energia/sesco/metros-perforados.csv"),
   col_types = cols(indice_tiempo = col_date(format = "%Y-%m"))
@@ -2941,10 +2774,8 @@ listado_pozos <- read_csv(here("data/secretaria_energia/cap_iv/listado-de-pozos-
   group_by(anio_terminacion_pozo, idempresa, empresa) %>%
   summarise(pozos = n()) %>%
   filter(!is.na(anio_terminacion_pozo))
-```
 
 
-```{r}
 ppye_ypf <- ypf_seg %>%
   filter(sector == "upstream") %>%
   mutate(anio = year(fecha)) %>%
@@ -2990,10 +2821,8 @@ ppye_ypf_tasas <- ppye_ypf %>%
 
 # GGally::ggpairs(ppye_ypf_tasas, lower = list(continuous = "smooth"))
 # plot(ppye_ypf_tasas)
-```
 
 
-```{r}
 # años bases
 anio_base_ypf_segmento <- ppye_ypf$activo_upstream[ppye_ypf$anio == 2006]
 
@@ -3021,11 +2850,8 @@ stock_y_pozos_ypf <- ppye_ypf %>%
 #   ggplot(aes(anio,valor , color = estimacion))+
 #   geom_line()+
 #   labs(y= "Millones de pesos de 2018", title = "Estimacion de Activo usptream y PPyE de YPF a partir de indice de pozos")
-```
 
-###### PPyE y activo upstream total rama a partir de YPF
 
-```{r}
 pozos_yfp_sobre_total <- listado_pozos %>%
   rename(anio = anio_terminacion_pozo) %>%
   group_by(anio) %>%
@@ -3061,12 +2887,8 @@ estimacion_ppye_total_via_ypf <- stock_y_pozos_ypf %>%
 #   geom_line()+
 #   labs(y= "Millones de pesos de 2018",
 #        title = "Estimacion de Activo usptream y PPyE total a partir de ampliación de pozos YPF")
-```
 
 
-
-# Valor total de la producción  
-```{r message=FALSE, warning=FALSE, include=FALSE}
 # MIP 97
 # coeficientes de requerimientos directos
 
@@ -3124,12 +2946,8 @@ var((read_csv(here("data/balances/balances_arg.csv"),
   filter(empresa == "YPF") %>%
   group_by(fecha) %>%
   summarise(tasa_depreciacion = mean(depreciaciones / ppye)))$tasa_depreciacion)
-```
 
 
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 # CCNN (datos oficiales)
 ## Base minería
 ccnn_oficial <- read_excel(here("data/mecon/base-mineria-e-hidrocarburos cuentas nacionales.xls"), sheet = "Cuentas Nacionales", skip = 5) %>%
@@ -3316,11 +3134,8 @@ coef_consumo_intermedio <- coef_consumo_intermedio %>%
   # coef_ci = imputeTS::na.interpolation(coef_ci, option = "linear" )) %>%
   select(anio, coef_ci)
 coef_consumo_intermedio
-```
 
-### Estimaciones propias 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 stock_estimado <- read.csv(here("data/balances/stock_estimado(temporal).csv"))
 
 # variables para la estimación
@@ -3336,10 +3151,10 @@ precios_y_cantidades <- prod_merge_crudo %>%
     select(anio, unidad_precio_crudo = unidad, precio_crudo_mdoint), by = "anio") %>%
   left_join(precios_referencia_y_expo_crudo %>%
     select(anio, unidad_precio_crudo = unidad, precio_me_crudo), by = c("anio", "unidad_precio_crudo")) %>%
-  right_join(prod_merge_gas_MMBTU %>%
+  left_join(prod_merge_gas_MMBTU %>%
     select(anio, unidad_cant_gas = unidad, prod_gas), by = "anio") %>%
   left_join(expo_q_gas_MMBTU %>% select(anio, unidad_cant_gas = unidad, expo_gas)) %>%
-  right_join(precio_mdomundial_gas_MMBTU %>%
+  left_join(precio_mdomundial_gas_MMBTU %>%
     select(anio, unidad_precio_gas = unidad, precio_externo_gas, precio_exportacion_gas_ar), by = "anio") %>%
   left_join(precio_interno_gas_mmbtu_usd %>%
     select(anio, precio_gas_mdoint)) %>%
@@ -3438,10 +3253,8 @@ empalme_ccnn <- ccnn_oficial %>%
   mutate(pv = ebe_extr - consumo_k_fijo - (vbp_tot * imp_prom_97))
 
 empalme_ccnn
-```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 ## Criterio propio
 criterio_propio <- precios_y_cantidades %>%
   left_join(empalme_ccnn %>%
@@ -3463,11 +3276,8 @@ criterio_propio <- precios_y_cantidades %>%
     fuente = "Criterio propio", unidad = "Millones de pesos corrientes",
     pv = ebe_tot - consumo_k_fijo - (vbp_tot * imp_prom_97)
   )
-```
 
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 filtro <- c(
   "anio", "unidad", "fuente", "vbp_tot", "vbp_extr",
   "ci_tot", "ci_extr", "ms_tot", "ms_extr",
@@ -3490,13 +3300,8 @@ valor_total_produccion <- valor_total_produccion_corr %>%
 
 
 write.csv(valor_total_produccion, file = here("results/data_viz/valor_total_produccion.csv"), row.names = F)
-```
 
 
-
-
-# Tasa de ganancia y renta apropiada por las empresas
-```{r message=FALSE, warning=FALSE, include=FALSE}
 # levanto data sets de otro R markdown
 balances_arg <- read_csv(here("data/balances/balances_arg.csv"),
   col_types = cols(fecha = col_date(format = "%Y-%m-%d"), X1 = col_skip())
@@ -3509,10 +3314,8 @@ petrobras_arg_segmentos <- read_csv(here("data/balances/petrobras_arg_segmentos.
 ypf_segmentos <- read_csv(here("data/ypf/ypf_segmentos.csv"),
   col_types = cols(X1 = col_skip())
 )
-```
 
-## Rentabilidad total de la rama
-```{r echo=FALSE, message=FALSE, warning=FALSE   ,fig.width=10, fig.height=5}
+
 tasa_ganancia_rama <- empalme_ccnn %>%
   distinct() %>%
   filter(anio > 1997) %>%
@@ -3578,11 +3381,8 @@ graf_tg_rama_2 <- tasa_ganancia_rama_stock %>%
   labs(title = "Tasa de ganancia hidrocarburífera con PPyE a partir de stock de pozos (1960 - 2018)")
 # ggplotly(graf_tg_rama_2, width = 800, height = 600)
 graf_tg_rama_2
-```
 
 
-## Renta apropiada por las empresas de la rama
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 tg_industrial <- read_delim(here("data/ccnn/tg_industrial.csv"),
   ";",
   escape_double = FALSE, trim_ws = TRUE
@@ -3604,11 +3404,8 @@ renta_tg <- tasa_ganancia_rama %>%
     renta_con_tg_union = ppye * (tg_hidrocarburos - union_tg)
   ) %>%
   distinct()
-```
 
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 renta_empresas_balances <- read_csv(here("data/balances/renta_empresa.csv"),
   col_types = cols(X1 = col_skip())
 )
@@ -3642,12 +3439,8 @@ renta_produccion_balances <- renta_empresas_balances %>%
 #   facet_wrap(~sector)
 #
 # ggplotly(graf_renta_emp, width = 600, height = 400)
-```
 
 
-
-
-```{r echo=FALSE}
 ejercicio <- valor_total_produccion %>%
   filter(variable == "va_tot") %>%
   # full_join(stock_rama %>%
@@ -3675,12 +3468,8 @@ ejercicio <- valor_total_produccion %>%
 #   facet_wrap(~activos)
 #
 #   ggplotly(graf_relacion, width = 600, height = 400)
-```
 
 
-
-# Renta por el diferencial de precios entre el mercado interno y las referencias internacionales 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 renta_dif_precios_crudo <- prod_merge_crudo %>%
   # filter(anio > 1990) %>%
   select(anio, unidad, prod_crudo) %>%
@@ -3719,10 +3508,8 @@ renta_dif_precios_crudo <- prod_merge_crudo %>%
     # renta_abaratamiento_sobrevaluacion_crudo = renta_abaratamiento_sobrevaluacion,
     renta_dif_precios_crudo, renta_dif_precios_brent
   )
-```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
 renta_diferencial_precios_gas <- prod_merge_gas_MMBTU %>%
   select(anio, unidad, prod_gas) %>%
   left_join(expo_q_gas_MMBTU %>% select(anio, unidad, expo_gas)) %>%
@@ -3754,10 +3541,8 @@ renta_diferencial_precios_gas <- prod_merge_gas_MMBTU %>%
     unidad_renta, renta_dif_precios_gas, renta_abaratamiento_sobrevaluacion_gas = renta_abaratamiento_sobrevaluacion
   )
 renta_diferencial_precios_gas
-```
 
-# Renta apropiada por sobrevaluación cambiaria
-```{r echo=FALSE}
+
 renta_tcp_crudo <- renta_dif_precios_crudo %>%
   left_join(expo_usd_crudo %>%
     select(anio, expo_crudo_usd = expo_crudo, unidad_expo = unidad)) %>%
@@ -3787,20 +3572,12 @@ renta_tcp_gas <- renta_diferencial_precios_gas %>%
     tcc, tcp, unidad_renta,
     renta_sobrevaluacion_gas
   )
-```
 
 
-# Renta apropiada por el Estado mediante impuestos específicos
-```{r echo=FALSE}
 retenciones_regalias <- regalias %>%
   left_join(retenciones_crudo %>% select(-c(retenciones_crudo_bfr, retenciones_hc)))
-```
 
 
-
-# Renta Hidrocarburífera Total. En precios constantes, sobre Plusvalía Total y PBI
-## Método directo (a partir de descuentos sobre el VBP)
-```{r echo=FALSE}
 # knitr::opts_chunk$set(echo= TRUE,fig.width = 120,fig.height = 400)
 renta_directo <- renta_tg %>%
   filter(stock_seleccionado == "Bolsar") %>%
@@ -3840,11 +3617,8 @@ renta_directo_pbi <- renta_directo %>%
     renta_pv = (renta_total * ipc_18) / ganancia,
     renta_pbi = (renta_total * ipc_18) / pbi
   )
-```
 
 
-## Método indirecto (suma de mecanismos)
-```{r echo=FALSE}
 renta_indirecto <- renta_dif_precios_crudo %>%
   # select(anio,renta_dif_precios_crudo, renta_dif_precios_brent ) %>%
   select(anio, renta_dif_precios_crudo) %>%
@@ -3906,12 +3680,8 @@ renta_indirecto <- renta_dif_precios_crudo %>%
   # select(-renta_dif_precios_brent) %>%
   distinct() %>%
   filter(anio > 1960)
-```
 
 
-
-## Costos
-```{r}
 # estimacion costos propia
 costos <- produccion_total %>%
   select(anio,
@@ -3965,10 +3735,8 @@ costos <- produccion_total %>%
 # (produccion x precio internacional - costos_totales) / barriles BOE = gcia + renta por barril
 # expresar en usd tcc y tcp
 # costos
-```
 
-# Comparación con estimación de otros autores
-```{r}
+
 # renta usd vs autores
 # falta agregar renta_hidrocarburos_jk
 renta_comparacion <- renta_indirecto %>%
@@ -4014,24 +3782,16 @@ renta_comparacion <- renta_indirecto %>%
   left_join(tcp_anual_b) %>%
   left_join(ipc_us) %>%
   mutate(valor = ((valor * tcc) / tcp) / ipc_us_20)
-```
 
 
-# Exportacion de resultados
-## Preprocesamiento
-
-```{r}
 t1 <- Sys.time()
 delta <- as.numeric(t1 - t0, units = "secs") # calculo la diferencia de tiempos
 print(delta)
-```
-```{r}
+
+
 write.csv(tasa_ganancia_rama_stock, here("results/argentina/tasa_ganancia_rama_stock.csv"), row.names = FALSE)
-```
 
 
-
-```{r include=FALSE}
 library(data.table)
 
 ## Exportación de resultados
@@ -4223,10 +3983,8 @@ impo_gas_dt[, unidad := fcase(
 #                           unidad == "USD", valor)]
 # impo_gas[, unidad := fcase(unidad == "m3", "m3/d" ,
 #                            unidad == "USD", "USD")]     # CONVERSION A m3/dia
-```
 
 
-```{r include=FALSE}
 # Precio crudo Mdo interno
 precio_mi_crudo <- as.data.table(precio_mi_crudo)
 precio_mi_crudo[, variable := "Precio del mercado interno del petróleo crudo"]
@@ -4838,11 +4596,8 @@ setnames(
   ),
   c("Q_total", "KTc", "P_ext", "KTCGnorm", "Pcost", "Pp", "PvtaPot")
 )
-```
 
 
-## Exportación
-```{r include=FALSE}
 # concatenacion de all data
 all_raw_data <- rbindlist(list(
   prod_merge_crudo, prod_merge_gas_MMBTU,
@@ -4917,10 +4672,3 @@ print("El código terminó de correr")
 t2 <- Sys.time()
 delta <- as.numeric(t2 - t0, units = "secs") # calculo la diferencia de tiempos
 print(delta)
-```
-
-
-
-
-
-

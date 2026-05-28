@@ -45,7 +45,11 @@
       "Bash(rtk pip *)",
       "Bash(/mnt/c/Users/mateo/Documents/data/repos/pioYPFConicet/.venv/Scripts/python.exe *)",
       "Bash(.venv/Scripts/python.exe *)",
-      "Bash(xargs grep -l \"unidad.*=.*barriles\\\\|unidad.*=.*MMBTU\")"
+      "Bash(xargs grep -l \"unidad.*=.*barriles\\\\|unidad.*=.*MMBTU\")",
+      "Bash(Get-ChildItem *)",
+      "Bash(python -c ' *)",
+      "Bash(python *)",
+      "PowerShell(cd \"C:\\\\Users\\\\mateo\\\\Documents\\\\data\\\\repos\\\\pioYPFConicet\"; .\\\\.venv\\\\Scripts\\\\python.exe src\\\\preproc\\\\_test_activos.py 2>&1 | Where-Object { $_ -notmatch \"^WARNING\" })"
     ]
   }
 }

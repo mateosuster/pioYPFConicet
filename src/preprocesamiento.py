@@ -5,8 +5,10 @@ Run: python src/preprocesamiento.py
 Loads all data sources, runs all preprocessing modules in order,
 and writes results/argentina/variables.csv + master .xlsx.
 
-Optional flag --intermediates saves each module's output DataFrames to
-results/intermedios/<module_name>/ for inspection.
+Optional flags:
+  --intermediates              save each module's output to results/intermedios/
+  --STOCK_SOURCE=<source>      capital stock source (see README)
+  --RENTA_SV_SOURCE=<sesco|indec>  overvaluation-rent export source (see README)
 """
 
 import sys
@@ -26,6 +28,18 @@ from preproc import (
 ROOT = Path(__file__).parent.parent
 INTERMEDIOS = ROOT / "results" / "intermedios"
 
+# Stock source for primary calculations (consumo_k_fijo, tg_rama, renta_directo).
+# Options: "Bolsar", "AFIP (v8)", "AFIP (nuevo)", "AFIP (combinada)", "S&P Capital IQ"
+STOCK_SOURCE = "S&P Capital IQ"
+# STOCK_SOURCE = "Bolsar"
+
+# Source for currency-overvaluation rent in renta_total (indirect method).
+# "sesco"  → SESCO-based: expo_q * precio_externo * (tcp - tcc), crude and gas separately
+# "indec"  → INDEC Complejos Exportadores: expo_USD * (tcp - tcc), 2002+ with petróleo/gas split;
+#             pre-2002 combined value in petróleo column; pre-1993 falls back to SESCO
+RENTA_SV_SOURCE = "sesco"
+# RENTA_SV_SOURCE = "indec"
+
 
 def _save_intermediates(module_name: str, data: dict) -> None:
     """Save all DataFrames and Series in *data* to results/intermedios/<module_name>/."""
@@ -40,8 +54,16 @@ def _save_intermediates(module_name: str, data: dict) -> None:
     print(f"    -> intermedios/{module_name}/ ({n} files)")
 
 
-def run(save_intermediates: bool = False) -> None:
+def run(save_intermediates: bool = False, stock_source: str = None,
+        renta_sv_source: str = None) -> None:
+    stock_source = stock_source or STOCK_SOURCE
+    renta_sv_source = renta_sv_source or RENTA_SV_SOURCE
+    if renta_sv_source not in ("sesco", "indec"):
+        raise ValueError(
+            f"renta_sv_source must be 'sesco' or 'indec', got {renta_sv_source!r}"
+        )
     print("=== preprocesamiento.py ===")
+    print(f"  STOCK_SOURCE={stock_source!r}, RENTA_SV_SOURCE={renta_sv_source!r}")
 
     print("[1/15] indices_precios...")
     idx = indices_precios.run()
@@ -69,7 +91,7 @@ def run(save_intermediates: bool = False) -> None:
         _save_intermediates("comex", cx)
 
     print("[6/15] fiscalidad...")
-    fisc = fiscalidad.run(idx["tcp_anual"], idx["ganancia_pbi"])
+    fisc = fiscalidad.run(idx["tcp_anual"], idx["ganancia_pbi"], idx["ipc"])
     if save_intermediates:
         _save_intermediates("fiscalidad", fisc)
 
@@ -111,6 +133,8 @@ def run(save_intermediates: bool = False) -> None:
         precios_referencia_crudo=pme["precios_referencia_crudo"],
         tcp_anual=idx["tcp_anual"],
         ipc=idx["ipc"],
+        stock_estimado=act["stock_estimado"],
+        stock_source=STOCK_SOURCE,
     )
     if save_intermediates:
         _save_intermediates("valor_produccion", {
@@ -121,8 +145,10 @@ def run(save_intermediates: bool = False) -> None:
     tg = tasa_ganancia.run(
         empalme_ccnn=vprod["empalme_ccnn"],
         valor_total_produccion=vprod["valor_total_produccion"],
-        stock_estimado=vprod["stock_estimado"],
+        stock_estimado=act["stock_estimado"],
         ipc=idx["ipc"],
+        stock_rama_alt=act["stock_rama_alt"],
+        stock_source=STOCK_SOURCE,
     )
     if save_intermediates:
         _save_intermediates("tasa_ganancia", tg)
@@ -134,6 +160,7 @@ def run(save_intermediates: bool = False) -> None:
         expo_usd_crudo=cx["expo_usd_crudo"],
         regalias=fisc["regalias"],
         retenciones=fisc["retenciones"],
+        tcp_anual=idx["tcp_anual"],
     )
     if save_intermediates:
         _save_intermediates("renta_sobrevaluacion", rsv)
@@ -141,6 +168,8 @@ def run(save_intermediates: bool = False) -> None:
     print("[13/15] renta_total...")
     rtot = renta_total.run(
         renta_tg=tg["renta_tg"],
+        renta_tg_multi=tg.get("renta_tg_multi"),
+        tasa_ganancia_rama_stock=tg.get("tasa_ganancia_rama_stock"),
         criterio_propio=vprod["criterio_propio"],
         subsidios=fisc["subsidios"],
         renta_crudo_dif=renta["renta_crudo_dif"],
@@ -156,6 +185,9 @@ def run(save_intermediates: bool = False) -> None:
         empalme_ccnn=vprod["empalme_ccnn"],
         ipc_us=idx["ipc_us"],
         precios_referencia_crudo=pme["precios_referencia_crudo"],
+        stock_source=stock_source,
+        renta_tcp_indec=rsv["renta_tcp_indec"],
+        renta_sv_source=renta_sv_source,
     )
     if save_intermediates:
         _save_intermediates("renta_total", rtot)
@@ -178,7 +210,15 @@ def run(save_intermediates: bool = False) -> None:
     }
 
     print("[14/15] output...")
-    variables = output.run(data)
+    variables = output.run(
+        data, stock_source=stock_source, renta_sv_source=renta_sv_source
+    )
+
+    print("[15/15] plots_renta_argentina...")
+    import plots_renta_argentina
+    plots_renta_argentina.main(
+        stock_source=stock_source, renta_sv_source=renta_sv_source
+    )
 
     print(f"\nDone. variables shape: {variables.shape}")
     print(f"Unique variables: {variables['variable'].nunique()}")
@@ -186,4 +226,15 @@ def run(save_intermediates: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    run(save_intermediates="--intermediates" in sys.argv)
+    _stock = STOCK_SOURCE
+    _renta_sv = RENTA_SV_SOURCE
+    for _a in sys.argv[1:]:
+        if _a.startswith("--STOCK_SOURCE="):
+            _stock = _a.split("=", 1)[1].strip("'\"")
+        elif _a.startswith("--RENTA_SV_SOURCE="):
+            _renta_sv = _a.split("=", 1)[1].strip("'\"")
+    run(
+        save_intermediates="--intermediates" in sys.argv,
+        stock_source=_stock,
+        renta_sv_source=_renta_sv,
+    )

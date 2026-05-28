@@ -12,6 +12,9 @@ ROOT = Path(__file__).parents[2]
 DATA = ROOT / "data"
 RESULTS = ROOT / "results" / "argentina"
 
+# Stock sources on renta_empresas sheet (aligned with tg_pg_total comparisons)
+MULTI_STOCK_SOURCES = frozenset({"AFIP (combinada)", "Bolsar", "S&P Capital IQ"})
+
 
 def _load_tg_industrial() -> pd.DataFrame:
     """Industrial profit rate benchmarks (JIC pre-1993, EM post-1993)."""
@@ -33,34 +36,20 @@ def _load_renta_empresa() -> pd.DataFrame:
 
 
 def build_tasa_ganancia_rama(
-    empalme_ccnn: pd.DataFrame,
+    valor_total_produccion: pd.DataFrame,
     stock_estimado: pd.DataFrame,
-    ipc: pd.DataFrame,
+    stock_source: str = "Bolsar",
 ) -> pd.DataFrame:
     """
-    Sector profit rate using empalme_ccnn.pv and Bolsar stock.
-    tasa_ganancia = pv / ppye_real
+    Sector profit rate for the selected stock (Criterio propio EBE / ppye).
+
+    Same numerator and denominator basis as ``build_tasa_ganancia_rama_stock`` and
+  the ``renta_empresas`` sheet, so ``renta_tg`` matches ``renta_tg_multi`` for
+    that source.
     """
-    ipc_map = ipc.set_index("anio")["ipc_18"]
-    stock_bolsar = stock_estimado[stock_estimado["fuente_ppye"] == "Bolsar"].copy()
-    stock_bolsar["ipc_18"] = stock_bolsar["anio"].map(ipc_map)
-    stock_bolsar["ppye"] = stock_bolsar["valor"] * stock_bolsar["ipc_18"]
-    stock_bolsar["fuente_pozo"] = "Estimación sin pozos"
-
-    pv_df = (
-        empalme_ccnn[["anio", "unidad", "pv"]]
-        .drop_duplicates()
-        .query("anio > 1997")
-    )
-
-    df = pv_df.merge(
-        stock_bolsar[["anio", "ppye", "fuente_ppye", "fuente_pozo"]],
-        on="anio",
-        how="left",
-    )
-    df["tasa_ganancia"] = df["pv"] / df["ppye"]
-    df = df[df["fuente_ppye"].notna()].rename(columns={"fuente_ppye": "stock_seleccionado"})
-    return df[["anio", "unidad", "pv", "ppye", "stock_seleccionado", "tasa_ganancia"]].copy()
+    df = build_tasa_ganancia_rama_stock(valor_total_produccion, stock_estimado)
+    df = df[df["stock_seleccionado"] == stock_source].copy()
+    return df[df["anio"] > 1997].reset_index(drop=True)
 
 
 def build_tasa_ganancia_rama_stock(
@@ -68,23 +57,30 @@ def build_tasa_ganancia_rama_stock(
     stock_estimado: pd.DataFrame,
 ) -> pd.DataFrame:
     """
-    Profit rate using criterio_propio ebe_tot and all stock estimates.
-    tasa_ganancia = ebe_tot / ppye
+    Profit rate using criterio_propio PV (plusvalía neta) and all stock estimates.
+    tasa_ganancia = pv / ppye
+
+    PV = EBE_extr − ConKfijo − Imp  (net surplus after depreciation and generic taxes).
+    Using PV ensures consistency with the direct rent formula:
+      renta_empresas = ppye × (TG − TG_normal) = PV − ppye × TG_normal
+    which equals renta_total + subsidios from build_renta_directo.
     """
-    ebe = (
+    pv = (
         valor_total_produccion[
-            (valor_total_produccion["variable"] == "ebe_tot")
+            (valor_total_produccion["variable"] == "pv")
             & (valor_total_produccion["fuente"] == "Criterio propio")
         ][["anio", "unidad", "valor"]]
-        .rename(columns={"valor": "excedente_bruto_explotacion"})
+        .rename(columns={"valor": "plusvalia"})
+        .groupby(["anio", "unidad"], as_index=False)["plusvalia"].mean()
     )
 
     stock = stock_estimado[["anio", "valor", "fuente_ppye"]].copy()
     stock = stock.rename(columns={"valor": "ppye", "fuente_ppye": "stock_seleccionado"})
 
-    df = ebe.merge(stock, on="anio", how="left")
-    df["tasa_ganancia"] = df["excedente_bruto_explotacion"] / df["ppye"]
-    return df[["anio", "unidad", "excedente_bruto_explotacion", "ppye", "stock_seleccionado", "tasa_ganancia"]].copy()
+    df = pv.merge(stock, on="anio", how="left")
+    df["tasa_ganancia"] = df["plusvalia"] / df["ppye"]
+    df = df[df["anio"] >= 1993].reset_index(drop=True)
+    return df[["anio", "unidad", "plusvalia", "ppye", "stock_seleccionado", "tasa_ganancia"]].copy()
 
 
 def build_renta_tg(
@@ -138,18 +134,59 @@ def build_renta_produccion_balances(renta_empresa: pd.DataFrame) -> pd.DataFrame
     return result.sort_values("anio").reset_index(drop=True)
 
 
+def _append_stock_alt(
+    stock_estimado: pd.DataFrame,
+    stock_rama_alt: pd.DataFrame,
+) -> pd.DataFrame:
+    """Aggregate ppye from stock_rama_alt and append as 'S&P Capital IQ' rows."""
+    ppye_alt = (
+        stock_rama_alt[
+            (stock_rama_alt["variable"] == "ppye")
+            & (stock_rama_alt["unidad"] == "Millones de pesos corrientes")
+            & (stock_rama_alt["sector"].isin(["integrada", "produccion"]))
+        ]
+        .groupby("anio", as_index=False)["valor"]
+        .sum()
+    )
+    ppye_alt["fuente_ppye"] = "S&P Capital IQ"
+    ppye_alt["unidad"] = "Millones de pesos corrientes"
+    for c in stock_estimado.columns:
+        if c not in ppye_alt.columns:
+            ppye_alt[c] = pd.NA
+    return pd.concat(
+        [stock_estimado, ppye_alt[stock_estimado.columns]],
+        ignore_index=True,
+    )
+
+
 def run(
     empalme_ccnn: pd.DataFrame,
     valor_total_produccion: pd.DataFrame,
     stock_estimado: pd.DataFrame,
     ipc: pd.DataFrame,
+    stock_rama_alt: pd.DataFrame | None = None,
+    stock_source: str = "Bolsar",
 ) -> dict:
     tg_industrial = _load_tg_industrial()
     renta_empresa = _load_renta_empresa()
 
-    tg_rama = build_tasa_ganancia_rama(empalme_ccnn, stock_estimado, ipc)
+    if stock_rama_alt is not None:
+        stock_estimado = _append_stock_alt(stock_estimado, stock_rama_alt)
+
+    tg_rama = build_tasa_ganancia_rama(
+        valor_total_produccion, stock_estimado, stock_source=stock_source
+    )
     tg_rama_stock = build_tasa_ganancia_rama_stock(valor_total_produccion, stock_estimado)
     renta_tg = build_renta_tg(tg_rama, tg_industrial)
+
+    # Multi-source renta_empresas: EBE/ppye per stock (same basis as tg_pg_total sheet)
+    tg_multi = tg_rama_stock[
+        tg_rama_stock["stock_seleccionado"].isin(MULTI_STOCK_SOURCES)
+        & tg_rama_stock["ppye"].notna()
+        & tg_rama_stock["tasa_ganancia"].notna()
+    ]
+    renta_tg_multi = build_renta_tg(tg_multi, tg_industrial)
+
     renta_prod_balances = build_renta_produccion_balances(renta_empresa)
 
     # Write output
@@ -161,6 +198,7 @@ def run(
         tasa_ganancia_rama=tg_rama,
         tasa_ganancia_rama_stock=tg_rama_stock,
         renta_tg=renta_tg,
+        renta_tg_multi=renta_tg_multi,
         renta_produccion_balances=renta_prod_balances,
     )
 

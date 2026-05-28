@@ -48,7 +48,9 @@ def build_regalias(tcp_anual: pd.DataFrame, renta_hidrocarburos_fr: pd.DataFrame
       regalias_usd     — total in USD
     """
     productos = ["crudo", "gas", "gasolina", "glp"]
-    moneda_map = {"crudo": "USD", "gas": "USD", "gasolina": "USD", "glp": "ars"}
+    # crudo and gasolina CSVs are in USD; gas and glp CSVs are in ARS
+    # (gas CSV is labeled "Suma de USD" but values are in ARS — royalties are paid at domestic ARS prices)
+    moneda_map = {"crudo": "USD", "gas": "ars", "gasolina": "USD", "glp": "ars"}
 
     frames = []
     for prod in productos:
@@ -106,10 +108,10 @@ def build_regalias(tcp_anual: pd.DataFrame, renta_hidrocarburos_fr: pd.DataFrame
     )
 
 
-def build_subsidios(tcp_anual: pd.DataFrame, ganancia_pbi: pd.DataFrame) -> pd.DataFrame:
+def build_subsidios(tcp_anual: pd.DataFrame, ganancia_pbi: pd.DataFrame, ipc: pd.DataFrame) -> pd.DataFrame:
     """
     Hydrocarbon subsidies in ARS (current pesos).
-    Columns: anio, unidad, subsidios_ejes, subsidios_cefip
+    Columns: anio, unidad, subsidios_ejes, subsidios_cefip, subsidios_acij
     """
     # CEFIP — % of GDP
     cefip_raw = pd.read_excel(DATA / "cefip/subsidios.xlsx")
@@ -138,19 +140,92 @@ def build_subsidios(tcp_anual: pd.DataFrame, ganancia_pbi: pd.DataFrame) -> pd.D
     subsidios_ejes = ejes_raw.groupby("anio").agg(subsidios_ejes=("subsidios_ejes", "sum")).reset_index()
     subsidios_ejes["unidad"] = "Pesos corrientes"
 
+    # ACIJ — constant Dec-2024 pesos → pesos corrientes
+    acij_raw = pd.read_excel(
+        ROOT / "update" / "Base de datos de petroleras en Argentina.xlsx",
+        sheet_name="Base de datos",
+    )
+    sub_col = [c for c in acij_raw.columns if "Subsidios" in str(c) and "2024" in str(c)][0]
+    acij_raw = acij_raw.rename(columns={
+        acij_raw.columns[0]: "anio",
+        acij_raw.columns[1]: "empresa",
+        sub_col: "subsidios_acij_m24",
+    })
+    acij_raw = acij_raw[["anio", "empresa", "subsidios_acij_m24"]].dropna(subset=["anio"])
+    acij_raw["anio"] = acij_raw["anio"].astype(int)
+    acij_anual = acij_raw.groupby("anio", as_index=False)["subsidios_acij_m24"].sum()
+    # corriente_Y = constante_2024 * (ipc_03_Y / ipc_03_2024) = constante_2024 * ipc_24_Y
+    ipc_24_map = ipc.set_index("anio")["ipc_24"]
+    acij_anual["ipc_24"] = acij_anual["anio"].map(ipc_24_map)
+    acij_anual["subsidios_acij"] = acij_anual["subsidios_acij_m24"] * acij_anual["ipc_24"] * 1e6
+    acij_anual = acij_anual[["anio", "subsidios_acij"]]
+
     df = (
-        subsidios_ejes.merge(subsidios_cefip, on=["anio", "unidad"], how="outer")
-        .sort_values("anio", ascending=False)
+        subsidios_ejes
+        .merge(subsidios_cefip, on=["anio", "unidad"], how="outer")
+        .merge(acij_anual, on="anio", how="outer")
+        .sort_values("anio")
     )
     df["unidad"] = "Pesos corrientes"
-    df.sort_values("anio", ascending=True, inplace=True)
     return df
 
 
-def run(tcp_anual: pd.DataFrame, ganancia_pbi: pd.DataFrame) -> dict:
+def plot_subsidios_comparison(
+    subsidios: pd.DataFrame,
+    ipc: pd.DataFrame,
+    tcp_anual: pd.DataFrame,
+) -> None:
+    """Save two line plots comparing subsidios by source: constant ARS and USD TCC."""
+    import plotly.graph_objects as go
+
+    RESULTS = ROOT / "results" / "argentina"
+    RESULTS.mkdir(parents=True, exist_ok=True)
+
+    ipc_18_map = ipc.set_index("anio")["ipc_18"]
+    tcc_map = tcp_anual.set_index("anio")["tcc"]
+
+    df = subsidios.copy()
+    df["ipc_18"] = df["anio"].map(ipc_18_map)
+    df["tcc"] = df["anio"].map(tcc_map)
+
+    sources = {
+        "EJES": "subsidios_ejes",
+        "CEFIP": "subsidios_cefip",
+        "ACIJ": "subsidios_acij",
+    }
+
+    fig1 = go.Figure()
+    for label, col in sources.items():
+        if col in df.columns:
+            y = df[col] / df["ipc_18"] / 1e6
+            fig1.add_trace(go.Scatter(x=df["anio"], y=y, mode="lines+markers", name=label))
+    fig1.update_layout(
+        title="Subsidios hidrocarburos — pesos constantes 2018",
+        xaxis_title="Año",
+        yaxis_title="Millones de pesos constantes 2018",
+        legend_title="Fuente",
+    )
+    fig1.write_html(str(RESULTS / "subsidios_comparison_ars_constantes.html"))
+
+    fig2 = go.Figure()
+    for label, col in sources.items():
+        if col in df.columns:
+            y = df[col] / df["tcc"] / 1e6
+            fig2.add_trace(go.Scatter(x=df["anio"], y=y, mode="lines+markers", name=label))
+    fig2.update_layout(
+        title="Subsidios hidrocarburos — millones de USD (TCC)",
+        xaxis_title="Año",
+        yaxis_title="Millones de USD (TCC)",
+        legend_title="Fuente",
+    )
+    fig2.write_html(str(RESULTS / "subsidios_comparison_usd_tcc.html"))
+
+
+def run(tcp_anual: pd.DataFrame, ganancia_pbi: pd.DataFrame, ipc: pd.DataFrame) -> dict:
     retenciones = build_retenciones(tcp_anual)
     regalias_result = build_regalias(tcp_anual)
-    subsidios = build_subsidios(tcp_anual, ganancia_pbi)
+    subsidios = build_subsidios(tcp_anual, ganancia_pbi, ipc)
+    plot_subsidios_comparison(subsidios, ipc, tcp_anual)
 
     return dict(
         retenciones=retenciones,
@@ -162,7 +237,7 @@ def run(tcp_anual: pd.DataFrame, ganancia_pbi: pd.DataFrame) -> dict:
 if __name__ == "__main__":
     from preproc.indices_precios import run as run_indices
     aux = run_indices()
-    result = run(aux["tcp_anual"], aux["ganancia_pbi"])
+    result = run(aux["tcp_anual"], aux["ganancia_pbi"], aux["ipc"])
     print("fiscalidad OK")
     for k, v in result.items():
         print(f"  {k}: {v.shape}")
