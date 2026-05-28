@@ -7,9 +7,12 @@ notas
 
 # Archivos pesados
 produccin-de-petrleo-por-yacimiento.csv
+produccin-de-petrleo-por-yacimiento_old.csv
 produccin-de-gas-por-yacimiento.csv
+produccin-de-gas-por-yacimiento_old.csv
 
 importaciones-exportaciones.csv
+importaciones-exportaciones-a-partir-del-2016-.csv
 produccin-de-pozos-de-gas-y-petrleo-2021.csv
 
 .env
