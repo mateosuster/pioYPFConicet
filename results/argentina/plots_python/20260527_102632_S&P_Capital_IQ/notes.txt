@@ -1,0 +1,3 @@
+Fecha: 2026-05-27 10:26:32
+STOCK_SOURCE: S&P Capital IQ
+RENTA_SV_SOURCE: sesco
