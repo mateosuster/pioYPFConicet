@@ -347,3 +347,50 @@ donde $CI_{extr}$ y $MS_{extr}$ provienen del Empalme CCNN (en USD TCC), $ConKfi
 * Iñigo Carrera, Juan (2007). "La formación económica de la sociedad argentina. Volumen 1: Renta agraria, ganancia industrial y deuda externa. 1882-2004". Imago Mundi, Buenos Aires.
 * Zannotti, G. et al. (2017). Ganadores y perdedores en la Argentina de los hidrocarburos no convencionales. Taller Ecologista Rosario y Observatorio Petrolero Sur en EJES, Argentina.
 * Porto, A. et al. (2021). "Precios y tarifas y política económica Argentina: 1945-2019". UNLP.
+
+---
+
+## 6. Resumen de fuentes por función
+
+El proyecto recopila datos de **26 fuentes institucionales distintas**, distribuidas según su rol en el cálculo:
+
+### Fuentes principales (usadas en los cálculos centrales)
+
+| # | Institución | Qué aporta |
+|---|---|---|
+| 1 | **Secretaría de Energía – SESCO** | Producción, expo/impo, regalías, precios MI gas |
+| 2 | **MECON / Ministerio de Hacienda** | Precios MI crudo, masa salarial, cuentas nacionales |
+| 3 | **Anuario de Combustibles** | Producción histórica crudo y gas (1911–1949/1992) |
+| 4 | **EIA (US Energy Information Administration)** | Brent, WTI, Henry Hub |
+| 5 | **UN Comtrade** | Exportaciones/importaciones y precios crudo/gas (históricos e internacionales) |
+| 6 | **IDEE / Fundación Bariloche** | Precios internos crudo y gas 1970–1988 (Kozulj & Pistonesi) |
+| 7 | **Memorias anuales de YPF** | Precios MI crudo 1989–1991; activos históricos (Betania) |
+| 8 | **Ministerio de Trabajo – OEDE** | Empleo y remuneraciones 1996–hoy |
+| 9 | **AFIP** | Capital adelantado (KTA/PPyE) y retenciones |
+| 10 | **Bolsar** | Balances de empresas que cotizan en bolsa local |
+| 11 | **S&P Capital IQ / Petroarg** | Balances de empresas (fuente por defecto para stock PPyE) |
+| 12 | **INDEC** | Cuentas Nacionales (VBP, VA), Complejos Exportadores, IPIM |
+| 13 | **BLS (US Bureau of Labor Statistics)** | IPC EEUU para conversiones a dólares constantes |
+| 14 | **Matriz Insumo-Producto 1997 + COU 2006–2016** | Coeficientes técnicos (CI/VBP, servicios/extracción) |
+| 15 | **Tasa de ganancia industrial** | Serie JIC (pre-1993) + EM (post-1993) como tasa de referencia |
+
+### Fuentes de subsidios (combinadas por período)
+
+| # | Institución | Período |
+|---|---|---|
+| 16 | **EJES / Zannotti et al.** | Subsidios históricos en USD |
+| 17 | **CEFIP / Porto et al.** | Subsidios ≤ 2012 |
+| 18 | **ACIJ** | Subsidios ≥ 2013 |
+
+### Fuentes de cotejo y verificación cruzada
+
+| # | Institución | Qué verifica |
+|---|---|---|
+| 19 | **British Petroleum Statistical Review** | Precios gas mundial |
+| 20 | **FMI – Commodity Price Index** | LNG Asia, Gas EU, Henry Hub |
+| 21 | **YPFB Bolivia** | Precios de exportación de gas boliviano |
+| 22 | **CEPAL** | Masa salarial por rama 1991 |
+| 23 | **Campodónico Sánchez / CEPAL (2008)** | Retenciones históricas en USD |
+| 24 | **INDEC – Complejos Exportadores** | Alternativa para renta por sobrevaluación |
+| 25 | **FRED (St. Louis Fed)** | Serie WTI como cotejo de precio del crudo |
+| 26 | **Otros autores** (`data/otros autores/renta_autores.csv`) | Comparación de estimaciones de renta |
