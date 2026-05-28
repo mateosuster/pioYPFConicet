@@ -1,0 +1,649 @@
+anio,sector,unidad,variable,valor,fuente
+2001,extraccion_petroleo_gas,Millones de pesos 2018,KTA,457013.0678591406,AFIP (combinada)
+2002,extraccion_petroleo_gas,Millones de pesos 2018,KTA,778489.2357177554,AFIP (combinada)
+2003,extraccion_petroleo_gas,Millones de pesos 2018,KTA,723823.7363497312,AFIP (combinada)
+2004,extraccion_petroleo_gas,Millones de pesos 2018,KTA,905669.9944217307,AFIP (combinada)
+2005,extraccion_petroleo_gas,Millones de pesos 2018,KTA,701405.6906751558,AFIP (combinada)
+2006,extraccion_petroleo_gas,Millones de pesos 2018,KTA,979507.5426958221,AFIP (combinada)
+2007,extraccion_petroleo_gas,Millones de pesos 2018,KTA,919622.2875999248,AFIP (combinada)
+2008,extraccion_petroleo_gas,Millones de pesos 2018,KTA,872813.6084008368,AFIP (combinada)
+2009,extraccion_petroleo_gas,Millones de pesos 2018,KTA,781034.5489847009,AFIP (combinada)
+2010,extraccion_petroleo_gas,Millones de pesos 2018,KTA,668395.3586799374,AFIP (combinada)
+2011,extraccion_petroleo_gas,Millones de pesos 2018,KTA,589442.0589216385,AFIP (combinada)
+2012,extraccion_petroleo_gas,Millones de pesos 2018,KTA,604219.3889039739,AFIP (combinada)
+2013,extraccion_petroleo_gas,Millones de pesos 2018,KTA,648219.655312949,AFIP (combinada)
+2014,extraccion_petroleo_gas,Millones de pesos 2018,KTA,597533.8359181157,AFIP (combinada)
+2015,extraccion_petroleo_gas,Millones de pesos 2018,KTA,676356.714881984,AFIP (combinada)
+2016,extraccion_petroleo_gas,Millones de pesos 2018,KTA,595081.661031153,AFIP (combinada)
+2017,extraccion_petroleo_gas,Millones de pesos 2018,KTA,535655.791997022,AFIP (combinada)
+2018,extraccion_petroleo_gas,Millones de pesos 2018,KTA,1452279.18462635,AFIP (combinada)
+2019,extraccion_petroleo_gas,Millones de pesos 2018,KTA,1529105.4282337888,AFIP (combinada)
+2020,extraccion_petroleo_gas,Millones de pesos 2018,KTA,60583.8089001254,AFIP (combinada)
+2021,extraccion_petroleo_gas,Millones de pesos 2018,KTA,1283399.8289350609,AFIP (combinada)
+2022,extraccion_petroleo_gas,Millones de pesos 2018,KTA,1372200.1014508954,AFIP (combinada)
+2001,extraccion_petroleo_gas,Millones de pesos 2018,activo,566361.8098842695,AFIP (combinada)
+2002,extraccion_petroleo_gas,Millones de pesos 2018,activo,1006678.369912202,AFIP (combinada)
+2003,extraccion_petroleo_gas,Millones de pesos 2018,activo,967221.6313693776,AFIP (combinada)
+2004,extraccion_petroleo_gas,Millones de pesos 2018,activo,1136228.736744508,AFIP (combinada)
+2005,extraccion_petroleo_gas,Millones de pesos 2018,activo,893881.5921521555,AFIP (combinada)
+2006,extraccion_petroleo_gas,Millones de pesos 2018,activo,1208493.525090176,AFIP (combinada)
+2007,extraccion_petroleo_gas,Millones de pesos 2018,activo,1152192.8927550248,AFIP (combinada)
+2008,extraccion_petroleo_gas,Millones de pesos 2018,activo,1033952.1055128858,AFIP (combinada)
+2009,extraccion_petroleo_gas,Millones de pesos 2018,activo,939479.4479914213,AFIP (combinada)
+2010,extraccion_petroleo_gas,Millones de pesos 2018,activo,888516.1982583012,AFIP (combinada)
+2011,extraccion_petroleo_gas,Millones de pesos 2018,activo,851554.7536345295,AFIP (combinada)
+2012,extraccion_petroleo_gas,Millones de pesos 2018,activo,883673.1938586794,AFIP (combinada)
+2013,extraccion_petroleo_gas,Millones de pesos 2018,activo,866175.4845384983,AFIP (combinada)
+2014,extraccion_petroleo_gas,Millones de pesos 2018,activo,971269.7783501026,AFIP (combinada)
+2015,extraccion_petroleo_gas,Millones de pesos 2018,activo,1331075.337435945,AFIP (combinada)
+2016,extraccion_petroleo_gas,Millones de pesos 2018,activo,1225205.5603413412,AFIP (combinada)
+2017,extraccion_petroleo_gas,Millones de pesos 2018,activo,1144583.5290014069,AFIP (combinada)
+2018,extraccion_petroleo_gas,Millones de pesos 2018,activo,2168904.84910892,AFIP (combinada)
+2019,extraccion_petroleo_gas,Millones de pesos 2018,activo,2245068.079604706,AFIP (combinada)
+2020,extraccion_petroleo_gas,Millones de pesos 2018,activo,125759.55174408232,AFIP (combinada)
+2021,extraccion_petroleo_gas,Millones de pesos 2018,activo,1872506.278004748,AFIP (combinada)
+2022,extraccion_petroleo_gas,Millones de pesos 2018,activo,2056500.046995093,AFIP (combinada)
+2001,extraccion_petroleo_gas,Millones de pesos 2018,ppye,350212.5048247018,AFIP (combinada)
+2002,extraccion_petroleo_gas,Millones de pesos 2018,ppye,650538.7897876343,AFIP (combinada)
+2003,extraccion_petroleo_gas,Millones de pesos 2018,ppye,586759.4221845468,AFIP (combinada)
+2004,extraccion_petroleo_gas,Millones de pesos 2018,ppye,655280.6741955163,AFIP (combinada)
+2005,extraccion_petroleo_gas,Millones de pesos 2018,ppye,578514.4701920009,AFIP (combinada)
+2006,extraccion_petroleo_gas,Millones de pesos 2018,ppye,683331.9642005743,AFIP (combinada)
+2007,extraccion_petroleo_gas,Millones de pesos 2018,ppye,682801.0602907616,AFIP (combinada)
+2008,extraccion_petroleo_gas,Millones de pesos 2018,ppye,655653.6489766135,AFIP (combinada)
+2009,extraccion_petroleo_gas,Millones de pesos 2018,ppye,595227.5257195081,AFIP (combinada)
+2010,extraccion_petroleo_gas,Millones de pesos 2018,ppye,499331.2515951269,AFIP (combinada)
+2011,extraccion_petroleo_gas,Millones de pesos 2018,ppye,446774.0538188668,AFIP (combinada)
+2012,extraccion_petroleo_gas,Millones de pesos 2018,ppye,464698.19404896547,AFIP (combinada)
+2013,extraccion_petroleo_gas,Millones de pesos 2018,ppye,492854.1366215982,AFIP (combinada)
+2014,extraccion_petroleo_gas,Millones de pesos 2018,ppye,529019.2943434226,AFIP (combinada)
+2015,extraccion_petroleo_gas,Millones de pesos 2018,ppye,581696.5029560219,AFIP (combinada)
+2016,extraccion_petroleo_gas,Millones de pesos 2018,ppye,524826.8158887702,AFIP (combinada)
+2017,extraccion_petroleo_gas,Millones de pesos 2018,ppye,473974.7306089689,AFIP (combinada)
+2018,extraccion_petroleo_gas,Millones de pesos 2018,ppye,1334186.19274905,AFIP (combinada)
+2019,extraccion_petroleo_gas,Millones de pesos 2018,ppye,1406729.3985541947,AFIP (combinada)
+2020,extraccion_petroleo_gas,Millones de pesos 2018,ppye,58229.1928651791,AFIP (combinada)
+2021,extraccion_petroleo_gas,Millones de pesos 2018,ppye,1182449.9031330682,AFIP (combinada)
+2022,extraccion_petroleo_gas,Millones de pesos 2018,ppye,1253955.0299537336,AFIP (combinada)
+2001,servicios_petroleros,Millones de pesos 2018,KTA,29286.142650768335,AFIP (combinada)
+2002,servicios_petroleros,Millones de pesos 2018,KTA,49732.594459293636,AFIP (combinada)
+2003,servicios_petroleros,Millones de pesos 2018,KTA,48147.19611979925,AFIP (combinada)
+2004,servicios_petroleros,Millones de pesos 2018,KTA,47697.74057133201,AFIP (combinada)
+2005,servicios_petroleros,Millones de pesos 2018,KTA,45609.2916831983,AFIP (combinada)
+2006,servicios_petroleros,Millones de pesos 2018,KTA,49270.97140536187,AFIP (combinada)
+2007,servicios_petroleros,Millones de pesos 2018,KTA,54653.82064536289,AFIP (combinada)
+2008,servicios_petroleros,Millones de pesos 2018,KTA,44733.71140590958,AFIP (combinada)
+2009,servicios_petroleros,Millones de pesos 2018,KTA,45011.63796710274,AFIP (combinada)
+2010,servicios_petroleros,Millones de pesos 2018,KTA,36032.04797374883,AFIP (combinada)
+2011,servicios_petroleros,Millones de pesos 2018,KTA,34256.399202981884,AFIP (combinada)
+2012,servicios_petroleros,Millones de pesos 2018,KTA,39785.724230677944,AFIP (combinada)
+2013,servicios_petroleros,Millones de pesos 2018,KTA,40619.09153616514,AFIP (combinada)
+2014,servicios_petroleros,Millones de pesos 2018,KTA,45295.5623461389,AFIP (combinada)
+2015,servicios_petroleros,Millones de pesos 2018,KTA,56975.84933544367,AFIP (combinada)
+2016,servicios_petroleros,Millones de pesos 2018,KTA,45872.51079457561,AFIP (combinada)
+2017,servicios_petroleros,Millones de pesos 2018,KTA,39194.89904240305,AFIP (combinada)
+2018,servicios_petroleros,Millones de pesos 2018,KTA,79259.27274371,AFIP (combinada)
+2019,servicios_petroleros,Millones de pesos 2018,KTA,97922.2779616864,AFIP (combinada)
+2020,servicios_petroleros,Millones de pesos 2018,KTA,75071.83209991828,AFIP (combinada)
+2021,servicios_petroleros,Millones de pesos 2018,KTA,73004.14592986382,AFIP (combinada)
+2022,servicios_petroleros,Millones de pesos 2018,KTA,82055.09930620145,AFIP (combinada)
+2001,servicios_petroleros,Millones de pesos 2018,activo,39637.97961061543,AFIP (combinada)
+2002,servicios_petroleros,Millones de pesos 2018,activo,62967.205042627524,AFIP (combinada)
+2003,servicios_petroleros,Millones de pesos 2018,activo,61422.2783804376,AFIP (combinada)
+2004,servicios_petroleros,Millones de pesos 2018,activo,61923.49336146938,AFIP (combinada)
+2005,servicios_petroleros,Millones de pesos 2018,activo,62429.82102499379,AFIP (combinada)
+2006,servicios_petroleros,Millones de pesos 2018,activo,81199.68465502824,AFIP (combinada)
+2007,servicios_petroleros,Millones de pesos 2018,activo,87659.12281234202,AFIP (combinada)
+2008,servicios_petroleros,Millones de pesos 2018,activo,79703.54854496068,AFIP (combinada)
+2009,servicios_petroleros,Millones de pesos 2018,activo,76441.92187788789,AFIP (combinada)
+2010,servicios_petroleros,Millones de pesos 2018,activo,68374.55354696595,AFIP (combinada)
+2011,servicios_petroleros,Millones de pesos 2018,activo,69333.55889808478,AFIP (combinada)
+2012,servicios_petroleros,Millones de pesos 2018,activo,86673.03660546867,AFIP (combinada)
+2013,servicios_petroleros,Millones de pesos 2018,activo,90476.71490723098,AFIP (combinada)
+2014,servicios_petroleros,Millones de pesos 2018,activo,111098.70825943351,AFIP (combinada)
+2015,servicios_petroleros,Millones de pesos 2018,activo,127322.25253441534,AFIP (combinada)
+2016,servicios_petroleros,Millones de pesos 2018,activo,100968.53447786377,AFIP (combinada)
+2017,servicios_petroleros,Millones de pesos 2018,activo,101545.24186056237,AFIP (combinada)
+2018,servicios_petroleros,Millones de pesos 2018,activo,168380.35332721,AFIP (combinada)
+2019,servicios_petroleros,Millones de pesos 2018,activo,185583.0544909629,AFIP (combinada)
+2020,servicios_petroleros,Millones de pesos 2018,activo,156545.0270177582,AFIP (combinada)
+2021,servicios_petroleros,Millones de pesos 2018,activo,155347.9169234333,AFIP (combinada)
+2022,servicios_petroleros,Millones de pesos 2018,activo,174991.686848381,AFIP (combinada)
+2001,servicios_petroleros,Millones de pesos 2018,ppye,16125.748808427366,AFIP (combinada)
+2002,servicios_petroleros,Millones de pesos 2018,ppye,32712.16037340813,AFIP (combinada)
+2003,servicios_petroleros,Millones de pesos 2018,ppye,30630.1572948419,AFIP (combinada)
+2004,servicios_petroleros,Millones de pesos 2018,ppye,36517.4788329995,AFIP (combinada)
+2005,servicios_petroleros,Millones de pesos 2018,ppye,35156.79861361069,AFIP (combinada)
+2006,servicios_petroleros,Millones de pesos 2018,ppye,30982.74584819885,AFIP (combinada)
+2007,servicios_petroleros,Millones de pesos 2018,ppye,38536.61121457721,AFIP (combinada)
+2008,servicios_petroleros,Millones de pesos 2018,ppye,31277.721428652556,AFIP (combinada)
+2009,servicios_petroleros,Millones de pesos 2018,ppye,32225.714038608126,AFIP (combinada)
+2010,servicios_petroleros,Millones de pesos 2018,ppye,23988.175341933118,AFIP (combinada)
+2011,servicios_petroleros,Millones de pesos 2018,ppye,23064.069841246685,AFIP (combinada)
+2012,servicios_petroleros,Millones de pesos 2018,ppye,23796.631766645212,AFIP (combinada)
+2013,servicios_petroleros,Millones de pesos 2018,ppye,25257.433095255077,AFIP (combinada)
+2014,servicios_petroleros,Millones de pesos 2018,ppye,30398.294919049582,AFIP (combinada)
+2015,servicios_petroleros,Millones de pesos 2018,ppye,36724.32330956436,AFIP (combinada)
+2016,servicios_petroleros,Millones de pesos 2018,ppye,30877.867492464964,AFIP (combinada)
+2017,servicios_petroleros,Millones de pesos 2018,ppye,26516.913083939737,AFIP (combinada)
+2018,servicios_petroleros,Millones de pesos 2018,ppye,55056.34624858,AFIP (combinada)
+2019,servicios_petroleros,Millones de pesos 2018,ppye,67886.7575996429,AFIP (combinada)
+2020,servicios_petroleros,Millones de pesos 2018,ppye,54373.51877273335,AFIP (combinada)
+2021,servicios_petroleros,Millones de pesos 2018,ppye,53345.7577116237,AFIP (combinada)
+2022,servicios_petroleros,Millones de pesos 2018,ppye,58007.309805577665,AFIP (combinada)
+1997,integrada,Millones de pesos 2018,KTA,35274.79660235221,Bolsar
+1997,integrada,Millones de pesos 2018,activo,105392.03829859232,Bolsar
+1997,integrada,Millones de pesos 2018,activo_no_corr,0.0,Bolsar
+1997,integrada,Millones de pesos 2018,inventarios,661.243483533639,Bolsar
+1997,integrada,Millones de pesos 2018,ppye,34613.55311881857,Bolsar
+1997,integrada,Millones de pesos 2018,ppye_neta,34613.55311881857,Bolsar
+1997,produccion,Millones de pesos 2018,KTA,24974.65772423206,Bolsar
+1997,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+1997,produccion,Millones de pesos 2018,activo_no_corr,12131.27467867484,Bolsar
+1997,produccion,Millones de pesos 2018,inventarios,0.0,Bolsar
+1997,produccion,Millones de pesos 2018,ppye,27670.496541715358,Bolsar
+1997,produccion,Millones de pesos 2018,ppye_neta,24974.65772423206,Bolsar
+1998,distribucion,Millones de pesos 2018,KTA,33677.47359737866,Bolsar
+1998,distribucion,Millones de pesos 2018,activo,15037.415263690382,Bolsar
+1998,distribucion,Millones de pesos 2018,activo_no_corr,35461.32168365734,Bolsar
+1998,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+1998,distribucion,Millones de pesos 2018,ppye,33987.298500547964,Bolsar
+1998,distribucion,Millones de pesos 2018,ppye_neta,33677.47359737866,Bolsar
+1998,integrada,Millones de pesos 2018,KTA,214845.12228962785,Bolsar
+1998,integrada,Millones de pesos 2018,activo,116093.77508615797,Bolsar
+1998,integrada,Millones de pesos 2018,activo_no_corr,275177.7781508238,Bolsar
+1998,integrada,Millones de pesos 2018,inventarios,6753.447302602634,Bolsar
+1998,integrada,Millones de pesos 2018,ppye,229844.00316059188,Bolsar
+1998,integrada,Millones de pesos 2018,ppye_neta,207416.51025269506,Bolsar
+1998,produccion,Millones de pesos 2018,KTA,25199.43023359192,Bolsar
+1998,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+1998,produccion,Millones de pesos 2018,activo_no_corr,30617.30773381418,Bolsar
+1998,produccion,Millones de pesos 2018,inventarios,0.0,Bolsar
+1998,produccion,Millones de pesos 2018,ppye,225106.51027667662,Bolsar
+1998,produccion,Millones de pesos 2018,ppye_neta,25199.43023359192,Bolsar
+1998,transporte,Millones de pesos 2018,KTA,68921.1220734902,Bolsar
+1998,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+1998,transporte,Millones de pesos 2018,activo_no_corr,74133.52341958776,Bolsar
+1998,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+1998,transporte,Millones de pesos 2018,ppye,72790.54498471871,Bolsar
+1998,transporte,Millones de pesos 2018,ppye_neta,68921.1220734902,Bolsar
+1999,distribucion,Millones de pesos 2018,KTA,32946.18757364519,Bolsar
+1999,distribucion,Millones de pesos 2018,activo,15076.287942466768,Bolsar
+1999,distribucion,Millones de pesos 2018,activo_no_corr,36362.31578418395,Bolsar
+1999,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+1999,distribucion,Millones de pesos 2018,ppye,34978.16887060885,Bolsar
+1999,distribucion,Millones de pesos 2018,ppye_neta,32946.18757364519,Bolsar
+1999,integrada,Millones de pesos 2018,KTA,199178.44471646138,Bolsar
+1999,integrada,Millones de pesos 2018,activo,111242.9781855374,Bolsar
+1999,integrada,Millones de pesos 2018,activo_no_corr,267360.50177711324,Bolsar
+1999,integrada,Millones de pesos 2018,inventarios,7037.144620492395,Bolsar
+1999,integrada,Millones de pesos 2018,ppye,216468.6877825378,Bolsar
+1999,integrada,Millones de pesos 2018,ppye_neta,191379.73739643447,Bolsar
+1999,produccion,Millones de pesos 2018,KTA,37329.325284991886,Bolsar
+1999,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+1999,produccion,Millones de pesos 2018,activo_no_corr,40109.404118833954,Bolsar
+1999,produccion,Millones de pesos 2018,inventarios,512.4367122560006,Bolsar
+1999,produccion,Millones de pesos 2018,ppye,223668.8850836391,Bolsar
+1999,produccion,Millones de pesos 2018,ppye_neta,36752.76262556148,Bolsar
+1999,transporte,Millones de pesos 2018,KTA,72984.95502751211,Bolsar
+1999,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+1999,transporte,Millones de pesos 2018,activo_no_corr,80585.78513086628,Bolsar
+1999,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+1999,transporte,Millones de pesos 2018,ppye,78569.7706815992,Bolsar
+1999,transporte,Millones de pesos 2018,ppye_neta,72984.95502751211,Bolsar
+2000,distribucion,Millones de pesos 2018,KTA,33910.76288033002,Bolsar
+2000,distribucion,Millones de pesos 2018,activo,15822.277528098726,Bolsar
+2000,distribucion,Millones de pesos 2018,activo_no_corr,37302.57327397152,Bolsar
+2000,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2000,distribucion,Millones de pesos 2018,ppye,35743.435086706246,Bolsar
+2000,distribucion,Millones de pesos 2018,ppye_neta,33910.76288033002,Bolsar
+2000,integrada,Millones de pesos 2018,KTA,354171.87978729745,Bolsar
+2000,integrada,Millones de pesos 2018,activo,308501.5908423441,Bolsar
+2000,integrada,Millones de pesos 2018,activo_no_corr,524679.2031804759,Bolsar
+2000,integrada,Millones de pesos 2018,inventarios,17450.69903146248,Bolsar
+2000,integrada,Millones de pesos 2018,ppye,359489.54774695646,Bolsar
+2000,integrada,Millones de pesos 2018,ppye_neta,334626.1624012444,Bolsar
+2000,produccion,Millones de pesos 2018,KTA,105069.43357697097,Bolsar
+2000,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2000,produccion,Millones de pesos 2018,activo_no_corr,42021.87525312703,Bolsar
+2000,produccion,Millones de pesos 2018,inventarios,622.5369579262288,Bolsar
+2000,produccion,Millones de pesos 2018,ppye,437628.5273570395,Bolsar
+2000,produccion,Millones de pesos 2018,ppye_neta,104359.60722913888,Bolsar
+2000,transporte,Millones de pesos 2018,KTA,77171.80421553252,Bolsar
+2000,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2000,transporte,Millones de pesos 2018,activo_no_corr,84157.74629682979,Bolsar
+2000,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2000,transporte,Millones de pesos 2018,ppye,81378.01466748035,Bolsar
+2000,transporte,Millones de pesos 2018,ppye_neta,77171.80421553252,Bolsar
+2001,distribucion,Millones de pesos 2018,KTA,34206.69784931043,Bolsar
+2001,distribucion,Millones de pesos 2018,activo,15901.396142797643,Bolsar
+2001,distribucion,Millones de pesos 2018,activo_no_corr,39009.91852570374,Bolsar
+2001,distribucion,Millones de pesos 2018,inventarios,17.97681798396632,Bolsar
+2001,distribucion,Millones de pesos 2018,ppye,36836.44620229161,Bolsar
+2001,distribucion,Millones de pesos 2018,ppye_neta,34187.32892004914,Bolsar
+2001,integrada,Millones de pesos 2018,KTA,413615.5472960711,Bolsar
+2001,integrada,Millones de pesos 2018,activo,351575.56908150634,Bolsar
+2001,integrada,Millones de pesos 2018,activo_no_corr,560611.3614131552,Bolsar
+2001,integrada,Millones de pesos 2018,inventarios,15973.612506737081,Bolsar
+2001,integrada,Millones de pesos 2018,ppye,428868.08171589696,Bolsar
+2001,integrada,Millones de pesos 2018,ppye_neta,395958.2774471309,Bolsar
+2001,produccion,Millones de pesos 2018,KTA,105150.86153154426,Bolsar
+2001,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2001,produccion,Millones de pesos 2018,activo_no_corr,48778.02735487652,Bolsar
+2001,produccion,Millones de pesos 2018,inventarios,978.9431026319373,Bolsar
+2001,produccion,Millones de pesos 2018,ppye,494278.4119603414,Bolsar
+2001,produccion,Millones de pesos 2018,ppye_neta,104047.40303523108,Bolsar
+2001,transporte,Millones de pesos 2018,KTA,83066.03699197638,Bolsar
+2001,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2001,transporte,Millones de pesos 2018,activo_no_corr,86999.78622048808,Bolsar
+2001,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2001,transporte,Millones de pesos 2018,ppye,84484.1503759214,Bolsar
+2001,transporte,Millones de pesos 2018,ppye_neta,83066.03699197638,Bolsar
+2002,distribucion,Millones de pesos 2018,KTA,58856.85015987248,Bolsar
+2002,distribucion,Millones de pesos 2018,activo,24845.752121888927,Bolsar
+2002,distribucion,Millones de pesos 2018,activo_no_corr,65642.71565625523,Bolsar
+2002,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2002,distribucion,Millones de pesos 2018,ppye,60678.643014360365,Bolsar
+2002,distribucion,Millones de pesos 2018,ppye_neta,58856.85015987248,Bolsar
+2002,integrada,Millones de pesos 2018,KTA,541690.5449210597,Bolsar
+2002,integrada,Millones de pesos 2018,activo,282275.40158946795,Bolsar
+2002,integrada,Millones de pesos 2018,activo_no_corr,661115.9841283388,Bolsar
+2002,integrada,Millones de pesos 2018,inventarios,20234.869895005428,Bolsar
+2002,integrada,Millones de pesos 2018,ppye,575712.0184427795,Bolsar
+2002,integrada,Millones de pesos 2018,ppye_neta,520174.6380465798,Bolsar
+2002,produccion,Millones de pesos 2018,KTA,94751.20199085854,Bolsar
+2002,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2002,produccion,Millones de pesos 2018,activo_no_corr,113097.17299820803,Bolsar
+2002,produccion,Millones de pesos 2018,inventarios,2885.1328078692723,Bolsar
+2002,produccion,Millones de pesos 2018,ppye,629366.6051685547,Bolsar
+2002,produccion,Millones de pesos 2018,ppye_neta,91647.28080823028,Bolsar
+2002,transporte,Millones de pesos 2018,KTA,162279.460767761,Bolsar
+2002,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2002,transporte,Millones de pesos 2018,activo_no_corr,167104.06141689466,Bolsar
+2002,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2002,transporte,Millones de pesos 2018,ppye,163360.87918224168,Bolsar
+2002,transporte,Millones de pesos 2018,ppye_neta,162279.460767761,Bolsar
+2003,distribucion,Millones de pesos 2018,KTA,50884.86587185971,Bolsar
+2003,distribucion,Millones de pesos 2018,activo,21850.27224645868,Bolsar
+2003,distribucion,Millones de pesos 2018,activo_no_corr,56752.05168149599,Bolsar
+2003,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2003,distribucion,Millones de pesos 2018,ppye,52009.39862696833,Bolsar
+2003,distribucion,Millones de pesos 2018,ppye_neta,50884.86587185971,Bolsar
+2003,integrada,Millones de pesos 2018,KTA,559823.5208879266,Bolsar
+2003,integrada,Millones de pesos 2018,activo,294138.414751036,Bolsar
+2003,integrada,Millones de pesos 2018,activo_no_corr,651244.0223526406,Bolsar
+2003,integrada,Millones de pesos 2018,inventarios,23558.03829739157,Bolsar
+2003,integrada,Millones de pesos 2018,ppye,584651.1144044842,Bolsar
+2003,integrada,Millones de pesos 2018,ppye_neta,535148.2605344047,Bolsar
+2003,produccion,Millones de pesos 2018,KTA,92219.17181917021,Bolsar
+2003,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2003,produccion,Millones de pesos 2018,activo_no_corr,94828.68353132567,Bolsar
+2003,produccion,Millones de pesos 2018,inventarios,2083.456144921362,Bolsar
+2003,produccion,Millones de pesos 2018,ppye,524125.8862213256,Bolsar
+2003,produccion,Millones de pesos 2018,ppye_neta,90014.04361618476,Bolsar
+2003,transporte,Millones de pesos 2018,KTA,122987.49921212206,Bolsar
+2003,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2003,transporte,Millones de pesos 2018,activo_no_corr,131474.9156424239,Bolsar
+2003,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2003,transporte,Millones de pesos 2018,ppye,124795.32813093133,Bolsar
+2003,transporte,Millones de pesos 2018,ppye_neta,122987.49921212206,Bolsar
+2004,distribucion,Millones de pesos 2018,KTA,46992.175611617015,Bolsar
+2004,distribucion,Millones de pesos 2018,activo,20183.280393037967,Bolsar
+2004,distribucion,Millones de pesos 2018,activo_no_corr,52641.9209835667,Bolsar
+2004,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2004,distribucion,Millones de pesos 2018,ppye,48380.337457537404,Bolsar
+2004,distribucion,Millones de pesos 2018,ppye_neta,46992.175611617015,Bolsar
+2004,integrada,Millones de pesos 2018,KTA,536777.3728577163,Bolsar
+2004,integrada,Millones de pesos 2018,activo,319092.9320348424,Bolsar
+2004,integrada,Millones de pesos 2018,activo_no_corr,627349.9308497123,Bolsar
+2004,integrada,Millones de pesos 2018,inventarios,28285.101046015177,Bolsar
+2004,integrada,Millones de pesos 2018,ppye,556576.1061472832,Bolsar
+2004,integrada,Millones de pesos 2018,ppye_neta,506601.68949349696,Bolsar
+2004,produccion,Millones de pesos 2018,KTA,104133.36120006088,Bolsar
+2004,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2004,produccion,Millones de pesos 2018,activo_no_corr,94931.15060751562,Bolsar
+2004,produccion,Millones de pesos 2018,inventarios,2359.0576934096657,Bolsar
+2004,produccion,Millones de pesos 2018,ppye,528871.1375839805,Bolsar
+2004,produccion,Millones de pesos 2018,ppye_neta,101630.70624682121,Bolsar
+2004,transporte,Millones de pesos 2018,KTA,114266.13724635784,Bolsar
+2004,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2004,transporte,Millones de pesos 2018,activo_no_corr,123303.48004349317,Bolsar
+2004,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2004,transporte,Millones de pesos 2018,ppye,116442.04847426538,Bolsar
+2004,transporte,Millones de pesos 2018,ppye_neta,114266.13724635784,Bolsar
+2005,distribucion,Millones de pesos 2018,KTA,41063.48495251447,Bolsar
+2005,distribucion,Millones de pesos 2018,activo,18724.97480408535,Bolsar
+2005,distribucion,Millones de pesos 2018,activo_no_corr,47193.24280281863,Bolsar
+2005,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2005,distribucion,Millones de pesos 2018,ppye,43063.97754452297,Bolsar
+2005,distribucion,Millones de pesos 2018,ppye_neta,41063.48495251447,Bolsar
+2005,integrada,Millones de pesos 2018,KTA,526020.6745199396,Bolsar
+2005,integrada,Millones de pesos 2018,activo,300549.55920690193,Bolsar
+2005,integrada,Millones de pesos 2018,activo_no_corr,614769.866169098,Bolsar
+2005,integrada,Millones de pesos 2018,inventarios,33373.175835682996,Bolsar
+2005,integrada,Millones de pesos 2018,ppye,554723.6132229692,Bolsar
+2005,integrada,Millones de pesos 2018,ppye_neta,490682.76459979883,Bolsar
+2005,produccion,Millones de pesos 2018,KTA,116893.93725722413,Bolsar
+2005,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2005,produccion,Millones de pesos 2018,activo_no_corr,96185.88522221077,Bolsar
+2005,produccion,Millones de pesos 2018,inventarios,2312.473028911818,Bolsar
+2005,produccion,Millones de pesos 2018,ppye,562841.5228632515,Bolsar
+2005,produccion,Millones de pesos 2018,ppye_neta,114424.65206824968,Bolsar
+2005,transporte,Millones de pesos 2018,KTA,102788.2357137891,Bolsar
+2005,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2005,transporte,Millones de pesos 2018,activo_no_corr,111443.29911220486,Bolsar
+2005,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2005,transporte,Millones de pesos 2018,ppye,104895.44063496194,Bolsar
+2005,transporte,Millones de pesos 2018,ppye_neta,102788.2357137891,Bolsar
+2006,distribucion,Millones de pesos 2018,KTA,36145.61990234201,Bolsar
+2006,distribucion,Millones de pesos 2018,activo,16635.97800029315,Bolsar
+2006,distribucion,Millones de pesos 2018,activo_no_corr,40303.827781158594,Bolsar
+2006,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2006,distribucion,Millones de pesos 2018,ppye,38291.38888375975,Bolsar
+2006,distribucion,Millones de pesos 2018,ppye_neta,36145.61990234201,Bolsar
+2006,integrada,Millones de pesos 2018,KTA,448974.4581824082,Bolsar
+2006,integrada,Millones de pesos 2018,activo,294033.5760395952,Bolsar
+2006,integrada,Millones de pesos 2018,activo_no_corr,568435.2553530365,Bolsar
+2006,integrada,Millones de pesos 2018,inventarios,37096.82239554656,Bolsar
+2006,integrada,Millones de pesos 2018,ppye,479316.7767935223,Bolsar
+2006,integrada,Millones de pesos 2018,ppye_neta,409830.194960162,Bolsar
+2006,produccion,Millones de pesos 2018,KTA,135074.1140249314,Bolsar
+2006,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2006,produccion,Millones de pesos 2018,activo_no_corr,101265.37023958105,Bolsar
+2006,produccion,Millones de pesos 2018,inventarios,2326.150149222024,Bolsar
+2006,produccion,Millones de pesos 2018,ppye,562955.9757558049,Bolsar
+2006,produccion,Millones de pesos 2018,ppye_neta,132588.99426827006,Bolsar
+2006,transporte,Millones de pesos 2018,KTA,91054.45911210559,Bolsar
+2006,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2006,transporte,Millones de pesos 2018,activo_no_corr,99119.65272013823,Bolsar
+2006,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2006,transporte,Millones de pesos 2018,ppye,92921.71367535378,Bolsar
+2006,transporte,Millones de pesos 2018,ppye_neta,91054.45911210559,Bolsar
+2007,distribucion,Millones de pesos 2018,KTA,31650.902219407973,Bolsar
+2007,distribucion,Millones de pesos 2018,activo,14876.083428940427,Bolsar
+2007,distribucion,Millones de pesos 2018,activo_no_corr,35536.80216017894,Bolsar
+2007,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2007,distribucion,Millones de pesos 2018,ppye,33375.24268776206,Bolsar
+2007,distribucion,Millones de pesos 2018,ppye_neta,31650.902219407973,Bolsar
+2007,integrada,Millones de pesos 2018,KTA,430780.20775430044,Bolsar
+2007,integrada,Millones de pesos 2018,activo,271032.2889242324,Bolsar
+2007,integrada,Millones de pesos 2018,activo_no_corr,532838.5407623611,Bolsar
+2007,integrada,Millones de pesos 2018,inventarios,45292.6084735958,Bolsar
+2007,integrada,Millones de pesos 2018,ppye,457405.8523994995,Bolsar
+2007,integrada,Millones de pesos 2018,ppye_neta,382531.5486745862,Bolsar
+2007,produccion,Millones de pesos 2018,KTA,149029.70806126116,Bolsar
+2007,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2007,produccion,Millones de pesos 2018,activo_no_corr,108503.74190727928,Bolsar
+2007,produccion,Millones de pesos 2018,inventarios,2541.157725063834,Bolsar
+2007,produccion,Millones de pesos 2018,ppye,519933.5484174539,Bolsar
+2007,produccion,Millones de pesos 2018,ppye_neta,146286.73690958525,Bolsar
+2007,transporte,Millones de pesos 2018,KTA,78893.39137158716,Bolsar
+2007,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2007,transporte,Millones de pesos 2018,activo_no_corr,85701.81333377314,Bolsar
+2007,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2007,transporte,Millones de pesos 2018,ppye,80796.67079115455,Bolsar
+2007,transporte,Millones de pesos 2018,ppye_neta,78893.39137158716,Bolsar
+2008,distribucion,Millones de pesos 2018,KTA,25951.95046146144,Bolsar
+2008,distribucion,Millones de pesos 2018,activo,12000.386802698416,Bolsar
+2008,distribucion,Millones de pesos 2018,activo_no_corr,29231.981842802175,Bolsar
+2008,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2008,distribucion,Millones de pesos 2018,ppye,27135.156995179637,Bolsar
+2008,distribucion,Millones de pesos 2018,ppye_neta,25951.95046146144,Bolsar
+2008,integrada,Millones de pesos 2018,KTA,383094.64452896535,Bolsar
+2008,integrada,Millones de pesos 2018,activo,238939.03916372484,Bolsar
+2008,integrada,Millones de pesos 2018,activo_no_corr,483134.7164936258,Bolsar
+2008,integrada,Millones de pesos 2018,inventarios,51583.34893383432,Bolsar
+2008,integrada,Millones de pesos 2018,ppye,400704.83532874624,Bolsar
+2008,integrada,Millones de pesos 2018,ppye_neta,328519.1899601548,Bolsar
+2008,produccion,Millones de pesos 2018,KTA,133257.53842893333,Bolsar
+2008,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2008,produccion,Millones de pesos 2018,activo_no_corr,101076.45985670885,Bolsar
+2008,produccion,Millones de pesos 2018,inventarios,2814.5779157478305,Bolsar
+2008,produccion,Millones de pesos 2018,ppye,475373.9317994681,Bolsar
+2008,produccion,Millones de pesos 2018,ppye_neta,130225.96716796487,Bolsar
+2008,transporte,Millones de pesos 2018,KTA,62686.13447155473,Bolsar
+2008,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2008,transporte,Millones de pesos 2018,activo_no_corr,68275.2756971673,Bolsar
+2008,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2008,transporte,Millones de pesos 2018,ppye,65060.71728599552,Bolsar
+2008,transporte,Millones de pesos 2018,ppye_neta,62686.13447155473,Bolsar
+2009,distribucion,Millones de pesos 2018,KTA,22421.333003758336,Bolsar
+2009,distribucion,Millones de pesos 2018,activo,9795.166978179395,Bolsar
+2009,distribucion,Millones de pesos 2018,activo_no_corr,26000.508093704822,Bolsar
+2009,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2009,distribucion,Millones de pesos 2018,ppye,23847.54750304427,Bolsar
+2009,distribucion,Millones de pesos 2018,ppye_neta,22421.333003758336,Bolsar
+2009,integrada,Millones de pesos 2018,KTA,336645.1088194282,Bolsar
+2009,integrada,Millones de pesos 2018,activo,207975.5520880117,Bolsar
+2009,integrada,Millones de pesos 2018,activo_no_corr,238816.44429427883,Bolsar
+2009,integrada,Millones de pesos 2018,inventarios,36733.36766723666,Bolsar
+2009,integrada,Millones de pesos 2018,ppye,352836.74545417086,Bolsar
+2009,integrada,Millones de pesos 2018,ppye_neta,297299.7137394672,Bolsar
+2009,produccion,Millones de pesos 2018,KTA,125146.67501954544,Bolsar
+2009,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2009,produccion,Millones de pesos 2018,activo_no_corr,108803.56829765755,Bolsar
+2009,produccion,Millones de pesos 2018,inventarios,2396.6337501802673,Bolsar
+2009,produccion,Millones de pesos 2018,ppye,444656.6497702878,Bolsar
+2009,produccion,Millones de pesos 2018,ppye_neta,122552.67770658646,Bolsar
+2009,transporte,Millones de pesos 2018,KTA,54239.34463799419,Bolsar
+2009,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2009,transporte,Millones de pesos 2018,activo_no_corr,59170.18432155586,Bolsar
+2009,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2009,transporte,Millones de pesos 2018,ppye,55769.15380231978,Bolsar
+2009,transporte,Millones de pesos 2018,ppye_neta,54239.34463799419,Bolsar
+2010,distribucion,Millones de pesos 2018,KTA,18157.88517325494,Bolsar
+2010,distribucion,Millones de pesos 2018,activo,7981.5730760031565,Bolsar
+2010,distribucion,Millones de pesos 2018,activo_no_corr,20973.366654402314,Bolsar
+2010,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2010,distribucion,Millones de pesos 2018,ppye,19045.127652570976,Bolsar
+2010,distribucion,Millones de pesos 2018,ppye_neta,18157.88517325494,Bolsar
+2010,integrada,Millones de pesos 2018,KTA,279368.09399987437,Bolsar
+2010,integrada,Millones de pesos 2018,activo,162935.85331691953,Bolsar
+2010,integrada,Millones de pesos 2018,activo_no_corr,349167.6891767125,Bolsar
+2010,integrada,Millones de pesos 2018,inventarios,35201.7044140469,Bolsar
+2010,integrada,Millones de pesos 2018,ppye,303234.3689569596,Bolsar
+2010,integrada,Millones de pesos 2018,ppye_neta,241772.78010306647,Bolsar
+2010,produccion,Millones de pesos 2018,KTA,186612.92675594272,Bolsar
+2010,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2010,produccion,Millones de pesos 2018,activo_no_corr,102046.99912910808,Bolsar
+2010,produccion,Millones de pesos 2018,inventarios,1753.9999148752268,Bolsar
+2010,produccion,Millones de pesos 2018,ppye,459505.02259735327,Bolsar
+2010,produccion,Millones de pesos 2018,ppye_neta,184699.7706280244,Bolsar
+2010,transporte,Millones de pesos 2018,KTA,41836.1553981875,Bolsar
+2010,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2010,transporte,Millones de pesos 2018,activo_no_corr,47272.968081267965,Bolsar
+2010,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2010,transporte,Millones de pesos 2018,ppye,43461.41887849421,Bolsar
+2010,transporte,Millones de pesos 2018,ppye_neta,41836.1553981875,Bolsar
+2011,distribucion,Millones de pesos 2018,KTA,14670.69821726259,Bolsar
+2011,distribucion,Millones de pesos 2018,activo,6598.557049620065,Bolsar
+2011,distribucion,Millones de pesos 2018,activo_no_corr,17251.060537788082,Bolsar
+2011,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2011,distribucion,Millones de pesos 2018,ppye,15575.980970417608,Bolsar
+2011,distribucion,Millones de pesos 2018,ppye_neta,14670.69821726259,Bolsar
+2011,integrada,Millones de pesos 2018,KTA,254489.66322870206,Bolsar
+2011,integrada,Millones de pesos 2018,activo,128152.60414766645,Bolsar
+2011,integrada,Millones de pesos 2018,activo_no_corr,368578.91286728263,Bolsar
+2011,integrada,Millones de pesos 2018,inventarios,40324.42789959952,Bolsar
+2011,integrada,Millones de pesos 2018,ppye,282224.75168721995,Bolsar
+2011,integrada,Millones de pesos 2018,ppye_neta,211529.83293548517,Bolsar
+2011,produccion,Millones de pesos 2018,KTA,225083.95888644035,Bolsar
+2011,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2011,produccion,Millones de pesos 2018,activo_no_corr,97469.96892818908,Bolsar
+2011,produccion,Millones de pesos 2018,inventarios,2080.9624489472226,Bolsar
+2011,produccion,Millones de pesos 2018,ppye,477748.5151195528,Bolsar
+2011,produccion,Millones de pesos 2018,ppye_neta,222801.71286728262,Bolsar
+2011,transporte,Millones de pesos 2018,KTA,33033.59676572426,Bolsar
+2011,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2011,transporte,Millones de pesos 2018,activo_no_corr,37736.837801102345,Bolsar
+2011,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2011,transporte,Millones de pesos 2018,ppye,34396.52312166224,Bolsar
+2011,transporte,Millones de pesos 2018,ppye_neta,33033.59676572426,Bolsar
+2012,distribucion,Millones de pesos 2018,KTA,11891.95411796708,Bolsar
+2012,distribucion,Millones de pesos 2018,activo,5192.850983139569,Bolsar
+2012,distribucion,Millones de pesos 2018,activo_no_corr,13724.581539125003,Bolsar
+2012,distribucion,Millones de pesos 2018,inventarios,0.0,Bolsar
+2012,distribucion,Millones de pesos 2018,ppye,12614.178292201372,Bolsar
+2012,distribucion,Millones de pesos 2018,ppye_neta,11891.95411796708,Bolsar
+2012,integrada,Millones de pesos 2018,KTA,265076.2858540522,Bolsar
+2012,integrada,Millones de pesos 2018,activo,88112.98996187864,Bolsar
+2012,integrada,Millones de pesos 2018,activo_no_corr,347945.0928488808,Bolsar
+2012,integrada,Millones de pesos 2018,inventarios,37144.251352847976,Bolsar
+2012,integrada,Millones de pesos 2018,ppye,305994.7634103528,Bolsar
+2012,integrada,Millones de pesos 2018,ppye_neta,224511.1690958421,Bolsar
+2012,produccion,Millones de pesos 2018,KTA,274455.015071693,Bolsar
+2012,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2012,produccion,Millones de pesos 2018,activo_no_corr,138357.07671946925,Bolsar
+2012,produccion,Millones de pesos 2018,inventarios,3057.563295753628,Bolsar
+2012,produccion,Millones de pesos 2018,ppye,560380.2894784666,Bolsar
+2012,produccion,Millones de pesos 2018,ppye_neta,271080.56969064625,Bolsar
+2012,transporte,Millones de pesos 2018,KTA,26531.215394625375,Bolsar
+2012,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2012,transporte,Millones de pesos 2018,activo_no_corr,29517.454247504364,Bolsar
+2012,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2012,transporte,Millones de pesos 2018,ppye,27343.494018010886,Bolsar
+2012,transporte,Millones de pesos 2018,ppye_neta,26531.215394625375,Bolsar
+2013,distribucion,Millones de pesos 2018,KTA,9795.977919043737,Bolsar
+2013,distribucion,Millones de pesos 2018,activo,4676.742117635842,Bolsar
+2013,distribucion,Millones de pesos 2018,activo_no_corr,10430.13937483219,Bolsar
+2013,distribucion,Millones de pesos 2018,inventarios,24.739362371137172,Bolsar
+2013,distribucion,Millones de pesos 2018,ppye,10307.181976001324,Bolsar
+2013,distribucion,Millones de pesos 2018,ppye_neta,9761.90019235664,Bolsar
+2013,integrada,Millones de pesos 2018,KTA,323457.3323107401,Bolsar
+2013,integrada,Millones de pesos 2018,activo,77465.53502399461,Bolsar
+2013,integrada,Millones de pesos 2018,activo_no_corr,428310.6638104068,Bolsar
+2013,integrada,Millones de pesos 2018,inventarios,41554.82707571296,Bolsar
+2013,integrada,Millones de pesos 2018,ppye,371858.33282728965,Bolsar
+2013,integrada,Millones de pesos 2018,ppye_neta,279354.19091770507,Bolsar
+2013,produccion,Millones de pesos 2018,KTA,391502.45911067876,Bolsar
+2013,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2013,produccion,Millones de pesos 2018,activo_no_corr,161098.75548921514,Bolsar
+2013,produccion,Millones de pesos 2018,inventarios,2513.8609534677576,Bolsar
+2013,produccion,Millones de pesos 2018,ppye,731548.3904041897,Bolsar
+2013,produccion,Millones de pesos 2018,ppye_neta,388723.8519567587,Bolsar
+2013,transporte,Millones de pesos 2018,KTA,20629.422506393472,Bolsar
+2013,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2013,transporte,Millones de pesos 2018,activo_no_corr,24502.899772351673,Bolsar
+2013,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2013,transporte,Millones de pesos 2018,ppye,21393.02726549971,Bolsar
+2013,transporte,Millones de pesos 2018,ppye_neta,20629.422506393472,Bolsar
+2014,distribucion,Millones de pesos 2018,KTA,6963.8251914817565,Bolsar
+2014,distribucion,Millones de pesos 2018,activo,3564.1974370646967,Bolsar
+2014,distribucion,Millones de pesos 2018,activo_no_corr,7834.59318475066,Bolsar
+2014,distribucion,Millones de pesos 2018,inventarios,9.179812272787537,Bolsar
+2014,distribucion,Millones de pesos 2018,ppye,7703.895231504504,Bolsar
+2014,distribucion,Millones de pesos 2018,ppye_neta,6951.704108539592,Bolsar
+2014,integrada,Millones de pesos 2018,KTA,320313.6966958956,Bolsar
+2014,integrada,Millones de pesos 2018,activo,63581.511067526255,Bolsar
+2014,integrada,Millones de pesos 2018,activo_no_corr,473642.18069838657,Bolsar
+2014,integrada,Millones de pesos 2018,inventarios,38910.88545684564,Bolsar
+2014,integrada,Millones de pesos 2018,ppye,413019.58327214135,Bolsar
+2014,integrada,Millones de pesos 2018,ppye_neta,279282.93241424294,Bolsar
+2014,produccion,Millones de pesos 2018,KTA,341028.00905791536,Bolsar
+2014,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2014,produccion,Millones de pesos 2018,activo_no_corr,172736.01746144902,Bolsar
+2014,produccion,Millones de pesos 2018,inventarios,2394.195734369849,Bolsar
+2014,produccion,Millones de pesos 2018,ppye,730398.8541162106,Bolsar
+2014,produccion,Millones de pesos 2018,ppye_neta,338380.5312531613,Bolsar
+2014,transporte,Millones de pesos 2018,KTA,14087.36962943216,Bolsar
+2014,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2014,transporte,Millones de pesos 2018,activo_no_corr,17566.528991858388,Bolsar
+2014,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2014,transporte,Millones de pesos 2018,ppye,15246.129136227153,Bolsar
+2014,transporte,Millones de pesos 2018,ppye_neta,14087.36962943216,Bolsar
+2015,distribucion,Millones de pesos 2018,KTA,5965.462539843205,Bolsar
+2015,distribucion,Millones de pesos 2018,activo,3826.0997702600985,Bolsar
+2015,distribucion,Millones de pesos 2018,activo_no_corr,6739.728365948931,Bolsar
+2015,distribucion,Millones de pesos 2018,inventarios,24.76450377773745,Bolsar
+2015,distribucion,Millones de pesos 2018,ppye,6483.217801307617,Bolsar
+2015,distribucion,Millones de pesos 2018,ppye_neta,5932.391296383393,Bolsar
+2015,integrada,Millones de pesos 2018,KTA,463313.4288918039,Bolsar
+2015,integrada,Millones de pesos 2018,activo,59826.785231642985,Bolsar
+2015,integrada,Millones de pesos 2018,activo_no_corr,626773.834048275,Bolsar
+2015,integrada,Millones de pesos 2018,inventarios,43976.19282174727,Bolsar
+2015,integrada,Millones de pesos 2018,ppye,592769.80015609,Bolsar
+2015,integrada,Millones de pesos 2018,ppye_neta,415098.82587518456,Bolsar
+2015,produccion,Millones de pesos 2018,KTA,329683.61670187337,Bolsar
+2015,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2015,produccion,Millones de pesos 2018,activo_no_corr,239684.55116003912,Bolsar
+2015,produccion,Millones de pesos 2018,inventarios,322.4584974771742,Bolsar
+2015,produccion,Millones de pesos 2018,ppye,861077.607693101,Bolsar
+2015,produccion,Millones de pesos 2018,ppye_neta,329283.21070754406,Bolsar
+2015,transporte,Millones de pesos 2018,KTA,11140.873338839105,Bolsar
+2015,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2015,transporte,Millones de pesos 2018,activo_no_corr,15566.737476109789,Bolsar
+2015,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2015,transporte,Millones de pesos 2018,ppye,12467.7050664341,Bolsar
+2015,transporte,Millones de pesos 2018,ppye_neta,11140.873338839105,Bolsar
+2016,distribucion,Millones de pesos 2018,KTA,4599.656128097407,Bolsar
+2016,distribucion,Millones de pesos 2018,activo,4961.998765439827,Bolsar
+2016,distribucion,Millones de pesos 2018,activo_no_corr,5789.22390372329,Bolsar
+2016,distribucion,Millones de pesos 2018,inventarios,29.40590015020204,Bolsar
+2016,distribucion,Millones de pesos 2018,ppye,5390.444055154044,Bolsar
+2016,distribucion,Millones de pesos 2018,ppye_neta,4563.451931539486,Bolsar
+2016,integrada,Millones de pesos 2018,KTA,475096.743698714,Bolsar
+2016,integrada,Millones de pesos 2018,activo,53560.21224156681,Bolsar
+2016,integrada,Millones de pesos 2018,activo_no_corr,522719.2599270625,Bolsar
+2016,integrada,Millones de pesos 2018,inventarios,36551.755838622514,Bolsar
+2016,integrada,Millones de pesos 2018,ppye,531085.8696801725,Bolsar
+2016,integrada,Millones de pesos 2018,ppye_neta,435267.91518187354,Bolsar
+2016,produccion,Millones de pesos 2018,KTA,517571.31720165396,Bolsar
+2016,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2016,produccion,Millones de pesos 2018,activo_no_corr,210172.92754017012,Bolsar
+2016,produccion,Millones de pesos 2018,inventarios,344.82743854752954,Bolsar
+2016,produccion,Millones de pesos 2018,ppye,1017437.292686123,Bolsar
+2016,produccion,Millones de pesos 2018,ppye_neta,517136.04248280614,Bolsar
+2016,transporte,Millones de pesos 2018,KTA,9334.0141734381,Bolsar
+2016,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2016,transporte,Millones de pesos 2018,activo_no_corr,13744.55226429939,Bolsar
+2016,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2016,transporte,Millones de pesos 2018,ppye,10866.317168232048,Bolsar
+2016,transporte,Millones de pesos 2018,ppye_neta,9334.0141734381,Bolsar
+2017,distribucion,Millones de pesos 2018,KTA,20019.586721990396,Bolsar
+2017,distribucion,Millones de pesos 2018,activo,6504.317190233957,Bolsar
+2017,distribucion,Millones de pesos 2018,activo_no_corr,20816.724860452552,Bolsar
+2017,distribucion,Millones de pesos 2018,inventarios,52.436413941054155,Bolsar
+2017,distribucion,Millones de pesos 2018,ppye,20381.476730997387,Bolsar
+2017,distribucion,Millones de pesos 2018,ppye_neta,19955.5940585188,Bolsar
+2017,integrada,Millones de pesos 2018,KTA,407310.24790220696,Bolsar
+2017,integrada,Millones de pesos 2018,activo,0.0,Bolsar
+2017,integrada,Millones de pesos 2018,activo_no_corr,459727.33044983074,Bolsar
+2017,integrada,Millones de pesos 2018,inventarios,32722.389482307473,Bolsar
+2017,integrada,Millones de pesos 2018,ppye,458780.1065411787,Bolsar
+2017,integrada,Millones de pesos 2018,ppye_neta,372842.91767432063,Bolsar
+2017,produccion,Millones de pesos 2018,KTA,7081.145109407154,Bolsar
+2017,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2017,produccion,Millones de pesos 2018,activo_no_corr,215157.19391504998,Bolsar
+2017,produccion,Millones de pesos 2018,inventarios,306.9017454208678,Bolsar
+2017,produccion,Millones de pesos 2018,ppye,320019.16349371936,Bolsar
+2017,produccion,Millones de pesos 2018,ppye_neta,6700.279443188273,Bolsar
+2017,transporte,Millones de pesos 2018,KTA,31509.103566908732,Bolsar
+2017,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2017,transporte,Millones de pesos 2018,activo_no_corr,35893.75148230199,Bolsar
+2017,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2017,transporte,Millones de pesos 2018,ppye,33784.15794088527,Bolsar
+2017,transporte,Millones de pesos 2018,ppye_neta,31509.103566908732,Bolsar
+2018,distribucion,Millones de pesos 2018,KTA,29071.64617774528,Bolsar
+2018,distribucion,Millones de pesos 2018,activo,19666.874804,Bolsar
+2018,distribucion,Millones de pesos 2018,activo_no_corr,40790.320440999996,Bolsar
+2018,distribucion,Millones de pesos 2018,inventarios,125.565652,Bolsar
+2018,distribucion,Millones de pesos 2018,ppye,32385.911247,Bolsar
+2018,distribucion,Millones de pesos 2018,ppye_neta,28930.916748,Bolsar
+2018,integrada,Millones de pesos 2018,KTA,647094.392852574,Bolsar
+2018,integrada,Millones de pesos 2018,activo,0.0,Bolsar
+2018,integrada,Millones de pesos 2018,activo_no_corr,785601.0,Bolsar
+2018,integrada,Millones de pesos 2018,inventarios,53324.0,Bolsar
+2018,integrada,Millones de pesos 2018,ppye,740103.0,Bolsar
+2018,integrada,Millones de pesos 2018,ppye_neta,589789.0,Bolsar
+2018,produccion,Millones de pesos 2018,KTA,54139.3036905869,Bolsar
+2018,produccion,Millones de pesos 2018,activo,0.0,Bolsar
+2018,produccion,Millones de pesos 2018,activo_no_corr,475318.445,Bolsar
+2018,produccion,Millones de pesos 2018,inventarios,847.572,Bolsar
+2018,produccion,Millones de pesos 2018,ppye,542750.893,Bolsar
+2018,produccion,Millones de pesos 2018,ppye_neta,53250.446,Bolsar
+2018,transporte,Millones de pesos 2018,KTA,65681.206,Bolsar
+2018,transporte,Millones de pesos 2018,activo,0.0,Bolsar
+2018,transporte,Millones de pesos 2018,activo_no_corr,78107.688,Bolsar
+2018,transporte,Millones de pesos 2018,inventarios,0.0,Bolsar
+2018,transporte,Millones de pesos 2018,ppye,74244.363,Bolsar
+2018,transporte,Millones de pesos 2018,ppye_neta,65681.206,Bolsar

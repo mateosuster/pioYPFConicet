@@ -1,0 +1,17 @@
+refYear,flowCode,flowDesc,reporterCode,reporterDesc,partnerCode,partnerDesc,cmdCode,cmdDesc,primaryValue,netWgt,qty,classificationCode,commodity_label
+1985,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,68948888.0,406661280.0,472947072.0,S2,crude_petroleum_sitc
+1986,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,18805804.0,131729832.0,153201792.0,S2,crude_petroleum_sitc
+1987,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,10343388.0,83200376.0,96762032.0,S2,crude_petroleum_sitc
+1988,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,17428304.0,200983680.0,233744032.0,S2,crude_petroleum_sitc
+1989,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,34547936.0,315928160.0,367424448.0,S2,crude_petroleum_sitc
+1990,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,146791712.0,1038185024.0,1207409152.0,S2,crude_petroleum_sitc
+1991,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,147616852.0,881398298.0,1025066221.0,S2,crude_petroleum_sitc
+1992,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,348814560.0,2697115136.0,3136744960.0,S2,crude_petroleum_sitc
+1993,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,527361344.0,4523322368.0,4523322368.0,S2,crude_petroleum_sitc
+1994,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,1125573120.0,10526416896.0,10526416896.0,S2,crude_petroleum_sitc
+1995,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,1591854976.0,14010169344.0,14010169344.0,S2,crude_petroleum_sitc
+1996,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,2319963648.0,16472775680.0,16472775680.0,S2,crude_petroleum_sitc
+1997,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,2191356416.0,16535476224.0,16535476224.0,S2,crude_petroleum_sitc
+1998,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,1462650880.0,17094863872.0,17094863872.0,S2,crude_petroleum_sitc
+1999,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,1599392752.0,14237253126.0,14237253126.0,S2,crude_petroleum_sitc
+2000,X,Export,32,Argentina,0,World,333,Crude petroleum and oils obtained from bituminous minerals,2808667093.0,14359427673.0,14359427673.0,S2,crude_petroleum_sitc

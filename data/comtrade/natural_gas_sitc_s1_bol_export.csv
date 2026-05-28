@@ -1,0 +1,12 @@
+refYear,flowCode,flowDesc,reporterCode,reporterDesc,partnerCode,partnerDesc,cmdCode,cmdDesc,primaryValue,netWgt,qty,classificationCode,commodity_label
+1965,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",1231.0,11062.0,11062.0,S1,natural_gas_sitc_s1_bol
+1966,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",1827.0,15625.0,15625.0,S1,natural_gas_sitc_s1_bol
+1967,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",1055.0,10000.0,10000.0,S1,natural_gas_sitc_s1_bol
+1968,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",2229.0,18343.0,18343.0,S1,natural_gas_sitc_s1_bol
+1990,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",3884.0,12125.0,12125.0,S1,natural_gas_sitc_s1_bol
+1991,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",2666.0,22000.0,22000.0,S1,natural_gas_sitc_s1_bol
+1992,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",8750.0,25000.0,25000.0,S1,natural_gas_sitc_s1_bol
+1993,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",2139.0,10000.0,10000.0,S1,natural_gas_sitc_s1_bol
+1995,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",2483.0,9937.0,9937.0,S1,natural_gas_sitc_s1_bol
+1998,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",3323.0,554.0,554.0,S1,natural_gas_sitc_s1_bol
+1999,X,Export,32,Argentina,68,Bolivia (Plurinational State of),3411,"Gas, natural",3322.0,359.0,359.0,S1,natural_gas_sitc_s1_bol

@@ -1,0 +1,53 @@
+refYear,flowCode,flowDesc,reporterCode,reporterDesc,partnerCode,partnerDesc,cmdCode,cmdDesc,primaryValue,netWgt,qty,classificationCode,commodity_label
+1993,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",3.0,1.0,1.0,H0,natural_gas_hs
+1994,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",299.0,144.0,144.0,H0,natural_gas_hs
+1996,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",519.0,53.0,53.0,H1,natural_gas_hs
+1996,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",114300.0,2354187.0,2354187.0,H1,natural_gas_hs
+1997,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",36569.0,31093.0,31093.0,H1,natural_gas_hs
+1997,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",19948996.0,749971328.0,749971328.0,H1,natural_gas_hs
+1998,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",17.0,7.0,7.0,H1,natural_gas_hs
+1998,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",77879392.0,1410052096.0,1410052096.0,H1,natural_gas_hs
+1999,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",40.0,2.0,2.0,H1,natural_gas_hs
+1999,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",135612753.0,2469778655.0,2469778655.0,H1,natural_gas_hs
+2000,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",185859198.0,2889413308.0,2889413308.0,H1,natural_gas_hs
+2000,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",2464.0,275.0,275.0,H1,natural_gas_hs
+2001,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",660.0,10.0,10.0,H1,natural_gas_hs
+2001,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",315276233.0,3636630469.0,3636630469.0,H1,natural_gas_hs
+2002,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",308993614.0,3617916822.0,3617916822.0,H2,natural_gas_hs
+2002,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",525.0,4.0,4.0,H2,natural_gas_hs
+2003,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",354209883.0,4049603426.0,4049603426.0,H2,natural_gas_hs
+2004,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",413418247.0,4743696848.0,4743696848.0,H2,natural_gas_hs
+2004,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",307.0,1.0,1.0,H2,natural_gas_hs
+2005,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",491912723.0,4299832976.0,4299832976.0,H2,natural_gas_hs
+2006,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",206.0,11.0,11.0,H2,natural_gas_hs
+2006,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",634810615.0,4494882336.0,4494882336.0,H2,natural_gas_hs
+2007,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",75.0,15.0,15.0,H3,natural_gas_hs
+2007,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",454771417.0,2111238604.0,2111238604.0,H3,natural_gas_hs
+2008,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",349067357.0,625186465.0,625186465.0,H3,natural_gas_hs
+2008,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",23.0,4.0,4.0,H3,natural_gas_hs
+2009,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",97.0,9.0,9.0,H3,natural_gas_hs
+2009,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",456059168.0,701937738.0,701937738.0,H3,natural_gas_hs
+2010,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",215825027.0,367111145.0,367111145.0,H3,natural_gas_hs
+2010,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",330.0,1.0,1.0,H3,natural_gas_hs
+2011,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",130650372.0,149254869.0,149254869.0,H3,natural_gas_hs
+2012,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",87.0,6.0,6.0,H4,natural_gas_hs
+2012,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",76492515.0,64359192.0,64359192.0,H4,natural_gas_hs
+2013,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",74631733.0,55123351.0,55123351.0,H4,natural_gas_hs
+2014,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",67.5,4.5,4.5,H4,natural_gas_hs
+2014,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",53112416.46,38740757.0,38740757.0,H4,natural_gas_hs
+2014,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",67.5,4.5,4.5,H4,natural_gas_hs
+2014,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",53112416.46,38740757.0,38740757.0,H4,natural_gas_hs
+2015,X,Export,32,Argentina,0,World,271111,"Petroleum gases and other gaseous hydrocarbons; liquefied, natural gas",2409.46,,5717.892,H4,natural_gas_hs
+2015,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",44485580.52,33313032.2,33313032.2,H4,natural_gas_hs
+2016,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",39151295.14,37043240.0,37043240.0,H4,natural_gas_hs
+2017,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",27119030.84,43073852.0,43073852.0,H4,natural_gas_hs
+2018,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",29600781.55,133777000.0,133777000.0,H5,natural_gas_hs
+2018,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",29600781.55,133777000.0,133777000.0,H5,natural_gas_hs
+2019,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",357047214.18,1391780600.0,1391780600.0,H5,natural_gas_hs
+2020,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",217119214.56,1068710000.0,1068710000.0,H5,natural_gas_hs
+2021,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",123358869.07,559561880.0,559561880.0,H5,natural_gas_hs
+2022,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",688819871.56,1762810000.0,1762810000.0,H5,natural_gas_hs
+2023,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",790045649.54,1711116400.0,1711116400.0,H5,natural_gas_hs
+2024,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",667061988.51,1841643170.0,1841643170.0,H6,natural_gas_hs
+2025,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",659232098.75,2326724363.57,2326724363.57,H6,natural_gas_hs
+2025,X,Export,32,Argentina,0,World,271121,"Petroleum gases and other gaseous hydrocarbons; in gaseous state, natural gas",659232098.75,2326724363.57,2326724363.57,H6,natural_gas_hs

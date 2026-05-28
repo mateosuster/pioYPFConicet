@@ -13,15 +13,17 @@ output:
 <div style="text-align: justify "> 
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
-#limpieza de memoria
-rm(list =ls())
+# limpieza de memoria
+rm(list = ls())
 gc()
 
 # configuración de impresión
 knitr::opts_chunk$set(echo = TRUE)
-options(warn = -1, message = -1) 
+options(warn = -1, message = -1)
 
 # bibliotecas
+
+library(here)
 library(data.table)
 library(tidyverse)
 library(knitr)
@@ -32,26 +34,28 @@ library(readxl)
 source("functiones_hidrocarburos.R")
 
 # parámetros para los graficos
-alpha_n = 0.7
-n_plot = 0
+alpha_n <- 0.7
+n_plot <- 0
 ```
 
 # Datos auxiliares
 Para realizar conversiones a dolares de poder adquisitivo constante cargamos los datos del tipo de cambio de paridad (actualizado hasta 2018) y el índice de precios al consumidor de Estados Unidos. 
 ```{r message=FALSE, warning=FALSE}
-#TC
-tcp_arg <- as.data.table(read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio")) 
-tcp_arg = tcp_arg[,!c("sv", "fuente"), with = F]
+# TC
+tcp_arg <- as.data.table(read_excel("./results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tipo_cambio"))
+tcp_arg <- tcp_arg[, !c("sv", "fuente"), with = F]
 
-#IPC Arg
-ipc_arg <- as.data.table(read_csv("../data/indices/ipc_annual_avg.csv"))
+# IPC Arg
+ipc_arg <- as.data.table(read_csv("./data/indices/ipc_annual_avg.csv"))
 
-#CPI EEUU
-ipc_us <- as.data.table(read_csv("../data/bls/cpi.csv")) 
-setnames(ipc_us,"Year", "anio"  )
-ipc_us = ipc_us[, .(ipc_us_20 = mean(Value, na.rm=T)), by = anio]
-ipc_us[, ipc_us_20 := generar_indice(serie = ipc_us_20, 
-                                    fecha = anio, fecha_base = 2020)]
+# CPI EEUU
+ipc_us <- as.data.table(read_csv("./data/bls/cpi.csv"))
+setnames(ipc_us, "Year", "anio")
+ipc_us <- ipc_us[, .(ipc_us_20 = mean(Value, na.rm = T)), by = anio]
+ipc_us[, ipc_us_20 := generar_indice(
+  serie = ipc_us_20,
+  fecha = anio, fecha_base = 2020
+)]
 
 tail(tcp_arg)
 ```
@@ -65,21 +69,23 @@ tail(tcp_arg)
 
 
 ```{r}
-data = fread("../resultados/argentina/variables.csv")
+data <- fread("./results/argentina/variables.csv")
 glimpse(data)
 
-empleo_y_salario_plt <- data %>% 
-  filter(str_detect(codigo_variable, "Ocup|Rem")) %>% 
-  separate(variable, c("variable" ,"sector"), " - ") %>% 
-  left_join(ipc_arg %>% select(anio,IPC_18 ), by = "anio") %>% 
-  mutate(valor = case_when(variable == "Salario" ~ valor/IPC_18,
-                           T~ valor)) %>% 
-  ggplot(aes(anio, valor, color = fuente))+
-  geom_line(alpha = alpha_n)+
-  facet_wrap(variable~sector, scales = "free")
+empleo_y_salario_plt <- data %>%
+  filter(str_detect(codigo_variable, "Ocup|Rem")) %>%
+  separate(variable, c("variable", "sector"), " - ") %>%
+  left_join(ipc_arg %>% select(anio, IPC_18), by = "anio") %>%
+  mutate(valor = case_when(
+    variable == "Salario" ~ valor / IPC_18,
+    T ~ valor
+  )) %>%
+  ggplot(aes(anio, valor, color = fuente)) +
+  geom_line(alpha = alpha_n) +
+  facet_wrap(variable ~ sector, scales = "free")
 
 
-n_plot = n_plot +1
+n_plot <- n_plot + 1
 plot_ggplotly(empleo_y_salario_plt, paste0("Gráfico N°", n_plot, ". Remuneracion y ocupados en la industria hidrocarburífera"))
 ```
 
@@ -336,25 +342,29 @@ Donde:
 
 
 ```{r}
-valor_total_produccion = read.csv("../resultados/data_viz/valor_total_produccion.csv")
+valor_total_produccion <- read.csv("./results/data_viz/valor_total_produccion.csv")
 graf_valor_produccion <- valor_total_produccion %>%
-  mutate(sector = case_when(str_detect(variable, "tot") ~"Total rama",
-                            str_detect(variable, "extr") ~"Extracción de petróleo y gas",
-                            T  ~ NA_character_)) %>% 
+  mutate(sector = case_when(
+    str_detect(variable, "tot") ~ "Total rama",
+    str_detect(variable, "extr") ~ "Extracción de petróleo y gas",
+    T ~ NA_character_
+  )) %>%
   filter(anio > 1960) %>%
-  arrange(sector) %>% 
-  ggplot( aes(anio, valor, color = fuente))+
-  geom_line(alpha = 0.7)+
-  geom_point(size = 0.435, alpha = 0.2)+
-  theme_classic()+
-  theme(legend.position = "bottom")+
-  labs(title = "Valor de la Producción hidrocarburífera",
-       subtitle = "Valor total y componentes",
-       y = "Millones de pesos de 2018")+
-  facet_wrap(  sector~ variable, ncol = 5, scales = "free")
+  arrange(sector) %>%
+  ggplot(aes(anio, valor, color = fuente)) +
+  geom_line(alpha = 0.7) +
+  geom_point(size = 0.435, alpha = 0.2) +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  labs(
+    title = "Valor de la Producción hidrocarburífera",
+    subtitle = "Valor total y componentes",
+    y = "Millones de pesos de 2018"
+  ) +
+  facet_wrap(sector ~ variable, ncol = 5, scales = "free")
 # gp <- ggplotly(graf_valor_produccion)#, width = 750, height = 700)
 gp <- plot_ggplotly(graf_valor_produccion, "Valor de la Producción hidrocarburífera")
-gp[['x']][['layout']][['annotations']][[2]][['x']] <- -0.11
+gp[["x"]][["layout"]][["annotations"]][[2]][["x"]] <- -0.11
 gp %>% layout(margin = list(l = 75))
 ```
 
@@ -389,68 +399,82 @@ $$Impuestos\_netos\_específicos = Retenciones + Regalías - Subsidios$$
 ## Comparación de estimaciones propias
 
 ```{r}
-renta_pextq = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ") %>% 
+renta_pextq <- read_excel("./results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ") %>%
   # select(anio ,unidad, valor = Rtt) %>%
-  mutate(var = "Renta por descuentos sobre plusvalía")%>% 
+  mutate(var = "Renta por descuentos sobre plusvalía") %>%
   as.data.table()
 
-renta_mecanismos = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos") %>% 
+renta_mecanismos <- read_excel("./results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos") %>%
   # select(anio ,unidad, valor = Rtt) %>%
-  mutate(var = "Renta por suma de mecanismos") %>% 
+  mutate(var = "Renta por suma de mecanismos") %>%
   as.data.table()
 
-renta_arg = rbind(renta_pextq[,c("anio" ,"unidad", "Rtt", "var")], 
-                                renta_mecanismos[,c("anio" ,"unidad", "Rtt", "var")])
+renta_arg <- rbind(
+  renta_pextq[, c("anio", "unidad", "Rtt", "var")],
+  renta_mecanismos[, c("anio", "unidad", "Rtt", "var")]
+)
 
 merge_func <- function(...) merge(..., all.x = T, by = "anio")
 
-renta_usd = Reduce(merge_func, list(renta_arg, tcp_arg, ipc_us))
-renta_usd[, Rtt := ((Rtt/1e6)/TCp)/ipc_us_20]
+renta_usd <- Reduce(merge_func, list(renta_arg, tcp_arg, ipc_us))
+renta_usd[, Rtt := ((Rtt / 1e6) / TCp) / ipc_us_20]
 renta_usd[, unidad := "Millones de USD TCp de 2020"]
 # renta_usd = merge(renta_usd, tcp_arg, by = "anio", all.x= T)
 
-renta_plot1 = ggplot(renta_usd[anio > 1960], aes(anio, Rtt, color = var))+
-  geom_line()+
-  labs(y = "Millones de USD TCp de 2020")+
+renta_plot1 <- ggplot(renta_usd[anio > 1960], aes(anio, Rtt, color = var)) +
+  geom_line() +
+  labs(y = "Millones de USD TCp de 2020") +
   # scale_y_continuous(breaks = seq(0, 60*1e4, 10*1e4))
   scale_y_continuous(breaks = seq(0, 60000, 10000))
-renta_plot1 = plot_theme(renta_plot1)+theme(legend.title = element_blank(),
-                              axis.title.x = element_blank())
+renta_plot1 <- plot_theme(renta_plot1) + theme(
+  legend.title = element_blank(),
+  axis.title.x = element_blank()
+)
 
-ggsave( filename = "../resultados/argentina/renta_mecanismos_y_pxq_ARG.png",
-        renta_plot1, width = 12, height = 10)
+ggsave(
+  filename = "./results/argentina/renta_mecanismos_y_pxq_ARG.png",
+  renta_plot1, width = 12, height = 10
+)
 
-plot_ggplotly(renta_plot1, title = "Renta hidrocarburífera total de Argentina",
-       subtitle = "Comparación de estimaciones propias")
+plot_ggplotly(renta_plot1,
+  title = "Renta hidrocarburífera total de Argentina",
+  subtitle = "Comparación de estimaciones propias"
+)
 ```
 
 
 ```{r}
-renta_pextq_pbi = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ_vs_pib") %>% 
+renta_pextq_pbi <- read_excel("./results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_PextQ_vs_pib") %>%
   mutate(var = "Renta por descuentos sobre plusvalía")
 
-renta_mecanismos_pbi = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos_vs_pib") %>% 
+renta_mecanismos_pbi <- read_excel("./results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "RTPG_mecanismos_vs_pib") %>%
   mutate(var = "Renta por suma de mecanismos")
 
-renta_pbi = as.data.table(rbind(renta_pextq_pbi, renta_mecanismos_pbi))
-renta_pbi = renta_pbi[, !"unidad", with=F]
-renta_pbi = melt(renta_pbi, id.vars = c("anio", "var"))
+renta_pbi <- as.data.table(rbind(renta_pextq_pbi, renta_mecanismos_pbi))
+renta_pbi <- renta_pbi[, !"unidad", with = F]
+renta_pbi <- melt(renta_pbi, id.vars = c("anio", "var"))
 
-renta_plot2 = ggplot(renta_pbi, aes(anio, value, color = var))+
-  geom_line()+
-  facet_wrap(~variable, ncol =1)+
-  scale_y_continuous(labels = scales::percent_format(accuracy = 2))+
-  scale_x_continuous(breaks = seq(1960, 2020, 5))+
-  labs(y = "", x="")
+renta_plot2 <- ggplot(renta_pbi, aes(anio, value, color = var)) +
+  geom_line() +
+  facet_wrap(~variable, ncol = 1) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 2)) +
+  scale_x_continuous(breaks = seq(1960, 2020, 5)) +
+  labs(y = "", x = "")
 
-renta_plot2 = plot_theme(renta_plot2)+theme(legend.title = element_blank(),
-                              axis.title.x = element_blank(),
-                              axis.text.x = element_text(angle = 45,
-                                                         vjust= 0.7, hjust= 0.5),
-                              axis.title.y = element_blank())
+renta_plot2 <- plot_theme(renta_plot2) + theme(
+  legend.title = element_blank(),
+  axis.title.x = element_blank(),
+  axis.text.x = element_text(
+    angle = 45,
+    vjust = 0.7, hjust = 0.5
+  ),
+  axis.title.y = element_blank()
+)
 
-plot_ggplotly(renta_plot2,"Renta hidrocarburífera total de Argentina", 
-              "Sobre PBI y PV")
+plot_ggplotly(
+  renta_plot2, "Renta hidrocarburífera total de Argentina",
+  "Sobre PBI y PV"
+)
 ```
 
 
@@ -462,14 +486,17 @@ plot_ggplotly(renta_plot2,"Renta hidrocarburífera total de Argentina",
 Renta apropiada mediante el abaratamiento en el consumo interno por efecto del diferencial de precios interno/externo, sobrevaluación de la moneda y retenciones a la exportación
 ```{r}
 renta_mecanismos[, Subs := Subs * -1]
-renta_mecanismos = Reduce(merge_func, 
-                          list(melt(select(renta_mecanismos, -c("IPC_18", "unidad", "var", "Rtt")),
-                                    id.vars="anio") ,
-                               tcp_arg, ipc_us))
-renta_mecanismos[, value := ((value/1e6)/TCp)/ipc_us_20]
+renta_mecanismos <- Reduce(
+  merge_func,
+  list(
+    melt(select(renta_mecanismos, -c("IPC_18", "unidad", "var", "Rtt")),
+      id.vars = "anio"
+    ),
+    tcp_arg, ipc_us
+  )
+)
+renta_mecanismos[, value := ((value / 1e6) / TCp) / ipc_us_20]
 renta_mecanismos[, unidad := "Millones de USD TCp de 2020"]
-
-
 ```
 
 
@@ -492,14 +519,18 @@ $$RDP = MdoInt * PMI * (\frac{TCP}{TCC}  - 1)$$
 
 
 ```{r}
-renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rdifp", variable), ] ,
-                          aes(anio, value, color = variable))+
-  geom_line()+
+renta_difp_plot <- ggplot(
+  renta_mecanismos[grepl("Rdifp", variable), ],
+  aes(anio, value, color = variable)
+) +
+  geom_line() +
   labs(y = "Millones de USD TCp de 2020")
 
-plot_ggplotly(renta_difp_plot, 
-              "Renta por diferencial de precios interno y externo" ,
-              "Argentina (1960 - 2020)") 
+plot_ggplotly(
+  renta_difp_plot,
+  "Renta por diferencial de precios interno y externo",
+  "Argentina (1960 - 2020)"
+)
 ```
 
 
@@ -516,14 +547,18 @@ Donde:
 
 
 ```{r}
-renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rsvx", variable), ] ,
-                          aes(anio, value, color = variable))+
-  geom_line()+
+renta_difp_plot <- ggplot(
+  renta_mecanismos[grepl("Rsvx", variable), ],
+  aes(anio, value, color = variable)
+) +
+  geom_line() +
   labs(y = "Millones de USD TCp de 2020")
 
-plot_ggplotly(renta_difp_plot, 
-              "Renta por exportaciones sobrevaluadas" ,
-              "Argentina (1960 - 2020)") 
+plot_ggplotly(
+  renta_difp_plot,
+  "Renta por exportaciones sobrevaluadas",
+  "Argentina (1960 - 2020)"
+)
 ```
 
 
@@ -545,31 +580,38 @@ Donde:
 * $Gcia_{hidrocarburos}$ = Ganancia de empresas hidrocarburíferas
 
 ```{r}
-tasa_ganancia_rama_stock = read_excel("../resultados/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tg_pg_total")
+tasa_ganancia_rama_stock <- read_excel("./results/argentina/renta_de_la_tierra_hidrocarburifera_arg.xlsx", sheet = "tg_pg_total")
 # tasa de ganancia
 graf_tg_rama_2 <- tasa_ganancia_rama_stock %>%
-  filter(anio >1995) %>%
-  ggplot(aes(anio, TG_pg, color = stock_seleccionado))+
-  geom_line(aes(anio, TG_manuf))+
-  geom_line(alpha = 0.5)+
-  geom_point()+
-  scale_y_continuous(labels = scales::percent)+
-  theme(axis.text.x = element_text(angle = 90),
-        legend.position = "bottom")
+  filter(anio > 1995) %>%
+  ggplot(aes(anio, TG_pg, color = stock_seleccionado)) +
+  geom_line(aes(anio, TG_manuf)) +
+  geom_line(alpha = 0.5) +
+  geom_point() +
+  scale_y_continuous(labels = scales::percent) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  )
 
-plot_ggplotly(graf_tg_rama_2 , 
-              title = "Tasa de ganancia hidrocarburífera con PPyE a partir de stock de pozos (1960 - 2018)")
+plot_ggplotly(graf_tg_rama_2,
+  title = "Tasa de ganancia hidrocarburífera con PPyE a partir de stock de pozos (1960 - 2018)"
+)
 ```
 
 ```{r}
-renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rkindv", variable) & anio >1997, ] ,
-                          aes(anio, value, fill = variable))+
-  geom_col()+
+renta_difp_plot <- ggplot(
+  renta_mecanismos[grepl("Rkindv", variable) & anio > 1997, ],
+  aes(anio, value, fill = variable)
+) +
+  geom_col() +
   labs(y = "Millones de USD TCp de 2020")
 
-plot_ggplotly(renta_difp_plot, 
-              "Renta apropiada por las empresas" ,
-              "Argentina (1997 - 2020)") 
+plot_ggplotly(
+  renta_difp_plot,
+  "Renta apropiada por las empresas",
+  "Argentina (1997 - 2020)"
+)
 ```
 
 
@@ -601,15 +643,18 @@ Fuentes:
 * EJES
 
 ```{r}
-renta_difp_plot = ggplot( renta_mecanismos[grepl( "Rreg|Rret|Subs", variable) , ] ,
-                          aes(anio, value, fill = variable))+
-  geom_col()+
+renta_difp_plot <- ggplot(
+  renta_mecanismos[grepl("Rreg|Rret|Subs", variable), ],
+  aes(anio, value, fill = variable)
+) +
+  geom_col() +
   labs(y = "Millones de USD TCp de 2020")
 
-plot_ggplotly(renta_difp_plot, 
-              "Renta apropiada por medio de impuestos" ,
-              "Argentina (1997 - 2020)")
-
+plot_ggplotly(
+  renta_difp_plot,
+  "Renta apropiada por medio de impuestos",
+  "Argentina (1997 - 2020)"
+)
 ```
 
 
@@ -648,7 +693,7 @@ $$RC = PCMi * CrudoP$$
 
 ### Suma total de los mecanismos de apropiación 
 ```{r}
-# renta_mecanismos = renta_mecanismos[,!c("Rtt", "IPC_18", "unidad"), with = F] 
+# renta_mecanismos = renta_mecanismos[,!c("Rtt", "IPC_18", "unidad"), with = F]
 # renta_mecanismos[, Subs := Subs *-1]
 # renta_mecanismos = melt(renta_mecanismos, id.vars = "anio",
 #                         variable.name = "tipo_renta",
@@ -657,22 +702,27 @@ $$RC = PCMi * CrudoP$$
 # renta_mecanismos = Reduce(merge_func, list(renta_mecanismos, tcp_arg, ipc_us))
 # renta_mecanismos[, valor := ((valor/1e6)/TCp)/ipc_us_20]
 # renta_mecanismos[, unidad := "Millones de USD TCp de 2020"]
-renta_plot3 = ggplot(renta_mecanismos, aes(anio, value, 
-                             color = variable, fill = variable))+
-  geom_col(position = "stack")+
-  theme(legend.position = "bottom")+
-  labs(y = "Millones USD TCc de 2020")+
-  scale_x_continuous(breaks = seq(1960, 2020, 5))+
-  scale_y_continuous(breaks = seq(0, 50000, 10000),
-                     labels=function(x) format(x, big.mark = ".", scientific = FALSE))+
+renta_plot3 <- ggplot(renta_mecanismos, aes(anio, value,
+  color = variable, fill = variable
+)) +
+  geom_col(position = "stack") +
+  theme(legend.position = "bottom") +
+  labs(y = "Millones USD TCc de 2020") +
+  scale_x_continuous(breaks = seq(1960, 2020, 5)) +
+  scale_y_continuous(
+    breaks = seq(0, 50000, 10000),
+    labels = function(x) format(x, big.mark = ".", scientific = FALSE)
+  ) +
   theme_classic()
 # renta_plot3 = plot_theme(renta_plot3)+theme(legend.title = element_blank(),
 #                               axis.title.x = element_blank(),
 #                               axis.text.x = element_text(angle = 45,
 #                                                          vjust= 0.7, hjust= 0.5))
-plot_ggplotly(renta_plot3 , title = "Renta de la tierra hidrocarburífera",
-       subtitle = "Cursos de apropiación")
-# ggsave("../resultados/argentina/renta_mecanismos_tcp.png",renta_plot3)
+plot_ggplotly(renta_plot3,
+  title = "Renta de la tierra hidrocarburífera",
+  subtitle = "Cursos de apropiación"
+)
+# ggsave("../results/argentina/renta_mecanismos_tcp.png",renta_plot3)
 ```
 
 
@@ -680,88 +730,116 @@ plot_ggplotly(renta_plot3 , title = "Renta de la tierra hidrocarburífera",
 
 # Comparación con estimación de otros autores
 ```{r}
-#cargo renta autores
-renta_autores <- fread("../resultados/argentina/renta_autores.csv") 
-renta_autores = merge(renta_autores, ipc_us, all.x=T, by = "anio")
-renta_autores[, valor := valor /ipc_us_20]
+# cargo renta autores
+renta_autores <- fread("./results/argentina/renta_autores.csv")
+renta_autores <- merge(renta_autores, ipc_us, all.x = T, by = "anio")
+renta_autores[, valor := valor / ipc_us_20]
 renta_autores[, unidad := "Millones de USD TCc de 2020"]
-renta_autores = renta_autores[,!"ipc_us_20", with=F]
-renta_autores = merge(renta_autores, tcp_arg, all.x= T, by = "anio")
-renta_autores[,valor := (valor*TCc)/TCp]
-renta_autores= renta_autores[, !c("TCc", "TCp"), with = F]
+renta_autores <- renta_autores[, !"ipc_us_20", with = F]
+renta_autores <- merge(renta_autores, tcp_arg, all.x = T, by = "anio")
+renta_autores[, valor := (valor * TCc) / TCp]
+renta_autores <- renta_autores[, !c("TCc", "TCp"), with = F]
 
-#preproceso renta total
-renta_usd = renta_usd[, !c("TCc", "TCp", "ipc_us_20"), with = F]
-setnames(renta_usd, c("var","Rtt" ), c("tipo_de_renta","valor"))
+# preproceso renta total
+renta_usd <- renta_usd[, !c("TCc", "TCp", "ipc_us_20"), with = F]
+setnames(renta_usd, c("var", "Rtt"), c("tipo_de_renta", "valor"))
 renta_usd[, autor := "Propia"]
 
-#preproceso renta mecanismos
+# preproceso renta mecanismos
 # renta_mecanismos = as.data.table(renta_mecanismos)
 renta_mecanismos[, autor := "Propia"]
-renta_mecanismos[, value := value*TCp/TCc]
-renta_mecanismos = renta_mecanismos[, !c("TCc", "TCp", "ipc_us_20"), with = F]
+renta_mecanismos[, value := value * TCp / TCc]
+renta_mecanismos <- renta_mecanismos[, !c("TCc", "TCp", "ipc_us_20"), with = F]
 
 
 # setnames(renta_mecanismos, "tipo_renta", "tipo_de_renta")
-renta_mecanismos = dcast(renta_mecanismos, anio+autor~variable, value.var = "value")
-renta_mecanismos[, `:=`(renta_diferencial_precios = rowSums(cbind(Rdifp_crudo, Rdifp_gas), na.rm=T),
-                        renta_estado_total = rowSums(cbind(Rret, Rreg), na.rm=T),
-                        renta_sobrevaluacion = rowSums(cbind(Rsvx_crudo, Rsvx_gas), na.rm=T) ,
-                        unidad = "Millones de USD TCc de 2020" )]
+renta_mecanismos <- dcast(renta_mecanismos, anio + autor ~ variable, value.var = "value")
+renta_mecanismos[, `:=`(
+  renta_diferencial_precios = rowSums(cbind(Rdifp_crudo, Rdifp_gas), na.rm = T),
+  renta_estado_total = rowSums(cbind(Rret, Rreg), na.rm = T),
+  renta_sobrevaluacion = rowSums(cbind(Rsvx_crudo, Rsvx_gas), na.rm = T),
+  unidad = "Millones de USD TCc de 2020"
+)]
 
 
-renta_mecanismos= renta_mecanismos[, !c("Rdifp_crudo", "Rdifp_gas",
-                                        "Rsvx_crudo", "Rsvx_gas"), with=F]
-setnames(renta_mecanismos, c("Rkindv", "Subs", "Rret",  "Rreg"), 
-         c("renta_empresas", "subsidios", "retenciones", "regalias") )
-renta_mecanismos = melt(renta_mecanismos,id.vars = c("anio", "autor", "unidad"), variable.name = "tipo_de_renta",
-     value.name = "valor")
-#junto los datos
-renta_comparacion = rbind(renta_usd, renta_mecanismos, renta_autores)
+renta_mecanismos <- renta_mecanismos[, !c(
+  "Rdifp_crudo", "Rdifp_gas",
+  "Rsvx_crudo", "Rsvx_gas"
+), with = F]
+setnames(
+  renta_mecanismos, c("Rkindv", "Subs", "Rret", "Rreg"),
+  c("renta_empresas", "subsidios", "retenciones", "regalias")
+)
+renta_mecanismos <- melt(renta_mecanismos,
+  id.vars = c("anio", "autor", "unidad"), variable.name = "tipo_de_renta",
+  value.name = "valor"
+)
+# junto los datos
+renta_comparacion <- rbind(renta_usd, renta_mecanismos, renta_autores)
 
 
-#grafico renta total
-graf_renta_total_comparacion = ggplot(data = renta_comparacion[str_detect(tipo_de_renta , "renta_total|Renta por suma de mecanismos") & anio > 1990], 
-       aes(anio, valor, color = autor))+
-  geom_line()+
-  geom_point()+
-  theme(legend.position = "bottom")+
-  labs(y = "Millones de USD TCp de 2020", x="",
-       caption = "Nota: en la estimación propia se utilizó la renta por por suma de mecanismos")+
-  theme_classic()+
-  scale_x_continuous(breaks = seq(1960, 2020, 5))+
-  scale_y_continuous(labels=function(x) format(x, big.mark = ".", scientific = FALSE))
-graf_renta_total_comparacion =plot_theme( graf_renta_total_comparacion)+theme(
-  legend.title = element_blank())
-plot_ggplotly(graf_renta_total_comparacion, 
-              title = "Renta de la tierra hidrocarburífera total de Argentina",
-              subtitle = "Comparación con otras estimaciones")
+# grafico renta total
+graf_renta_total_comparacion <- ggplot(
+  data = renta_comparacion[str_detect(tipo_de_renta, "renta_total|Renta por suma de mecanismos") & anio > 1990],
+  aes(anio, valor, color = autor)
+) +
+  geom_line() +
+  geom_point() +
+  theme(legend.position = "bottom") +
+  labs(
+    y = "Millones de USD TCp de 2020", x = "",
+    caption = "Nota: en la estimación propia se utilizó la renta por por suma de mecanismos"
+  ) +
+  theme_classic() +
+  scale_x_continuous(breaks = seq(1960, 2020, 5)) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ".", scientific = FALSE))
+graf_renta_total_comparacion <- plot_theme(graf_renta_total_comparacion) + theme(
+  legend.title = element_blank()
+)
+plot_ggplotly(graf_renta_total_comparacion,
+  title = "Renta de la tierra hidrocarburífera total de Argentina",
+  subtitle = "Comparación con otras estimaciones"
+)
 
-# ggsave("../resultados/argentina/comparacion_autores_usd_tcp.png", graf_renta_total_comparacion,
+# ggsave("../results/argentina/comparacion_autores_usd_tcp.png", graf_renta_total_comparacion,
 #          width = 10, height = 5)
 ```
 
 ```{r}
-#grafico comparacion con otros autores
-graf_tipos_renta <- ggplot(data = renta_comparacion[!str_detect(tipo_de_renta, c("renta_total|Renta por descuentos sobre plusvalía|Renta por suma de mecanismos|renta_estado_total"
-                                 # "renta_diferencial_precios",
-                               ))& anio >1990],
-       aes(anio, valor, color = autor))+
-  geom_line()+
-  geom_point(size = 0.5)+
-  geom_hline(yintercept = 0)+
-  facet_wrap(~tipo_de_renta, scales = "free_y")+
-  labs(y = "Millones USD TCp de 2020")+
+# grafico comparacion con otros autores
+graf_tipos_renta <- ggplot(
+  data = renta_comparacion[!str_detect(tipo_de_renta, c(
+    "renta_total|Renta por descuentos sobre plusvalía|Renta por suma de mecanismos|renta_estado_total"
+    # "renta_diferencial_precios",
+  )) & anio > 1990],
+  aes(anio, valor, color = autor)
+) +
+  geom_line() +
+  geom_point(size = 0.5) +
+  geom_hline(yintercept = 0) +
+  facet_wrap(~tipo_de_renta, scales = "free_y") +
+  labs(y = "Millones USD TCp de 2020") +
   scale_x_continuous(breaks = seq(1990, 2020, 5))
 # # # ggplotly(graf_tipos_renta, width = 800, height = 600)
-graf_tipos_renta = plot_theme(graf_tipos_renta)+theme(
+graf_tipos_renta <- plot_theme(graf_tipos_renta) + theme(
   axis.text.x = element_text(angle = 45, hjust = 1),
-  strip.text = element_text(12), legend.title = element_blank() )
+  strip.text = element_text(12), legend.title = element_blank()
+)
 
-plot_ggplotly(graf_tipos_renta, title = "Renta de la tierra hidrocarburífera",
-       subtitle = "Comparación de estimaciones")
-ggsave("../resultados/argentina/comparacion_autores_tipo_renta_usd_tcp.png",
-       graf_tipos_renta, width = 16, height = 10)
+plot_ggplotly(graf_tipos_renta,
+  title = "Renta de la tierra hidrocarburífera",
+  subtitle = "Comparación de estimaciones"
+)
+ggsave("./results/argentina/comparacion_autores_tipo_renta_usd_tcp.png",
+  graf_tipos_renta,
+  width = 16, height = 10
+)
 ```
+
+
+```{r}
+print(f'En la comparación de estimaciones propias, se observa que la renta por diferencial de precios entre el mercado interno y las referencias internacionales es la que tiene mayor peso en la composición de la renta total hidrocarburífera. A su vez, se observa que la estimación de renta total por medio de la suma de mecanismos de apropiación es muy similar a la estimación obtenida por medio del descuento de la ganancia normal a la plusvalía total del sector, lo cual da cuenta de la consistencia entre ambos métodos.')
+```
+
 
 </div>

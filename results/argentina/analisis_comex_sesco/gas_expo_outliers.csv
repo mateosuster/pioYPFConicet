@@ -1,0 +1,4 @@
+anio,mes,empresa,tipodecomercializacion,subtipodecomercializacion,producto,unidad,provincia,cantidad,monto,pais,fecha_data,indice_tiempo,implied_usd_per_miles_m3,implied_price
+2017,4,PAN AMERICAN SUR S.A.,Exportación,S/N,Gas Natural(miles/m3),(miles/m3),no aplica,822.294,112.278,URUGUAY,2017-04-30,2017-04,0.1365424045414414,0.1365424045414414
+2025,4,PAN AMERICAN ENERGY SL,Exportación,S/N,Gas Natural(miles/m3),(miles/m3),no aplica,17901160.0,3960477.0,CHILE,2025-04-30,2025-04,0.22124136089504814,0.22124136089504814
+2025,7,PAN AMERICAN ENERGY SL,Exportación,S/N,Gas Natural(miles/m3),(miles/m3),no aplica,10168012.0,2442787.44,CHILE,2025-07-31,2025-07,0.24024238366359127,0.24024238366359127

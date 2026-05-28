@@ -1,0 +1,1015 @@
+anio,empresa,fuente,sector,unidad,variable,valor
+1997,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,24974.65772423206
+1997,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+1997,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,12131.27467867484
+1997,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+1997,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,27670.496541715358
+1997,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,24974.65772423206
+1997,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,35274.79660235221
+1997,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,105392.03829859232
+1997,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,0.0
+1997,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,661.243483533639
+1997,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,34613.55311881857
+1997,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,34613.55311881857
+1997,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+1997,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+1997,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+1997,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+1997,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+1997,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+1998,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,11978.420619244298
+1998,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,15037.415263690382
+1998,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,13034.685556388478
+1998,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+1998,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,12288.245522413601
+1998,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,11978.420619244298
+1998,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,21699.052978134365
+1998,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+1998,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,22426.636127268866
+1998,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+1998,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,21699.052978134365
+1998,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,21699.052978134365
+1998,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,25199.43023359192
+1998,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+1998,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,30617.30773381418
+1998,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+1998,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,29836.125396572832
+1998,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,25199.43023359192
+1998,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,40445.08552491503
+1998,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,116093.77508615797
+1998,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,0.0
+1998,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,655.1851860733899
+1998,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,39789.90033884164
+1998,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,39789.90033884164
+1998,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,25934.573211796494
+1998,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+1998,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,26678.737586024698
+1998,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+1998,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,26221.443525575705
+1998,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,25934.573211796494
+1998,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,42986.54886169371
+1998,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+1998,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,47454.785833563066
+1998,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+1998,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,46569.10145914301
+1998,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,42986.54886169371
+1998,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+1998,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+1998,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+1998,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+1998,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+1998,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+1998,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,174400.0367647128
+1998,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+1998,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,275177.7781508238
+1998,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,6098.262116529245
+1998,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,190054.10282175025
+1998,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,167626.60991385343
+1999,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,12061.956595186875
+1999,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,15076.287942466768
+1999,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,13617.42297302616
+1999,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+1999,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,12792.627069177017
+1999,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,12061.956595186875
+1999,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,20884.23097845832
+1999,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+1999,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,22744.892811157788
+1999,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+1999,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,22185.541801431835
+1999,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,20884.23097845832
+1999,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,32381.217610372634
+1999,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+1999,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,29346.9328195172
+1999,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,458.94421437993884
+1999,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,34624.791284886494
+1999,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,31871.125998606865
+1999,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,34471.809880093184
+1999,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,111242.9781855374
+1999,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,0.0
+1999,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,688.4163215699083
+1999,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,33783.393558523276
+1999,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,33783.393558523276
+1999,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,25886.442449290866
+1999,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+1999,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,29431.40405186391
+1999,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+1999,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,28856.601920253834
+1999,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,25886.442449290866
+1999,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,47098.51257822125
+1999,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+1999,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,51154.38107900236
+1999,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+1999,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,49713.16876134536
+1999,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,47098.51257822125
+1999,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,4948.107674619254
+1999,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+1999,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,10762.471299316756
+1999,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,53.492497876061755
+1999,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,5134.948336391543
+1999,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,4881.636626954616
+1999,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,164706.6348363682
+1999,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+1999,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,267360.50177711324
+1999,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,6348.728298922487
+1999,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,182685.29422401453
+1999,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,157596.3438379112
+2000,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,12566.756270261129
+2000,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,15822.277528098726
+2000,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,14052.759864810247
+2000,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2000,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,13120.302533028824
+2000,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,12566.756270261129
+2000,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,21344.006610068885
+2000,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2000,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,23249.81340916127
+2000,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2000,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,22623.132553677424
+2000,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,21344.006610068885
+2000,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,99931.95689467214
+2000,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2000,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,31117.83942336009
+2000,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,489.0313887872967
+2000,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,112039.66502058433
+2000,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,99376.32590040803
+2000,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,178775.68193290767
+2000,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,308501.5908423441
+2000,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,248350.7300215066
+2000,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,9548.981328425634
+2000,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,167917.93581306966
+2000,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,167917.93581306966
+2000,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,29992.320812819053
+2000,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2000,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,32261.70958022772
+2000,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2000,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,31508.678456977723
+2000,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,29992.320812819053
+2000,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,47179.48340271347
+2000,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2000,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,51896.036716602066
+2000,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2000,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,49869.33621050263
+2000,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,47179.48340271347
+2000,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,5137.476682298835
+2000,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2000,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,10904.03582976694
+2000,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,133.505569138932
+2000,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,5479.2106339494585
+2000,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,4983.281328730846
+2000,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,175396.1978543898
+2000,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2000,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,276328.4731589693
+2000,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,7901.717703036847
+2000,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,191571.6119338868
+2000,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,166708.22658817476
+2001,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,12175.222603965576
+2001,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,15901.396142797643
+2001,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,13909.311629877002
+2001,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2001,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,13221.85355139129
+2001,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,12175.222603965576
+2001,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,22031.475245344856
+2001,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2001,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,25100.60689582674
+2001,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,17.97681798396632
+2001,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,23614.59265090032
+2001,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,22012.10631608357
+2001,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,99208.97850496229
+2001,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2001,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,36630.04301219187
+2001,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,780.4696664529517
+2001,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,100836.68090572137
+2001,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,98339.17797307193
+2001,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,211615.73924314912
+2001,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,351575.56908150634
+2001,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,277639.07601286337
+2001,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,8845.322886466787
+2001,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,201517.26787815214
+2001,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,201517.26787815214
+2001,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,30524.8970933303
+2001,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2001,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,31874.69336580513
+2001,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2001,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,31139.20476779542
+2001,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,30524.8970933303
+2001,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,52541.13989864607
+2001,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2001,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,55125.09285468295
+2001,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2001,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,53344.94560812597
+2001,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,52541.13989864607
+2001,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,5941.883026581969
+2001,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2001,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,12147.984342684647
+2001,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,198.47343617898562
+2001,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,6146.666905116867
+2001,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,5708.2250621591475
+2001,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,201999.808052922
+2001,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2001,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,282972.2854002919
+2001,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,7128.289620270293
+2001,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,227350.81383774485
+2001,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,194441.0095689787
+2002,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,21103.10942864936
+2002,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,24845.752121888927
+2002,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,22301.36053019463
+2002,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2002,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,21749.130261842776
+2002,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,21103.10942864936
+2002,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,37753.74073122312
+2002,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2002,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,43341.35512606059
+2002,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2002,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,38929.512752517585
+2002,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,37753.74073122312
+2002,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,85052.20735742405
+2002,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2002,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,91625.30974929425
+2002,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,2480.2700586319215
+2002,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,85362.62785124863
+2002,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,82386.30378089033
+2002,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,190420.60240671298
+2002,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,282275.40158946795
+2002,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,222914.27151954395
+2002,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,7296.127755808903
+2002,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,182485.86956384365
+2002,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,182485.86956384365
+2002,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,61133.42770923658
+2002,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2002,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,62648.79003939207
+2002,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2002,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,61584.072109972854
+2002,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,61133.42770923658
+2002,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,101146.03305852442
+2002,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2002,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,104455.2713775026
+2002,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2002,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,101776.80707226884
+2002,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,101146.03305852442
+2002,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,9698.994633434479
+2002,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2002,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,21471.86324891379
+2002,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,404.8627492373507
+2002,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,9774.475605145384
+2002,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,9260.977027339955
+2002,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,351269.94251434674
+2002,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2002,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,438201.71260879474
+2002,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,12938.742139196525
+2002,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,393226.1488789359
+2002,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,337688.76848273614
+2003,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,18252.446131181932
+2003,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,21850.27224645868
+2003,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,20177.167813222644
+2003,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2003,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,18715.768702338013
+2003,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,18252.446131181932
+2003,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,32632.419740677775
+2003,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2003,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,36574.88386827335
+2003,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2003,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,33293.62992463032
+2003,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,32632.419740677775
+2003,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,81103.24307650003
+2003,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2003,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,71275.36412946312
+2003,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,1566.8919517213264
+2003,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,87417.99516696423
+2003,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,79455.99769135703
+2003,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,216933.3861989788
+2003,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,294138.414751036
+2003,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,239479.3931793618
+2003,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,5812.075960454687
+2003,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,210601.2101156606
+2003,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,210601.2101156606
+2003,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,43667.948658281784
+2003,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2003,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,46886.36294679125
+2003,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2003,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,44474.47896091956
+2003,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,43667.948658281784
+2003,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,79319.55055384028
+2003,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2003,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,84588.55269563265
+2003,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2003,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,80320.84917001177
+2003,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,79319.55055384028
+2003,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,11115.928742670176
+2003,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2003,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,23553.319401862547
+2003,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,516.5641932000354
+2003,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,11132.749097306167
+2003,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,10558.045924827728
+2003,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,342890.13468894776
+2003,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2003,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,411764.6291732788
+2003,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,17745.962336936882
+2003,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,374049.9042888236
+2003,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,324547.05041874404
+2004,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,16972.2259528332
+2004,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,20183.280393037967
+2004,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,18677.36009852419
+2004,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2004,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,17669.121566157075
+2004,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,16972.2259528332
+2004,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,30019.94965878382
+2004,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2004,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,33964.560885042505
+2004,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2004,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,30711.215891380325
+2004,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,30019.94965878382
+2004,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,93375.82154346569
+2004,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2004,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,73251.60653372716
+2004,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,1971.7559643428224
+2004,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,102426.6151388705
+2004,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,91294.04606585528
+2004,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,205988.4333474277
+2004,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,319092.9320348424
+2004,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,233208.12799506035
+2004,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,8497.744731282783
+2004,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,196826.61307776137
+2004,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,196826.61307776137
+2004,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,40293.30425887687
+2004,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2004,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,44174.78439594094
+2004,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2004,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,41093.924426239195
+2004,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,40293.30425887687
+2004,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,73972.83298748097
+2004,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2004,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,79128.69564755223
+2004,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2004,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,75348.12404802618
+2004,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,73972.83298748097
+2004,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,10757.539656595198
+2004,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2004,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,21679.544073788464
+2004,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,387.3017290668432
+2004,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,10910.039835729704
+2004,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,10336.66018096594
+2004,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,330788.9395102886
+2004,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2004,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,394141.80285465193
+2004,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,19787.356314732395
+2004,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,359749.49306952185
+2004,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,309775.0764157356
+2005,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,15125.763570568288
+2005,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,18724.97480408535
+2005,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,16504.530750450533
+2005,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2005,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,15943.633036039066
+2005,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,15125.763570568288
+2005,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,25937.72138194618
+2005,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2005,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,30688.7120523681
+2005,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2005,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,27120.3445084839
+2005,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,25937.72138194618
+2005,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,106201.2915881989
+2005,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2005,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,77647.93748321285
+2005,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,1957.5110289885592
+2005,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,117498.40591075229
+2005,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,104130.03790790359
+2005,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,217795.75982454358
+2005,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,300549.55920690193
+2005,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,237049.81119337064
+2005,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,12445.31402169962
+2005,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,204456.4568245205
+2005,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,204456.4568245205
+2005,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,36431.380993020386
+2005,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2005,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,40193.5898729459
+2005,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2005,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,36864.43654269363
+2005,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,36431.380993020386
+2005,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,66356.85472076871
+2005,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2005,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,71249.70923925895
+2005,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2005,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,68031.00409226831
+2005,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,66356.85472076871
+2005,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,10692.645669025223
+2005,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2005,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,18537.94773899791
+2005,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,354.9619999232587
+2005,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,11269.024955239438
+2005,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,10294.614160346084
+2005,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,308224.914695396
+2005,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2005,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,377720.05497572734
+2005,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,20927.861813983378
+2005,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,350267.15639844874
+2005,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,286226.30777527834
+2006,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,13297.923777152942
+2006,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,16635.97800029315
+2006,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,14510.77311497843
+2006,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2006,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,14262.406516601848
+2006,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,13297.923777152942
+2006,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,22847.69612518907
+2006,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2006,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,25793.054666180164
+2006,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2006,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,24028.982367157896
+2006,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,22847.69612518907
+2006,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,123511.54961721835
+2006,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2006,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,84813.23804939272
+2006,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,1879.9550227530365
+2006,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,139174.07489052633
+2006,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,121522.58879902835
+2006,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,169245.8902635558
+2006,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,294033.5760395952
+2006,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,221074.10019473685
+2006,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,12743.511909959516
+2006,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,155533.98882898787
+2006,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,155533.98882898787
+2006,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,31860.946745955545
+2006,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2006,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,35582.89892096405
+2006,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2006,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,32391.88335646543
+2006,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,31860.946745955545
+2006,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,59193.51236615004
+2006,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2006,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,63536.75379917417
+2006,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2006,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,60529.830318888344
+2006,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,59193.51236615004
+2006,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,11562.564407713042
+2006,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2006,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,16452.13219018834
+2006,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,446.19512646898784
+2006,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,11354.210797343321
+2006,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,11066.405469241701
+2006,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,279728.5679188524
+2006,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2006,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,347361.1551582996
+2006,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,24353.310485587044
+2006,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,323782.7879645344
+2006,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,254296.2061311741
+2007,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,11484.447612539154
+2007,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,14876.083428940427
+2007,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,12600.620152926038
+2007,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2007,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,12394.282561965718
+2007,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,11484.447612539154
+2007,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,20166.45460686882
+2007,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2007,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,22936.182007252897
+2007,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2007,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,20980.960125796344
+2007,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,20166.45460686882
+2007,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,138726.45291854843
+2007,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2007,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,94493.90941283114
+2007,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,2398.5158311878977
+2007,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,150471.9693671688
+2007,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,136144.3271798083
+2007,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,148124.751855508
+2007,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,271032.2889242324
+2007,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,189152.79610505616
+2007,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,12639.79771356162
+2007,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,134634.15054535665
+2007,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,134634.15054535665
+2007,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,27272.191007642483
+2007,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2007,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,30897.490578963196
+2007,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2007,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,27869.421449608264
+2007,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,27272.191007642483
+2007,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,51621.20036394468
+2007,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2007,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,54804.322754809946
+2007,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2007,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,52927.24934154628
+2007,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,51621.20036394468
+2007,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,10303.255142712718
+2007,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2007,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,14009.83249444814
+2007,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,142.64189387593635
+2007,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,10991.33204729805
+2007,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,10142.409729776975
+2007,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,282655.4558987925
+2007,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2007,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,343685.744657305
+2007,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,32652.810760034183
+2007,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,322771.7018541428
+2007,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,247897.3981292296
+2008,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,9332.323168339224
+2008,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,12000.386802698416
+2008,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,10060.163590585138
+2008,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2008,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,9945.525935553858
+2008,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,9332.323168339224
+2008,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,16619.627293122216
+2008,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2008,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,19171.81825221704
+2008,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2008,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,17189.63105962578
+2008,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,16619.627293122216
+2008,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,133257.53842893333
+2008,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2008,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,101076.45985670885
+2008,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,2814.5779157478305
+2008,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,144867.98095760893
+2008,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,130225.96716796487
+2008,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,131980.48021796325
+2008,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,238939.03916372484
+2008,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,174245.1379532269
+2008,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,15894.087053634807
+2008,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,129925.88349312411
+2008,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,114797.52719597952
+2008,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,21293.430528767076
+2008,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2008,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,24774.11142095799
+2008,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2008,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,21892.511368591415
+2008,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,21293.430528767076
+2008,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,41392.70394278765
+2008,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2008,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,43501.16427620931
+2008,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2008,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,43168.205917404106
+2008,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,41392.70394278765
+2008,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2008,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2008,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+2008,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2008,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2008,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2008,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,251114.1643110021
+2008,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2008,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,308889.57854039886
+2008,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,35689.26188019951
+2008,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,270778.95183562214
+2008,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,213721.66276417533
+2009,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,8131.503377222975
+2009,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,9795.166978179395
+2009,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,8784.505786916467
+2009,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2009,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,8634.9598232816
+2009,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,8131.503377222975
+2009,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,14289.829626535362
+2009,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2009,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,17216.002306788356
+2009,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2009,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,15212.587679762666
+2009,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,14289.829626535362
+2009,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,125146.67501954544
+2009,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2009,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,108803.56829765755
+2009,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,2396.6337501802673
+2009,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,149050.7974783164
+2009,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,122552.67770658646
+2009,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,105563.26887037946
+2009,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,207975.5520880117
+2009,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,143924.16362924658
+2009,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,9109.01023094831
+2009,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,100262.18184964667
+2009,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,95423.8648427038
+2009,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,18029.938771915367
+2009,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2009,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,21768.732471703166
+2009,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2009,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,18617.636614985888
+2009,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,18029.938771915367
+2009,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,36209.40586607882
+2009,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2009,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,37401.451849852696
+2009,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2009,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,37151.51718733389
+2009,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,36209.40586607882
+2009,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2009,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2009,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+2009,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2009,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2009,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2009,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,231081.83994904874
+2009,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2009,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,94892.28066503225
+2009,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,27624.357436288345
+2009,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,252574.56360452418
+2009,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,201875.84889676343
+2010,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,6448.460949697644
+2010,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,7981.5730760031565
+2010,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,6838.733283238656
+2010,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2010,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,6710.73536138532
+2010,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,6448.460949697644
+2010,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,11709.424223557298
+2010,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2010,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,14134.633371163656
+2010,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2010,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,12334.392291185657
+2010,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,11709.424223557298
+2010,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,186612.92675594272
+2010,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2010,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,102046.99912910808
+2010,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,1753.9999148752268
+2010,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,208869.1735366724
+2010,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,184699.7706280244
+2010,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,79035.23073161951
+2010,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,162935.85331691953
+2010,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,107287.5213237557
+2010,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,7531.460858974443
+2010,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,77240.42890444417
+2010,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,70739.8904444168
+2010,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,13762.849821860042
+2010,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2010,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,17636.884376703314
+2010,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2010,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,14400.704419475238
+2010,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,13762.849821860042
+2010,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,28073.305576327457
+2010,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2010,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,29636.08370456465
+2010,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2010,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,29060.71445901897
+2010,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,28073.305576327457
+2010,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2010,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2010,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+2010,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2010,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2010,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2010,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,200332.86326825485
+2010,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2010,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,241880.16785295677
+2010,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,27670.243555072455
+2010,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,225993.94005251542
+2010,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,171032.88965864966
+2011,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,5033.969212432897
+2011,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,6598.557049620065
+2011,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,5499.512981057045
+2011,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2011,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,5443.295029040074
+2011,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,5033.969212432897
+2011,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,9636.729004829693
+2011,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2011,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,11751.547556731037
+2011,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2011,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,10132.685941377535
+2011,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,9636.729004829693
+2011,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,225083.95888644035
+2011,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2011,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,97469.96892818908
+2011,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,2080.9624489472226
+2011,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,250079.66230223246
+2011,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,222801.71286728262
+2011,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,62378.14443799405
+2011,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,128152.60414766645
+2011,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,92452.53724572744
+2011,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,5607.03770966335
+2011,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,62001.120076133084
+2011,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,56099.27935286888
+2011,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,10950.52730561878
+2011,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2011,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,13775.12746614854
+2011,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2011,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,11202.138787501488
+2011,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,10950.52730561878
+2011,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,22083.06946010548
+2011,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2011,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,23961.71033495381
+2011,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2011,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,23194.384334160753
+2011,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,22083.06946010548
+2011,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2011,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2011,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+2011,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2011,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2011,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2011,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,192111.518790708
+2011,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2011,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,276126.3756215552
+2011,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,34717.390189936166
+2011,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,220223.6316110869
+2011,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,155430.5535826163
+2012,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,4004.8714179326594
+2012,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,5192.850983139569
+2012,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,4401.902744135727
+2012,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2012,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,4256.950821299097
+2012,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,4004.8714179326594
+2012,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,7887.082700034421
+2012,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2012,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,9322.678794989277
+2012,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2012,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,8357.227470902275
+2012,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,7887.082700034421
+2012,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,274455.015071693
+2012,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2012,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,138357.07671946925
+2012,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,3057.563295753628
+2012,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,307518.8698849945
+2012,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,271080.56969064625
+2012,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,40078.812245428104
+2012,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,88112.98996187864
+2012,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,59949.74639365256
+2012,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,4782.702219504528
+2012,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,39645.46903362503
+2012,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,34764.58817618345
+2012,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,8513.317479702468
+2012,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2012,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,10324.694648947974
+2012,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2012,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,8640.374662712708
+2012,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,8513.317479702468
+2012,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,18017.89791492291
+2012,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2012,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,19192.75959855639
+2012,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2012,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,18703.11935529818
+2012,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,18017.89791492291
+2012,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2012,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2012,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+2012,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2012,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2012,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2012,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,224997.47360862413
+2012,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2012,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,287995.3464552282
+2012,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,32361.549133343447
+2012,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,266349.2943767278
+2012,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,189746.58091965865
+2013,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,3273.036024344968
+2013,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,4676.742117635842
+2013,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,3521.3253936305236
+2013,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,24.739362371137172
+2013,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,3439.169034912957
+2013,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,3238.9582976578704
+2013,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,6522.941894698768
+2013,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2013,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,6908.813981201666
+2013,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2013,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,6868.012941088367
+2013,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,6522.941894698768
+2013,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,391502.45911067876
+2013,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2013,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,161098.75548921514
+2013,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,2513.8609534677576
+2013,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,419915.0366083528
+2013,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,388723.8519567587
+2013,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,36080.16804784305
+2013,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,77465.53502399461
+2013,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,52973.02859995721
+2013,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,4864.339511141451
+2013,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,35364.86221687876
+2013,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,30667.618337799424
+2013,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,6405.967525782755
+2013,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2013,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,8647.949032940385
+2013,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2013,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,6662.960607894282
+2013,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,6405.967525782755
+2013,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,14223.454980610717
+2013,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2013,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,15854.95073941129
+2013,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2013,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,14730.066657605428
+2013,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,14223.454980610717
+2013,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2013,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2013,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+2013,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2013,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2013,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2013,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,287377.16426289704
+2013,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2013,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,375337.63521044963
+2013,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,36690.48756457151
+2013,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,336493.4706104109
+2013,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,248686.57257990565
+2014,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,2223.281204016106
+2014,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,3564.1974370646967
+2014,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,2711.3265995993174
+2014,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,9.179812272787537
+2014,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,2627.372715680065
+2014,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,2211.1601210739414
+2014,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,4740.54398746565
+2014,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2014,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,5123.266585151342
+2014,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2014,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,5076.522515824439
+2014,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,4740.54398746565
+2014,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,341028.00905791536
+2014,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2014,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,172736.01746144902
+2014,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,2394.195734369849
+2014,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,362119.50243677193
+2014,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,338380.5312531613
+2014,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,31898.871140100233
+2014,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,63581.511067526255
+2014,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,40464.510297518245
+2014,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,5077.256388864756
+2014,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,30159.05909305672
+2014,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,26284.105344712476
+2014,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,4332.297181342242
+2014,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2014,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,6596.279896402386
+2014,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2014,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,4623.00198884143
+2014,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,4332.297181342242
+2014,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,9755.072448089917
+2014,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2014,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,10970.249095456003
+2014,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2014,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,10623.127147385723
+2014,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,9755.072448089917
+2014,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2014,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2014,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,0.0
+2014,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2014,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2014,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2014,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,288414.82555579534
+2014,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2014,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,433177.67040086834
+2014,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,33833.62906798088
+2014,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,382860.52417908463
+2014,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,252998.82706953044
+2015,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,1933.8708371492444
+2015,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,3826.0997702600985
+2015,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,2282.360430921803
+2015,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,24.76450377773745
+2015,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,2213.34084696296
+2015,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,1900.799593689432
+2015,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,4031.5917026939605
+2015,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2015,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,4457.367935027128
+2015,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2015,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,4269.876954344658
+2015,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,4031.5917026939605
+2015,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,323844.31915109686
+2015,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2015,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,232221.76779847484
+2015,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2015,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,357866.85808047093
+2015,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,323844.31915109686
+2015,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,30850.416310068165
+2015,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,59826.785231642985
+2015,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,37737.93917385213
+2015,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,4379.525468034491
+2015,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,29143.377457239843
+2015,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,25896.771488213337
+2015,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,3438.5566636714966
+2015,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2015,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,6436.32539761916
+2015,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2015,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,3791.885675410206
+2015,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,3438.5566636714966
+2015,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,7702.316675167608
+2015,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2015,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,9130.41207849063
+2015,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2015,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,8675.819391023893
+2015,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,7702.316675167608
+2015,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,5839.297550776511
+2015,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2015,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,7462.783361564283
+2015,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,322.4584974771742
+2015,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,6130.496760229057
+2015,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,5438.891556447169
+2015,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,432463.01258173573
+2015,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2015,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,589035.8948744229
+2015,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,39596.66735371278
+2015,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,563626.42269885
+2015,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,389202.0543869712
+2016,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,1518.7031385196638
+2016,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,4961.998765439827
+2016,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,1983.1667085670233
+2016,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,29.40590015020204
+2016,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,1784.279875896101
+2016,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,1482.4989419617434
+2016,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,3080.952989577743
+2016,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2016,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,3806.0571951562665
+2016,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2016,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,3606.164179257943
+2016,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,3080.952989577743
+2016,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,511689.0673024282
+2016,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2016,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,202498.88780763117
+2016,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2016,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,629417.9504555381
+2016,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,511689.0673024282
+2016,Petrobras,Bolsar,integrada,Millones de pesos 2018,KTA,22713.760462491908
+2016,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo,53560.21224156681
+2016,Petrobras,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,28605.400271908497
+2016,Petrobras,Bolsar,integrada,Millones de pesos 2018,inventarios,4263.2123627007595
+2016,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye,19561.056654821707
+2016,Petrobras,Bolsar,integrada,Millones de pesos 2018,ppye_neta,17863.762458355977
+2016,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,2647.9195244714265
+2016,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2016,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,5481.1400700100085
+2016,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2016,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,2974.2039869283612
+2016,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,2647.9195244714265
+2016,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,6686.094648966674
+2016,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2016,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,8263.412194289382
+2016,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2016,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,7892.113181303686
+2016,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,6686.094648966674
+2016,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,5882.24989922575
+2016,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2016,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,7674.039732538948
+2016,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,344.82743854752954
+2016,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,6860.63331546461
+2016,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,5446.9751803779245
+2016,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,452382.9832362221
+2016,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2016,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,494113.859655154
+2016,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,32288.543475921753
+2016,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,511524.81302535086
+2016,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,417404.15272351756
+2017,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,1410.3802499433386
+2017,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,6504.317190233957
+2017,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,1697.9598862549267
+2017,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,52.436413941054155
+2017,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,1566.5236338502566
+2017,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,1346.38758647174
+2017,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,18609.20647204706
+2017,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2017,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,19118.764974197624
+2017,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2017,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,18814.95309714713
+2017,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,18609.20647204706
+2017,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2017,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2017,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,195740.82317892995
+2017,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2017,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2017,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2017,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,25184.497921962284
+2017,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2017,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,28083.844792796874
+2017,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2017,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,26014.091009371015
+2017,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,25184.497921962284
+2017,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,6324.6056449464495
+2017,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2017,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,7809.906689505117
+2017,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2017,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,7770.066931514255
+2017,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,6324.6056449464495
+2017,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,7081.145109407154
+2017,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2017,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,19416.370736120036
+2017,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,306.9017454208678
+2017,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,18436.26017257368
+2017,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,6700.279443188273
+2017,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,407310.24790220696
+2017,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2017,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,459727.33044983074
+2017,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,32722.389482307473
+2017,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,458780.1065411787
+2017,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,372842.91767432063
+2018,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,KTA,7750.21717774528
+2018,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo,19666.874804
+2018,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,12556.380441
+2018,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,inventarios,125.565652
+2018,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye,8530.657247
+2018,Camuzzi Gas Pampeana,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,7609.487748
+2018,Metrogas,Bolsar,distribucion,Millones de pesos 2018,KTA,21321.429
+2018,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo,0.0
+2018,Metrogas,Bolsar,distribucion,Millones de pesos 2018,activo_no_corr,28233.94
+2018,Metrogas,Bolsar,distribucion,Millones de pesos 2018,inventarios,0.0
+2018,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye,23855.254
+2018,Metrogas,Bolsar,distribucion,Millones de pesos 2018,ppye_neta,21321.429
+2018,PAE,Bolsar,produccion,Millones de pesos 2018,KTA,0.0
+2018,PAE,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2018,PAE,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,407735.0
+2018,PAE,Bolsar,produccion,Millones de pesos 2018,inventarios,0.0
+2018,PAE,Bolsar,produccion,Millones de pesos 2018,ppye,0.0
+2018,PAE,Bolsar,produccion,Millones de pesos 2018,ppye_neta,0.0
+2018,TGN,Bolsar,transporte,Millones de pesos 2018,KTA,33094.378
+2018,TGN,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2018,TGN,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,39327.977
+2018,TGN,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2018,TGN,Bolsar,transporte,Millones de pesos 2018,ppye,35558.844
+2018,TGN,Bolsar,transporte,Millones de pesos 2018,ppye_neta,33094.378
+2018,TGS,Bolsar,transporte,Millones de pesos 2018,KTA,32586.828
+2018,TGS,Bolsar,transporte,Millones de pesos 2018,activo,0.0
+2018,TGS,Bolsar,transporte,Millones de pesos 2018,activo_no_corr,38779.711
+2018,TGS,Bolsar,transporte,Millones de pesos 2018,inventarios,0.0
+2018,TGS,Bolsar,transporte,Millones de pesos 2018,ppye,38685.519
+2018,TGS,Bolsar,transporte,Millones de pesos 2018,ppye_neta,32586.828
+2018,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,KTA,54139.3036905869
+2018,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo,0.0
+2018,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,activo_no_corr,67583.445
+2018,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,inventarios,847.572
+2018,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye,62487.893
+2018,Tecpetrol,Bolsar,produccion,Millones de pesos 2018,ppye_neta,53250.446
+2018,YPF,Bolsar,integrada,Millones de pesos 2018,KTA,647094.392852574
+2018,YPF,Bolsar,integrada,Millones de pesos 2018,activo,0.0
+2018,YPF,Bolsar,integrada,Millones de pesos 2018,activo_no_corr,785601.0
+2018,YPF,Bolsar,integrada,Millones de pesos 2018,inventarios,53324.0
+2018,YPF,Bolsar,integrada,Millones de pesos 2018,ppye,740103.0
+2018,YPF,Bolsar,integrada,Millones de pesos 2018,ppye_neta,589789.0
