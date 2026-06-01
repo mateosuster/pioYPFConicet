@@ -166,33 +166,12 @@ anio,variable,codigo_variable,unidad,valor,fuente
 1996.0,Q_crudo_expo,Q_crudo_expo,barriles,103610629.199821,SESCO/Comtrade
 1997.0,Q_crudo_expo,Q_crudo_expo,barriles,104005003.708477,SESCO/Comtrade
 1998.0,Q_crudo_expo,Q_crudo_expo,barriles,107523445.730744,SESCO/Comtrade
-2000.0,Q_crudo_expo,Q_crudo_expo,barriles,5608444.835399999,SESCO/Comtrade
-2001.0,Q_crudo_expo,Q_crudo_expo,barriles,104949187.51679999,SESCO/Comtrade
-2002.0,Q_crudo_expo,Q_crudo_expo,barriles,97245641.75039999,SESCO/Comtrade
-2003.0,Q_crudo_expo,Q_crudo_expo,barriles,83878726.09908,SESCO/Comtrade
-2004.0,Q_crudo_expo,Q_crudo_expo,barriles,64388883.8736,SESCO/Comtrade
-2005.0,Q_crudo_expo,Q_crudo_expo,barriles,54636926.3616,SESCO/Comtrade
-2006.0,Q_crudo_expo,Q_crudo_expo,barriles,31949152.3164,SESCO/Comtrade
-2007.0,Q_crudo_expo,Q_crudo_expo,barriles,20763719.822339997,SESCO/Comtrade
-2008.0,Q_crudo_expo,Q_crudo_expo,barriles,20686397.4114204,SESCO/Comtrade
-2009.0,Q_crudo_expo,Q_crudo_expo,barriles,38281780.30050659,SESCO/Comtrade
 2010.0,Q_crudo_expo,Q_crudo_expo,barriles,33429069.621789597,SESCO/Comtrade
 2011.0,Q_crudo_expo,Q_crudo_expo,barriles,21725042.042173795,SESCO/Comtrade
 2012.0,Q_crudo_expo,Q_crudo_expo,barriles,24058816.80833532,SESCO/Comtrade
 2013.0,Q_crudo_expo,Q_crudo_expo,barriles,15931837.93771614,SESCO/Comtrade
 2014.0,Q_crudo_expo,Q_crudo_expo,barriles,16825688.388588417,SESCO/Comtrade
 2015.0,Q_crudo_expo,Q_crudo_expo,barriles,14726080.94671626,SESCO/Comtrade
-2016.0,Q_crudo_expo,Q_crudo_expo,barriles,18683541.3286236,SESCO/Comtrade
-2017.0,Q_crudo_expo,Q_crudo_expo,barriles,10845928.399745999,SESCO/Comtrade
-2018.0,Q_crudo_expo,Q_crudo_expo,barriles,22591805.242284298,SESCO/Comtrade
-2019.0,Q_crudo_expo,Q_crudo_expo,barriles,23950112.1422574,SESCO/Comtrade
-2020.0,Q_crudo_expo,Q_crudo_expo,barriles,31543725.803204995,SESCO/Comtrade
-2021.0,Q_crudo_expo,Q_crudo_expo,barriles,27458149.587699596,SESCO/Comtrade
-2022.0,Q_crudo_expo,Q_crudo_expo,barriles,41883087.296918996,SESCO/Comtrade
-2023.0,Q_crudo_expo,Q_crudo_expo,barriles,46726874.548318796,SESCO/Comtrade
-2024.0,Q_crudo_expo,Q_crudo_expo,barriles,57626061.7100586,SESCO/Comtrade
-2025.0,Q_crudo_expo,Q_crudo_expo,barriles,83455468.7073426,SESCO/Comtrade
-2026.0,Q_crudo_expo,Q_crudo_expo,barriles,9993288.722247599,SESCO/Comtrade
 1994.0,Q_crudo_impo,Q_crudo_impo,barriles,3112715.0933999997,SESCO/MECON
 1995.0,Q_crudo_impo,Q_crudo_impo,barriles,3646549.2887999997,SESCO/MECON
 1996.0,Q_crudo_impo,Q_crudo_impo,barriles,5336926.749,SESCO/MECON
@@ -335,39 +314,23 @@ anio,variable,codigo_variable,unidad,valor,fuente
 2023.0,Q_crudo_prod,Q_crudo_prod,barriles,217765786.8019986,SecEnergia/SESCO/Anuario
 2024.0,Q_crudo_prod,Q_crudo_prod,barriles,237817865.7676833,SecEnergia/SESCO/Anuario
 2025.0,Q_crudo_prod,Q_crudo_prod,barriles,266845855.46639988,SecEnergia/SESCO/Anuario
-1994.0,Q_gas_expo,Q_gas_expo,MMBTU,31853.343299999997,SESCO/MECON
-1995.0,Q_gas_expo,Q_gas_expo,MMBTU,19096.1704,SESCO/MECON
-1996.0,Q_gas_expo,Q_gas_expo,MMBTU,30610.9544939511,SESCO/MECON
-1997.0,Q_gas_expo,Q_gas_expo,MMBTU,23720720.93327094,SESCO/MECON
-1998.0,Q_gas_expo,Q_gas_expo,MMBTU,70124828.5853785,SESCO/MECON
-1999.0,Q_gas_expo,Q_gas_expo,MMBTU,5910.546574,SESCO/MECON
-2000.0,Q_gas_expo,Q_gas_expo,MMBTU,11411.282034,SESCO/MECON
-2001.0,Q_gas_expo,Q_gas_expo,MMBTU,218230025.45962197,SESCO/MECON
-2002.0,Q_gas_expo,Q_gas_expo,MMBTU,206445367.650343,SESCO/MECON
-2003.0,Q_gas_expo,Q_gas_expo,MMBTU,228132934.10724398,SESCO/MECON
-2004.0,Q_gas_expo,Q_gas_expo,MMBTU,259446308.63520998,SESCO/MECON
-2005.0,Q_gas_expo,Q_gas_expo,MMBTU,233012074.3566,SESCO/MECON
-2006.0,Q_gas_expo,Q_gas_expo,MMBTU,108298011.9745562,SESCO/MECON
-2007.0,Q_gas_expo,Q_gas_expo,MMBTU,43962053.8586,SESCO/MECON
-2008.0,Q_gas_expo,Q_gas_expo,MMBTU,24637390.943919,SESCO/MECON
-2009.0,Q_gas_expo,Q_gas_expo,MMBTU,27435815.52332839,SESCO/MECON
+1999.0,Q_gas_expo,Q_gas_expo,MMBTU,119490500.0,SESCO/MECON
+2000.0,Q_gas_expo,Q_gas_expo,MMBTU,163887415.89999998,SESCO/MECON
+2001.0,Q_gas_expo,Q_gas_expo,MMBTU,213616714.5,SESCO/MECON
+2002.0,Q_gas_expo,Q_gas_expo,MMBTU,206375731.39999998,SESCO/MECON
+2003.0,Q_gas_expo,Q_gas_expo,MMBTU,228057062.0,SESCO/MECON
+2004.0,Q_gas_expo,Q_gas_expo,MMBTU,259389553.79999998,SESCO/MECON
+2005.0,Q_gas_expo,Q_gas_expo,MMBTU,232983812.39999998,SESCO/MECON
+2006.0,Q_gas_expo,Q_gas_expo,MMBTU,222398825.0,SESCO/MECON
+2007.0,Q_gas_expo,Q_gas_expo,MMBTU,93978095.69999999,SESCO/MECON
+2008.0,Q_gas_expo,Q_gas_expo,MMBTU,35663731.199999996,SESCO/MECON
+2009.0,Q_gas_expo,Q_gas_expo,MMBTU,31218719.9,SESCO/MECON
 2010.0,Q_gas_expo,Q_gas_expo,MMBTU,14161785.245399999,SESCO/MECON
 2011.0,Q_gas_expo,Q_gas_expo,MMBTU,5383011.3719999995,SESCO/MECON
 2012.0,Q_gas_expo,Q_gas_expo,MMBTU,2435306.7227,SESCO/MECON
 2013.0,Q_gas_expo,Q_gas_expo,MMBTU,2112516.3567999997,SESCO/MECON
 2014.0,Q_gas_expo,Q_gas_expo,MMBTU,910251.1302999998,SESCO/MECON
 2015.0,Q_gas_expo,Q_gas_expo,MMBTU,798427.4373,SESCO/MECON
-2016.0,Q_gas_expo,Q_gas_expo,MMBTU,984007.6915999999,SESCO/MECON
-2017.0,Q_gas_expo,Q_gas_expo,MMBTU,2379077.2218782,SESCO/MECON
-2018.0,Q_gas_expo,Q_gas_expo,MMBTU,14887610.7138,SESCO/MECON
-2019.0,Q_gas_expo,Q_gas_expo,MMBTU,60798927.7837,SESCO/MECON
-2020.0,Q_gas_expo,Q_gas_expo,MMBTU,42520319.7508,SESCO/MECON
-2021.0,Q_gas_expo,Q_gas_expo,MMBTU,30929677.3578,SESCO/MECON
-2022.0,Q_gas_expo,Q_gas_expo,MMBTU,68294121.85689999,SESCO/MECON
-2023.0,Q_gas_expo,Q_gas_expo,MMBTU,57357887.1725,SESCO/MECON
-2024.0,Q_gas_expo,Q_gas_expo,MMBTU,53872009.595599994,SESCO/MECON
-2025.0,Q_gas_expo,Q_gas_expo,MMBTU,72635352.5336,SESCO/MECON
-2026.0,Q_gas_expo,Q_gas_expo,MMBTU,12576371.630299998,SESCO/MECON
 1994.0,Q_gas_impo,Q_gas_impo,MMBTU,87138360.3125,SESCO/MECON
 1994.0,Q_gas_impo,Q_gas_impo,MMBTU,28436.974,SESCO/MECON
 1994.0,Q_gas_impo,Q_gas_impo,MMBTU,0.0,SESCO/MECON
@@ -1776,32 +1739,32 @@ anio,variable,codigo_variable,unidad,valor,fuente
 1997.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,2408179860.2734704,Propia
 1998.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,1822265237.0845213,Propia
 1999.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,4079562178.003023,Propia
-2000.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,7163843416.175277,Propia
-2001.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,4537674774.49888,Propia
-2002.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,2769919897.2927704,Propia
-2003.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,6851322825.256845,Propia
-2004.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,8101157180.629267,Propia
-2005.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,16358457900.639862,Propia
-2006.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,24880964707.139828,Propia
-2007.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,34893431916.60361,Propia
-2008.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,72571173597.10483,Propia
-2009.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,43882473268.32251,Propia
+2000.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,7314509542.044599,Propia
+2001.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,7248386058.80738,Propia
+2002.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,4272576395.9190083,Propia
+2003.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,9935818335.860176,Propia
+2004.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,10847614857.06245,Propia
+2005.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,21113187653.12308,Propia
+2006.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,28680045090.64517,Propia
+2007.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,38222274942.43837,Propia
+2008.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,79528887626.13535,Propia
+2009.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,52739888769.175446,Propia
 2010.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,72327381105.47421,Propia
 2011.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,131111966858.11891,Propia
 2012.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,177507264135.32913,Propia
 2013.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,193049656476.58252,Propia
 2014.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,256926183719.26468,Propia
 2015.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,203434363242.30396,Propia
-2016.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,202089997961.94385,Propia
-2017.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,254001475757.90466,Propia
-2018.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,329828083995.36096,Propia
-2019.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,397601586724.27625,Propia
-2020.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,464985690064.19543,Propia
-2021.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,725135638109.5197,Propia
-2022.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,1983950028910.4758,Propia
-2023.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,4382859355004.89,Propia
-2024.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,18250410519087.61,Propia
-2025.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,17246642740007.8,Propia
+2016.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,225761976025.60956,Propia
+2017.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,271714398111.93533,Propia
+2018.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,380533771432.3505,Propia
+2019.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,460568531211.67163,Propia
+2020.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,575132365350.372,Propia
+2021.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,860902714262.9359,Propia
+2022.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,2512802066859.134,Propia
+2023.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,5580232026204.352,Propia
+2024.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,24086965007828.477,Propia
+2025.0,renta_dif_precios_crudo,renta_dif_precios_crudo,Pesos corrientes,25095072959997.793,Propia
 1972.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,0.0038706968863278053,Propia
 1973.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,0.007768928237502642,Propia
 1974.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,0.01450141172788627,Propia
@@ -1820,34 +1783,34 @@ anio,variable,codigo_variable,unidad,valor,fuente
 1987.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,431836.66382682975,Propia
 1988.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1317475.102655849,Propia
 1993.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,3796339485.585545,Propia
-1998.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1419690531.868444,Propia
-1999.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,996983490.0395839,Propia
-2000.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1410727939.7857242,Propia
-2001.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1364295744.274491,Propia
-2002.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1733489864.3465867,Propia
-2003.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,880809591.8425808,Propia
-2004.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,6257172544.687608,Propia
-2005.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,10611857653.70099,Propia
-2006.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,15610876376.63879,Propia
-2007.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,7404121255.792247,Propia
-2008.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,9256958523.772055,Propia
-2009.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,13938227859.019836,Propia
+1998.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1496655234.2523003,Propia
+1999.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,914137857.8589003,Propia
+2000.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1265816810.7527373,Propia
+2001.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1368546417.0594974,Propia
+2002.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1733573947.680162,Propia
+2003.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,880852092.3434854,Propia
+2004.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,6257396828.34116,Propia
+2005.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,10612047602.994389,Propia
+2006.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,14572554166.649586,Propia
+2007.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,7193238071.310772,Propia
+2008.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,9198675459.141258,Propia
+2009.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,13906875664.002636,Propia
 2010.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,36420951435.76402,Propia
 2011.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,66084969865.30589,Propia
 2012.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,126814908652.94398,Propia
 2013.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,226040568715.37863,Propia
 2014.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,297182582490.1832,Propia
 2015.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,215392263235.74203,Propia
-2016.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,128545539104.3808,Propia
-2017.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,266669534328.8335,Propia
-2018.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,441144292990.22565,Propia
-2019.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,836477672917.6003,Propia
-2020.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,316136906051.45087,Propia
-2021.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,566225332722.3561,Propia
-2022.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1188319612207.8628,Propia
-2023.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,2624032110942.373,Propia
-2024.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,8328636762569.378,Propia
-2025.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,9834844898636.266,Propia
+2016.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,128625238295.4673,Propia
+2017.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,267072598057.13745,Propia
+2018.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,445136813390.2188,Propia
+2019.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,866726390576.8391,Propia
+2020.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,324811863295.9852,Propia
+2021.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,577391754149.3861,Propia
+2022.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,1237702572495.1045,Propia
+2023.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,2715723738931.1934,Propia
+2024.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,8586918813834.593,Propia
+2025.0,renta_dif_precios_gas,renta_dif_precios_gas,Pesos corrientes,10243378048517.434,Propia
 2002.0,retenciones,retenciones,ars,1353340000.0000002,AFIP
 2003.0,retenciones,retenciones,ars,1309710000.0,AFIP
 2004.0,retenciones,retenciones,ars,1842970000.0,AFIP
