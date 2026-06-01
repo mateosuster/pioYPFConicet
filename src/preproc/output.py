@@ -248,6 +248,7 @@ def write_outputs(
     criterio_ccnn: pd.DataFrame = None,
     renta_sv_crudo_gas: pd.DataFrame = None,
     renta_empresas: pd.DataFrame = None,
+    retenciones: pd.DataFrame = None,
     stock_source: str = "",
     renta_sv_source: str = "sesco",
 ) -> None:
@@ -305,6 +306,7 @@ def write_outputs(
         "costos_pg": costos,
         "RTPG_comparacion": renta_comparacion,
         "renta_sv_crudo&gas": renta_sv_crudo_gas,
+        "retenciones_fuentes": retenciones,
     }
     for name, df in optional_sheets.items():
         if df is not None:
@@ -401,16 +403,17 @@ def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> p
     expo_usd_crudo = data["expo_usd_crudo"].copy()
     expo_usd_gas   = data["expo_usd_gas"].copy()
     if renta_tcp_indec is not None:
+        # complejos values are in Millones USD → scale to USD to match other columns
+        tmp_crudo = renta_tcp_indec[["anio", "expo_petroleo_usd_indec"]].copy()
+        tmp_crudo["expo_indec_complejos_exportadores"] = tmp_crudo["expo_petroleo_usd_indec"] * 1e6
         expo_usd_crudo = expo_usd_crudo.merge(
-            renta_tcp_indec[["anio", "expo_petroleo_usd_indec"]].rename(
-                columns={"expo_petroleo_usd_indec": "expo_indec_complejos_exportadores"}
-            ),
+            tmp_crudo[["anio", "expo_indec_complejos_exportadores"]],
             on="anio", how="left",
         )
+        tmp_gas = renta_tcp_indec[["anio", "expo_gas_usd_indec"]].copy()
+        tmp_gas["expo_gas_indec_complejos_exportadores"] = tmp_gas["expo_gas_usd_indec"] * 1e6
         expo_usd_gas = expo_usd_gas.merge(
-            renta_tcp_indec[["anio", "expo_gas_usd_indec"]].rename(
-                columns={"expo_gas_usd_indec": "expo_gas_indec_complejos_exportadores"}
-            ),
+            tmp_gas[["anio", "expo_gas_indec_complejos_exportadores"]],
             on="anio", how="left",
         )
 
@@ -436,6 +439,7 @@ def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> p
         stock_petroarg=data.get("stock_petroarg"),
         renta_indirecto=data.get("renta_indirecto"),
         renta_empresas=data.get("renta_empresas"),
+        retenciones=data.get("retenciones"),
         renta_directo=data.get("renta_directo"),
         tasa_ganancia_rama_stock=data.get("tasa_ganancia_rama_stock"),
         ccnn_oficial=data.get("ccnn_oficial"),
