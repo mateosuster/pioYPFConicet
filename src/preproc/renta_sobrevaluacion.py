@@ -222,15 +222,23 @@ def build_retenciones_regalias(
 ) -> pd.DataFrame:
     """
     Combine royalties and export taxes for total rent calculation.
-    Uses retenciones_crudo_jk column from retenciones (JK series).
+    Primary: retenciones_crudo_jk (2002-2015); gap-filled with retenciones_afip_cap27 (2018-2023).
     """
-    ret_cols = ["anio"]
-    if "retenciones_crudo_jk" in retenciones.columns:
-        ret_cols.append("retenciones_crudo_jk")
-    elif "retenciones_crudo" in retenciones.columns:
-        ret_cols.append("retenciones_crudo")
+    ret = retenciones[["anio"]].copy()
 
-    ret = retenciones[ret_cols].copy()
+    if "retenciones_crudo_jk" in retenciones.columns:
+        ret["retenciones_crudo_jk"] = retenciones["retenciones_crudo_jk"]
+    elif "retenciones_crudo" in retenciones.columns:
+        ret["retenciones_crudo_jk"] = retenciones["retenciones_crudo"]
+
+    if "retenciones_afip_cap27" in retenciones.columns:
+        if "retenciones_crudo_jk" in ret.columns:
+            ret["retenciones_crudo_jk"] = ret["retenciones_crudo_jk"].fillna(
+                retenciones["retenciones_afip_cap27"]
+            )
+        else:
+            ret["retenciones_crudo_jk"] = retenciones["retenciones_afip_cap27"]
+
     df = regalias.merge(ret, on="anio", how="left")
     return df.sort_values("anio").reset_index(drop=True)
 

@@ -248,6 +248,7 @@ def write_outputs(
     criterio_ccnn: pd.DataFrame = None,
     renta_sv_crudo_gas: pd.DataFrame = None,
     renta_empresas: pd.DataFrame = None,
+    retenciones: pd.DataFrame = None,
     stock_source: str = "",
     renta_sv_source: str = "sesco",
 ) -> None:
@@ -305,6 +306,7 @@ def write_outputs(
         "costos_pg": costos,
         "RTPG_comparacion": renta_comparacion,
         "renta_sv_crudo&gas": renta_sv_crudo_gas,
+        "retenciones_fuentes": retenciones,
     }
     for name, df in optional_sheets.items():
         if df is not None:
@@ -393,6 +395,28 @@ def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> p
         ganancia_pbi=data["ganancia_pbi"],
         ipc_us=data["ipc_us"],
     )
+
+    # Merge INDEC Complejos Exportadores into export value sheets as reference columns.
+    # renta_tcp_indec already holds expo_petroleo_usd_indec / expo_gas_usd_indec; adding
+    # them here surfaces them in the export sheets where they belong.
+    renta_tcp_indec = data.get("renta_tcp_indec")
+    expo_usd_crudo = data["expo_usd_crudo"].copy()
+    expo_usd_gas   = data["expo_usd_gas"].copy()
+    if renta_tcp_indec is not None:
+        # complejos values are in Millones USD → scale to USD to match other columns
+        tmp_crudo = renta_tcp_indec[["anio", "expo_petroleo_usd_indec"]].copy()
+        tmp_crudo["expo_indec_complejos_exportadores"] = tmp_crudo["expo_petroleo_usd_indec"] * 1e6
+        expo_usd_crudo = expo_usd_crudo.merge(
+            tmp_crudo[["anio", "expo_indec_complejos_exportadores"]],
+            on="anio", how="left",
+        )
+        tmp_gas = renta_tcp_indec[["anio", "expo_gas_usd_indec"]].copy()
+        tmp_gas["expo_gas_indec_complejos_exportadores"] = tmp_gas["expo_gas_usd_indec"] * 1e6
+        expo_usd_gas = expo_usd_gas.merge(
+            tmp_gas[["anio", "expo_gas_indec_complejos_exportadores"]],
+            on="anio", how="left",
+        )
+
     write_outputs(
         variables=variables,
         ipc=data["ipc"],
@@ -402,9 +426,9 @@ def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> p
         precio_crudo_mi=data["precio_crudo_mi"],
         precio_gas_mi_mmbtu=data["precio_gas_mi_mmbtu"],
         expo_crudo=data["expo_crudo"],
-        expo_usd_crudo=data["expo_usd_crudo"],
+        expo_usd_crudo=expo_usd_crudo,
         expo_gas=data["expo_gas"],
-        expo_usd_gas=data["expo_usd_gas"],
+        expo_usd_gas=expo_usd_gas,
         precios_referencia_crudo=data["precios_referencia_crudo"],
         precio_mdomundial_gas=data["precio_mdomundial_gas_MMBTU"],
         renta_crudo_dif=data["renta_crudo_dif"],
@@ -415,6 +439,7 @@ def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> p
         stock_petroarg=data.get("stock_petroarg"),
         renta_indirecto=data.get("renta_indirecto"),
         renta_empresas=data.get("renta_empresas"),
+        retenciones=data.get("retenciones"),
         renta_directo=data.get("renta_directo"),
         tasa_ganancia_rama_stock=data.get("tasa_ganancia_rama_stock"),
         ccnn_oficial=data.get("ccnn_oficial"),

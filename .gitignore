@@ -22,3 +22,6 @@ produccin-de-pozos-de-gas-y-petrleo-2021.csv
 __pycache__/
 
 *.zip
+
+.claude/*
+.claude/

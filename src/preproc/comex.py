@@ -83,16 +83,50 @@ def _load_comex_mecon() -> pd.DataFrame:
 
 
 def _load_indec() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """INDEC export quantities and values."""
-    q = pd.read_csv(DATA / "indec/cantidades_expo_hidro_indec.csv",
-                    usecols=lambda c: c not in ["...1", "Unnamed: 0"])
-    q = q.rename(columns={"petroleo_crudo_expo": "expo_indec_crudo",
-                           "gas_natural_expo": "expo_indec_gas"})
-    v = pd.read_csv(DATA / "indec/expo_hidro_valor.csv",
-                    usecols=lambda c: c not in ["...1", "Unnamed: 0"])
-    v = v.rename(columns={"petroleo_crudo_expo": "expo_indec_crudo",
-                           "gas_natural_expo": "expo_indec_gas"})
-    return q, v
+    """INDEC export quantities and values from Datos_origen_2002_2025.xlsx (2002-2025)."""
+    path = DATA / "indec/Datos_origen_2002_2025.xlsx"
+    sheets = [
+        "datos origen_2002-2011",
+        "datos origen_2012-2022",
+        "datos origen_2023-2025",
+    ]
+    frames = [pd.read_excel(path, sheet_name=s, header=0) for s in sheets]
+    raw = pd.concat(frames, ignore_index=True)
+    raw.columns = [
+        "CANIO", "CMES", "PCIA", "DESCRIP_PCIA",
+        "CCOD_RUBRO", "DESCRIP_RUBRO",
+        "CCOD_PAIS", "DESCRIP_PAIS",
+        "DOLARES_FOB", "PESO_NETO_KG",
+    ]
+    raw["CCOD_RUBRO"] = raw["CCOD_RUBRO"].astype(str).str.strip()
+
+    crude_mask = raw["CCOD_RUBRO"] == "401"
+    gas_mask   = raw["CCOD_RUBRO"].isin(["404A", "404Z"])
+
+    # Values (USD)
+    crude_v = raw[crude_mask].groupby("CANIO")["DOLARES_FOB"].sum().reset_index()
+    gas_v   = raw[gas_mask  ].groupby("CANIO")["DOLARES_FOB"].sum().reset_index()
+    v = crude_v.merge(gas_v, on="CANIO", how="outer", suffixes=("_crude", "_gas"))
+    v = v.rename(columns={
+        "CANIO": "anio",
+        "DOLARES_FOB_crude": "expo_indec_crudo",
+        "DOLARES_FOB_gas":   "expo_indec_gas",
+    })
+    v["unidad"] = "usd"
+
+    # Quantities: crude kg → m3 (÷850 kg/m3) → bbl; gas kg → m3 (÷0.7370 kg/m3)
+    crude_q = raw[crude_mask].groupby("CANIO")["PESO_NETO_KG"].sum().reset_index()
+    gas_q   = raw[gas_mask  ].groupby("CANIO")["PESO_NETO_KG"].sum().reset_index()
+    q = crude_q.merge(gas_q, on="CANIO", how="outer", suffixes=("_crude", "_gas"))
+    q = q.rename(columns={"CANIO": "anio"})
+    q["expo_indec_crudo"] = m3_to_bbl_q(q["PESO_NETO_KG_crude"] / 850)
+    q["expo_indec_gas"]   = q["PESO_NETO_KG_gas"] / 0.7370
+    q["unidad"] = "m3"
+
+    return (
+        q[["anio", "expo_indec_crudo", "expo_indec_gas", "unidad"]],
+        v[["anio", "expo_indec_crudo", "expo_indec_gas", "unidad"]],
+    )
 
 
 def _load_comtrade_crudo() -> pd.DataFrame:
@@ -107,6 +141,27 @@ def _load_comtrade_crudo() -> pd.DataFrame:
         df["expo_bbl"] = m3_to_bbl_q(df["m3"])
     df["unidad_cantidad"] = "barriles"
     return df
+
+
+def _load_comtrade_usd_crudo() -> pd.DataFrame:
+    """UN-Comtrade crude oil HS export values (USD), updated by comtrade_download.py."""
+    path = DATA / "un_comtrade/expo_crudo_uncomtrade_hs.csv"
+    if not path.exists():
+        return pd.DataFrame(columns=["anio", "expo_comtrade_crudo_usd"])
+    df = pd.read_csv(path)
+    df = df.rename(columns={"Period": "anio", "Trade Value (US$)": "expo_comtrade_crudo_usd"})
+    return df[["anio", "expo_comtrade_crudo_usd"]].dropna()
+
+
+def _load_comtrade_usd_gas() -> pd.DataFrame:
+    """UN-Comtrade natural gas SITC export values (USD) and quantities (MMBTU), updated by comtrade_download.py."""
+    path = DATA / "un_comtrade/expo_gas_sitc.csv"
+    if not path.exists():
+        return pd.DataFrame(columns=["anio", "expo_comtrade_gas_usd", "expo_comtrade_gas"])
+    df = pd.read_csv(path)
+    df = df.rename(columns={"Trade Value (US$)": "expo_comtrade_gas_usd"})
+    df["expo_comtrade_gas"] = m3_to_mmbtu_q(df["expo_Mm3"] * 1e6)
+    return df[["anio", "expo_comtrade_gas_usd", "expo_comtrade_gas"]].dropna(subset=["anio"])
 
 
 def _load_comex_sesco_new() -> pd.DataFrame:
@@ -177,33 +232,16 @@ def _extract_gas_new(sn: pd.DataFrame) -> pd.DataFrame:
 
 # ===== CRUDE =====
 
-def build_expo_crudo(sesco: pd.DataFrame, mecon: pd.DataFrame,
+def build_expo_crudo(mecon: pd.DataFrame,
                      indec_q: pd.DataFrame, comtrade: pd.DataFrame,
                      sesco_new: pd.DataFrame = None) -> pd.DataFrame:
     """
     Annual crude export quantities (barrels).
-    Priority: new SESCO (2010+) → old SESCO (1999+) → Comtrade (pre-1999).
+    Priority: new SESCO (2010+) → Comtrade (pre-1999).
+    MECON, INDEC, and Comtrade kept as reference columns.
     """
-    crudo_sesco = (
-        sesco[
-            (sesco["producto"].str.contains("PETROLEO|Cuenca|Crudo importado", na=False))
-            & (sesco["variable"] == "exportacion")
-            & (sesco["unidad"] == "m3")
-        ]
-        .copy()
-    )
-    crudo_sesco = crudo_sesco.groupby(["anio", "unidad"])["valor"].sum().reset_index()
-    crudo_sesco["valor"] = np.where(
-        crudo_sesco["unidad"] == "m3",
-        m3_to_bbl_q(crudo_sesco["valor"]),
-        crudo_sesco["valor"],
-    )
-    crudo_sesco["unidad"] = "barriles"
-    crudo_sesco = crudo_sesco[crudo_sesco["valor"] > 0].rename(columns={"valor": "expo_sesco_crudo"})
-    crudo_sesco["anio"] = pd.to_numeric(crudo_sesco["anio"], errors="coerce")
-
-    df = crudo_sesco.merge(mecon[["anio", "expo_bbl_crudo"]].rename(
-        columns={"expo_bbl_crudo": "expo_mecon_crudo"}), on="anio", how="outer")
+    df = mecon[["anio", "expo_bbl_crudo"]].rename(
+        columns={"expo_bbl_crudo": "expo_mecon_crudo"}).copy()
     df = df.merge(indec_q[["anio", "expo_indec_crudo"]].dropna(), on="anio", how="outer")
     df = df.merge(comtrade[["anio", "expo_bbl"]].rename(
         columns={"expo_bbl": "expo_comtrade_crudo"}), on="anio", how="outer")
@@ -211,11 +249,11 @@ def build_expo_crudo(sesco: pd.DataFrame, mecon: pd.DataFrame,
     crudo_new = _extract_crudo_new(sesco_new if sesco_new is not None else pd.DataFrame())
     df = df.merge(crudo_new[["anio", "expo_crudo_sesco_new"]], on="anio", how="outer")
 
-    # Priority: new SESCO → old SESCO → comtrade (pre-1999)
+    # Priority: new SESCO (2010+) → comtrade (pre-1999)
     df["expo_crudo"] = np.where(
         df["anio"] < 1999,
         df.get("expo_comtrade_crudo", np.nan),
-        df["expo_crudo_sesco_new"].fillna(df.get("expo_sesco_crudo", np.nan)),
+        df["expo_crudo_sesco_new"],
     )
     df["unidad"] = "barriles"
     return df.sort_values("anio").reset_index(drop=True)
@@ -252,45 +290,27 @@ def build_impo_crudo(sesco: pd.DataFrame, mecon: pd.DataFrame) -> pd.DataFrame:
 
 # ===== GAS =====
 
-def build_expo_gas(sesco: pd.DataFrame, mecon: pd.DataFrame,
-                   sesco_new: pd.DataFrame = None) -> pd.DataFrame:
+def build_expo_gas(mecon: pd.DataFrame,
+                   sesco_new: pd.DataFrame = None,
+                   comtrade_q: pd.DataFrame = None) -> pd.DataFrame:
     """
     Annual gas export quantities in MMBTU.
-    Priority: new SESCO (2010+) → old SESCO → MECON.
+    Priority: new SESCO (2010+) → MECON.
+    comtrade_q added as reference column (not in priority chain).
     """
-    gas_sesco = (
-        sesco[
-            sesco["producto"].str.contains("GAS|gas", na=False)
-            & (sesco["variable"] == "exportacion")
-            & (sesco["unidad"] == "m3")
-        ]
-        .copy()
-    )
-    gas_sesco = gas_sesco.groupby(["anio", "unidad"])["valor"].sum().reset_index()
-    gas_sesco["valor"] = np.where(
-        gas_sesco["unidad"] == "m3",
-        m3_to_mmbtu_q(gas_sesco["valor"]),
-        gas_sesco["valor"],
-    )
-    gas_sesco["unidad"] = "MMBTU"
-    gas_sesco["anio"] = pd.to_numeric(gas_sesco["anio"], errors="coerce")
-    gas_sesco = gas_sesco.rename(columns={"valor": "expo_sesco_gas"})
-
-    df = gas_sesco.merge(
-        mecon[["anio", "expo_mmbtu_gas"]].rename(columns={"expo_mmbtu_gas": "expo_mecon_gas"}),
-        on="anio", how="outer",
-    )
+    df = mecon[["anio", "expo_mmbtu_gas"]].rename(
+        columns={"expo_mmbtu_gas": "expo_mecon_gas"}).copy()
 
     gas_new = _extract_gas_new(sesco_new if sesco_new is not None else pd.DataFrame())
     df = df.merge(gas_new[["anio", "expo_gas_sesco_new"]], on="anio", how="outer")
 
-    # Priority: new SESCO → old SESCO → MECON
-    df["expo_gas"] = (
-        df["expo_gas_sesco_new"]
-        .fillna(df.get("expo_sesco_gas", np.nan))
-        .fillna(df.get("expo_mecon_gas", np.nan))
-    )
+    # Priority: new SESCO → MECON
+    df["expo_gas"] = df["expo_gas_sesco_new"].fillna(df.get("expo_mecon_gas", np.nan))
     df["unidad"] = "MMBTU"
+
+    if comtrade_q is not None and not comtrade_q.empty:
+        df = df.merge(comtrade_q[["anio", "expo_comtrade_gas"]], on="anio", how="outer")
+
     return df.sort_values("anio").reset_index(drop=True)
 
 
@@ -323,80 +343,57 @@ def build_impo_gas(sesco: pd.DataFrame, mecon: pd.DataFrame) -> pd.DataFrame:
     return df.sort_values("anio").reset_index(drop=True)
 
 
-def build_expo_usd_crudo(sesco: pd.DataFrame, indec_v: pd.DataFrame,
-                         sesco_new: pd.DataFrame = None) -> pd.DataFrame:
+def build_expo_usd_crudo(indec_v: pd.DataFrame,
+                         sesco_new: pd.DataFrame = None,
+                         comtrade_usd: pd.DataFrame = None) -> pd.DataFrame:
     """
     Annual crude export value (USD).
-    Priority: new SESCO → old SESCO → INDEC.
-    Used to cross-check overvaluation rent calculation.
+    Priority: new SESCO → INDEC.
+    comtrade_usd added as reference column (not in priority chain).
     """
-    crudo_sesco_usd = (
-        sesco[
-            (sesco["producto"].str.contains("PETROLEO|Cuenca|Crudo importado", na=False))
-            & (sesco["variable"] == "exportacion")
-            & (sesco["unidad"] == "USD")
-        ]
-        .copy()
-    )
-    crudo_sesco_usd = crudo_sesco_usd.groupby("anio")["valor"].sum().reset_index()
-    crudo_sesco_usd["anio"] = pd.to_numeric(crudo_sesco_usd["anio"], errors="coerce")
-    crudo_sesco_usd = crudo_sesco_usd.rename(columns={"valor": "expo_crudo_sesco_usd"})
-
-    df = crudo_sesco_usd.merge(
-        indec_v[["anio", "expo_indec_crudo"]].dropna().rename(
-            columns={"expo_indec_crudo": "expo_crudo_indec_usd"}
-        ),
-        on="anio", how="outer",
-    )
+    df = indec_v[["anio", "expo_indec_crudo"]].dropna().rename(
+        columns={"expo_indec_crudo": "expo_crudo_indec_usd"}
+    ).copy()
 
     crudo_new = _extract_crudo_new(sesco_new if sesco_new is not None else pd.DataFrame())
     df = df.merge(crudo_new[["anio", "expo_crudo_usd_sesco_new"]], on="anio", how="outer")
 
-    # Priority: new SESCO → old SESCO → INDEC
-    df["expo_crudo_usd"] = (
-        df["expo_crudo_usd_sesco_new"]
-        .fillna(df.get("expo_crudo_sesco_usd", np.nan))
-        .fillna(df.get("expo_crudo_indec_usd", np.nan))
+    # Priority: new SESCO → INDEC
+    df["expo_crudo_usd"] = df["expo_crudo_usd_sesco_new"].fillna(
+        df.get("expo_crudo_indec_usd", np.nan)
     )
     df["unidad"] = "USD"
+
+    if comtrade_usd is not None and not comtrade_usd.empty:
+        df = df.merge(comtrade_usd[["anio", "expo_comtrade_crudo_usd"]], on="anio", how="outer")
+
     return df.sort_values("anio").reset_index(drop=True)
 
 
-def build_expo_usd_gas(sesco: pd.DataFrame, indec_v: pd.DataFrame,
-                       sesco_new: pd.DataFrame = None) -> pd.DataFrame:
+def build_expo_usd_gas(indec_v: pd.DataFrame,
+                       sesco_new: pd.DataFrame = None,
+                       comtrade_usd: pd.DataFrame = None) -> pd.DataFrame:
     """
     Annual gas export value (USD).
-    Priority: new SESCO → old SESCO → INDEC.
+    Priority: new SESCO → INDEC.
+    comtrade_usd added as reference column (not in priority chain).
     """
-    gas_sesco_usd = (
-        sesco[
-            sesco["producto"].str.contains("GAS|gas", na=False)
-            & (sesco["variable"] == "exportacion")
-            & (sesco["unidad"] == "USD")
-        ]
-        .copy()
-    )
-    gas_sesco_usd = gas_sesco_usd.groupby("anio")["valor"].sum().reset_index()
-    gas_sesco_usd["anio"] = pd.to_numeric(gas_sesco_usd["anio"], errors="coerce")
-    gas_sesco_usd = gas_sesco_usd.rename(columns={"valor": "expo_gas_sesco_usd"})
-
-    df = gas_sesco_usd.merge(
-        indec_v[["anio", "expo_indec_gas"]].dropna().rename(
-            columns={"expo_indec_gas": "expo_gas_indec_usd"}
-        ),
-        on="anio", how="outer",
-    )
+    df = indec_v[["anio", "expo_indec_gas"]].dropna().rename(
+        columns={"expo_indec_gas": "expo_gas_indec_usd"}
+    ).copy()
 
     gas_new = _extract_gas_new(sesco_new if sesco_new is not None else pd.DataFrame())
     df = df.merge(gas_new[["anio", "expo_gas_usd_sesco_new"]], on="anio", how="outer")
 
-    # Priority: new SESCO → old SESCO → INDEC
-    df["expo_gas_usd"] = (
-        df["expo_gas_usd_sesco_new"]
-        .fillna(df.get("expo_gas_sesco_usd", np.nan))
-        .fillna(df.get("expo_gas_indec_usd", np.nan))
+    # Priority: new SESCO → INDEC
+    df["expo_gas_usd"] = df["expo_gas_usd_sesco_new"].fillna(
+        df.get("expo_gas_indec_usd", np.nan)
     )
     df["unidad"] = "USD"
+
+    if comtrade_usd is not None and not comtrade_usd.empty:
+        df = df.merge(comtrade_usd[["anio", "expo_comtrade_gas_usd"]], on="anio", how="outer")
+
     return df.sort_values("anio").reset_index(drop=True)
 
 
@@ -406,13 +403,16 @@ def run() -> dict:
     indec_q, indec_v = _load_indec()
     comtrade = _load_comtrade_crudo()
     sesco_new = _load_comex_sesco_new()
+    comtrade_usd_crudo = _load_comtrade_usd_crudo()
+    comtrade_usd_gas   = _load_comtrade_usd_gas()
 
-    expo_crudo = build_expo_crudo(sesco, mecon, indec_q, comtrade, sesco_new)
-    impo_crudo = build_impo_crudo(sesco, mecon)
-    expo_gas = build_expo_gas(sesco, mecon, sesco_new)
-    impo_gas = build_impo_gas(sesco, mecon)
-    expo_usd_crudo = build_expo_usd_crudo(sesco, indec_v, sesco_new)
-    expo_usd_gas = build_expo_usd_gas(sesco, indec_v, sesco_new)
+    expo_crudo     = build_expo_crudo(mecon, indec_q, comtrade, sesco_new)
+    impo_crudo     = build_impo_crudo(sesco, mecon)
+    expo_gas       = build_expo_gas(mecon, sesco_new,
+                                    comtrade_q=comtrade_usd_gas[["anio", "expo_comtrade_gas"]])
+    impo_gas       = build_impo_gas(sesco, mecon)
+    expo_usd_crudo = build_expo_usd_crudo(indec_v, sesco_new, comtrade_usd=comtrade_usd_crudo)
+    expo_usd_gas   = build_expo_usd_gas(indec_v, sesco_new,   comtrade_usd=comtrade_usd_gas)
 
     return dict(
         expo_crudo=expo_crudo,

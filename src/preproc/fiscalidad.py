@@ -35,7 +35,27 @@ def build_retenciones(tcp_anual: pd.DataFrame) -> pd.DataFrame:
         ret_main = ret_main.drop(columns=["ipc08_bfr"])
     ret_main["unidad"] = "ars"
 
-    df = ret_main.merge(ret_campodonico, on=["anio", "unidad"], how="outer")
+    # Alternative source: AFIP Cap.27 annual series 2018-2023, millions of current ARS
+    cap27_raw = pd.read_excel(
+        DATA / "afip/retenciones_petroleo_2018_2023-1.xlsx",
+        sheet_name="Serie Cap.27",
+        header=2,
+        usecols=["Año", "Cap.27 (ARS M)"],
+    )
+    cap27 = (
+        cap27_raw
+        .rename(columns={"Año": "anio", "Cap.27 (ARS M)": "retenciones_afip_cap27"})
+        .dropna(subset=["anio", "retenciones_afip_cap27"])
+    )
+    cap27["anio"] = cap27["anio"].astype(int)
+    cap27["retenciones_afip_cap27"] = cap27["retenciones_afip_cap27"] * 1e6
+    cap27["unidad"] = "ars"
+
+    df_old = ret_main.merge(ret_campodonico, on=["anio", "unidad"], how="outer")
+    df = pd.concat(
+        [df_old, cap27[["anio", "unidad", "retenciones_afip_cap27"]]],
+        ignore_index=True,
+    ).sort_values("anio").reset_index(drop=True)
     return df
 
 
