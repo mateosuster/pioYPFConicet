@@ -177,6 +177,78 @@ Prioridad para exportaciones de gas: SESCO nuevo (2010+) > SESCO viejo > MECON.
 
 ---
 
+## 2.9 Construcción del Stock de Capital (PPyE)
+
+El stock de Propiedad, Planta y Equipos (PPyE) es el denominador de la tasa de ganancia de la rama y, por ende, la variable que permite calcular la renta apropiada por las empresas mediante diferencial de rentabilidad. Su construcción varía según la fuente seleccionada (parámetro `STOCK_SOURCE`).
+
+### 2.9.1 Fuente S&P Capital IQ / Petroarg (por defecto)
+
+Los balances individuales de cada empresa se extraen del archivo `update/Petroarg.zip`, que contiene archivos XLS con hoja *Balance Sheet* en formato S&P Capital IQ. El procesamiento es el siguiente:
+
+1. **Extracción**: Se parsean las hojas *Balance Sheet* e *Income Statement* de cada empresa en el ZIP. Para cada hoja se identifica la fila de encabezado con las fechas (`Balance Sheet as of:` / `For the Fiscal Period Ending`) y se mapean las columnas a años.
+2. **Conversión a ARS**: Cada celda en USD se convierte a pesos corrientes usando el tipo de cambio del año correspondiente, extraído de la fila `Exchange Rate` de la misma hoja.
+3. **Variable PPyE**: Se utiliza la línea `Net Property, Plant & Equipment` (PPyE neta de depreciaciones acumuladas), mapeada internamente como `ppye_neta`.
+4. **Empresas y sectores incluidos**:
+
+| Empresa | Sector |
+|---|---|
+| YPF | integrada |
+| Petrobras Argentina | integrada |
+| Pan American Energy | integrada |
+| Capex | produccion |
+| CGC | produccion |
+| Tecpetrol | produccion |
+| Aconcagua, PCR, Roch | produccion |
+
+5. **Agregación a nivel rama**: Se suman los valores de PPyE de todos los sectores `integrada` y `produccion` para cada año, obteniendo el stock de capital de la rama hidrocarburífera upstream.
+
+$$PPyE_{rama}^{CIQ} = \sum_{e \in \{integrada, produccion\}} PPyE_{neta,e}$$
+
+### 2.9.2 Fuente Bolsar
+
+Los balances provienen de `data/balances/balances_arg.csv`. Para cada empresa que cotiza en bolsa local (YPF, Petrobras, Tecpetrol, Camuzzi Gas Pampeana, Metrogas, entre otras) se extraen las variables `ppye` (bruta) y `ppye_neta`. La agregación a nivel rama utiliza sectores `integrada` y `produccion`, excluyendo distribución, transporte y refinación.
+
+Para los años que coinciden con la cobertura Bolsar, el stock de YPF y Petrobras upstream se reemplaza por el activo del segmento upstream (`activo upstream`) proveniente de `data/ypf/ypf_segmentos.csv` y `data/balances/petrobras_arg_segmentos.csv`, de manera de aislar el segmento de extracción:
+
+$$PPyE_{rama}^{Bolsar} = PPyE_{otras\ empresas} + Activo_{upstream,YPF} + Activo_{upstream,Petrobras}$$
+
+### 2.9.3 Fuentes AFIP
+
+Las series AFIP miden el stock contable declarado fiscalmente. Se combinan dos versiones:
+
+- **AFIP (v8)** (`data/afip/gcia_v8.xlsx`): cubre aproximadamente 2001-2013. La PPyE corresponde a *Bienes de Uso* (`bsuso`). Sectores: extracción de petróleo y gas (CIIU `petro`) y servicios petroleros (`ser_petro`).
+- **AFIP (nuevo)** (`update/Serie_AFIP_Consolidada_2002_2022_V2.xlsx`, sheet `activo`): cubre 2002-2022. Sectores 061 + 062 → extracción; 091 → servicios petroleros. PPyE = *Bienes de Uso* (`activo_bienes_de_uso_importe`).
+
+En ambos casos se agrega la suma de extracción + servicios petroleros:
+
+$$PPyE_{rama}^{AFIP} = Bienes\ de\ Uso_{extraccion} + Bienes\ de\ Uso_{servicios\ petroleros}$$
+
+La fuente **AFIP (combinada)** empalma ambas series: v8 para años < 2014 y la nueva para años ≥ 2014.
+
+### 2.9.4 Fuente Memoria de YPF (Betania)
+
+El archivo `data/ypf/Calculos Betania Tg.xls` (sheet `YPF_A $HOY_PARADEFLACYCALCULAR`) contiene el balance histórico de YPF. La PPyE corresponde a *Bienes de Uso* (`Bs Uso`). Se anulan los años con datos inválidos (1983, 1985-1988). Esta fuente es de uso interno y comparativo, no se usa por defecto en el cálculo principal.
+
+### 2.9.5 Selección de fuente y uso en el cálculo
+
+El parámetro `STOCK_SOURCE` determina qué serie PPyE se usa en el cálculo de tasa de ganancia y renta:
+
+| Valor de `STOCK_SOURCE` | Fuente PPyE | Sectores |
+|---|---|---|
+| `"S&P Capital IQ"` *(por defecto)* | Petroarg / S&P CIQ, PPyE neta | integrada + produccion |
+| `"Bolsar"` | Balances Bolsar + segmentos upstream | integrada + produccion |
+| `"AFIP (v8)"` | AFIP serie histórica, Bienes de Uso | extraccion + servicios |
+| `"AFIP (nuevo)"` | AFIP consolidada 2002-2022, Bienes de Uso | extraccion + servicios |
+| `"AFIP (combinada)"` | v8 pre-2014 + nuevo ≥ 2014 | extraccion + servicios |
+
+El resultado del módulo `activos.py` es un DataFrame unificado (`stock_estimado`) con una fila por año y fuente, en Millones de pesos corrientes. Este DataFrame es consumido por `tasa_ganancia.py` para calcular:
+
+$$TG_{rama} = \frac{PV_{extr}}{PPyE_{seleccionada}}$$
+
+El cálculo se realiza simultáneamente para las tres fuentes principales (`S&P Capital IQ`, `Bolsar`, `AFIP (combinada)`) para permitir la comparación entre alternativas.
+
+---
+
 ## 3. Criterios de cómputo
 
 ### 3.1 Valor total de la producción
@@ -251,11 +323,7 @@ donde $Coef_{Imp}$ es el coeficiente promedio de impuestos genéricos de la MIP 
 
 ### 3.2 Tasa de ganancia por rama
 
-**Capital Total Adelantado ($KTA$):**
-* **S&P Capital IQ (Petroarg):** PPyE (Property, Plant & Equipment neta) por sector `integrada` y `produccion`. *(Fuente por defecto).*
-* **Bolsar:** PPyE neta + Inventarios (sectores `integrada` y `produccion`).
-* **AFIP:** Bienes de Uso + Bienes de Cambio + Disponibilidades.
-* **Memoria YPF:** Bienes de Uso + Bienes de Cambio.
+El stock de capital utilizado como denominador es la PPyE construida según la fuente seleccionada (ver §2.9). En el cálculo central se usa PPyE neta; el detalle de cada fuente y su construcción se describe en §2.9.
 
 **Tasa de Ganancia de la Rama:**
 $$TG_{rama} = \frac{PV_{extr}^{criterio\ propio}}{PPyE_{seleccionada}}$$

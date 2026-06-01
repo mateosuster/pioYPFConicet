@@ -25,3 +25,6 @@ __pycache__/
 
 .claude/*
 .claude/
+
+# *.xlsx
+*.xls
