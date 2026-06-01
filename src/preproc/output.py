@@ -393,6 +393,27 @@ def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> p
         ganancia_pbi=data["ganancia_pbi"],
         ipc_us=data["ipc_us"],
     )
+
+    # Merge INDEC Complejos Exportadores into export value sheets as reference columns.
+    # renta_tcp_indec already holds expo_petroleo_usd_indec / expo_gas_usd_indec; adding
+    # them here surfaces them in the export sheets where they belong.
+    renta_tcp_indec = data.get("renta_tcp_indec")
+    expo_usd_crudo = data["expo_usd_crudo"].copy()
+    expo_usd_gas   = data["expo_usd_gas"].copy()
+    if renta_tcp_indec is not None:
+        expo_usd_crudo = expo_usd_crudo.merge(
+            renta_tcp_indec[["anio", "expo_petroleo_usd_indec"]].rename(
+                columns={"expo_petroleo_usd_indec": "expo_indec_complejos_exportadores"}
+            ),
+            on="anio", how="left",
+        )
+        expo_usd_gas = expo_usd_gas.merge(
+            renta_tcp_indec[["anio", "expo_gas_usd_indec"]].rename(
+                columns={"expo_gas_usd_indec": "expo_gas_indec_complejos_exportadores"}
+            ),
+            on="anio", how="left",
+        )
+
     write_outputs(
         variables=variables,
         ipc=data["ipc"],
@@ -402,9 +423,9 @@ def run(data: dict, stock_source: str = "", renta_sv_source: str = "sesco") -> p
         precio_crudo_mi=data["precio_crudo_mi"],
         precio_gas_mi_mmbtu=data["precio_gas_mi_mmbtu"],
         expo_crudo=data["expo_crudo"],
-        expo_usd_crudo=data["expo_usd_crudo"],
+        expo_usd_crudo=expo_usd_crudo,
         expo_gas=data["expo_gas"],
-        expo_usd_gas=data["expo_usd_gas"],
+        expo_usd_gas=expo_usd_gas,
         precios_referencia_crudo=data["precios_referencia_crudo"],
         precio_mdomundial_gas=data["precio_mdomundial_gas_MMBTU"],
         renta_crudo_dif=data["renta_crudo_dif"],
